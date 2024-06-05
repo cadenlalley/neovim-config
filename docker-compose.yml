@@ -1,0 +1,13 @@
+version: '3.2'
+
+services:
+  db:
+    image: mysql:8.0.36
+    container_name: kitchen_app_db
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "kitchens_api_svc"
+      MYSQL_PASSWORD: "clw48qxal00002e63pdl9c1nw"
+      MYSQL_DATABASE: "kitchens_app"
+    ports:
+      - "3306:3306"

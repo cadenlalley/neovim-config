@@ -5,8 +5,8 @@ import (
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
+	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/labstack/echo/v4"
-	"github.com/rs/zerolog/log"
 )
 
 type Authorizer struct {
@@ -19,33 +19,24 @@ func NewAuthorizer(validator *validator.Validator) *Authorizer {
 	}
 }
 
-// ValidateToken is a middleware that will check the validity of our JWT.
 func (a *Authorizer) ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
-	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
-		log.Err(err).Msg("encountered error while validating JWT")
-	}
-
-	middleware := jwtmiddleware.New(
-		a.validator.ValidateToken,
-		jwtmiddleware.WithErrorHandler(errorHandler),
-	)
-
-	return func(ctx echo.Context) error {
-		encounteredError := true
-		var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
-			encounteredError = false
-			ctx.SetRequest(r)
-			next(ctx)
+	return func(c echo.Context) error {
+		token, err := jwtmiddleware.AuthHeaderTokenExtractor(c.Request())
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
 
-		middleware.CheckJWT(handler).ServeHTTP(ctx.Response(), ctx.Request())
-
-		if encounteredError {
-			ctx.JSON(http.StatusUnauthorized, map[string]string{
-				"message": "JWT is invalid",
-			})
+		validClaims, err := a.validator.ValidateToken(c.Request().Context(), token)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusUnauthorized, err)
 		}
-		return nil
+
+		claims := validClaims.(*validator.ValidatedClaims)
+
+		c.Set(auth.ClaimsContextKey, validClaims)
+		c.Set(auth.UserIDContextKey, claims.RegisteredClaims.Subject)
+
+		return next(c)
 	}
 }
 

@@ -2,16 +2,19 @@ package api
 
 import (
 	"github.com/auth0/go-jwt-middleware/v2/validator"
+	"github.com/jmoiron/sqlx"
 	"github.com/kitchens-io/kitchens-api/internal/middleware"
 	"github.com/labstack/echo/v4"
 	mw "github.com/labstack/echo/v4/middleware"
 )
 
 type App struct {
+	db  *sqlx.DB
 	API *echo.Echo
 }
 
 type CreateInput struct {
+	DB            *sqlx.DB
 	AuthValidator *validator.Validator
 }
 
@@ -19,6 +22,7 @@ type CreateInput struct {
 // and middleware attached.
 func Create(input CreateInput) *App {
 	app := &App{
+		db:  input.DB,
 		API: echo.New(),
 	}
 
@@ -27,6 +31,14 @@ func Create(input CreateInput) *App {
 	// Disable the Echo banners on app start.
 	app.API.HideBanner = true
 	app.API.HidePort = true
+
+	// app.API.HTTPErrorHandler = func(err error, c echo.Context) {
+	// 	// Take required information from error and context and send it to a service like New Relic
+	// 	fmt.Println(c.Path(), c.QueryParams(), err.Error())
+
+	// 	// Call the default handler to return the HTTP response
+	// 	app.API.DefaultHTTPErrorHandler(err, c)
+	// }
 
 	// Attach middelware and routes to the Echo instance.
 	app.API.Use(mw.Logger())
@@ -39,8 +51,12 @@ func Create(input CreateInput) *App {
 	v1 := app.API.Group("/v1")
 	v1.Use(authorizer.ValidateToken)
 
-	// TODO: temporary route for checking claims on a JWT.
-	v1.GET("/jwt", app.GetJWT)
+	// Uses the JWT to get the users account.
+	v1.GET("/iam", app.GetIAM)
+
+	// Account Routes
+	// v1.GET("/account/{account_id}", nil)
+	v1.POST("/account", app.CreateAccount)
 
 	// Auth Handler
 	// app.API.POST("/sign-in", app.PostSignIn)

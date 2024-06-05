@@ -11,6 +11,9 @@ import (
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 )
 
+const ClaimsContextKey = "auth0_claims"
+const UserIDContextKey = "auth0_sub"
+
 // CustomClaims contains custom data we want from the token.
 type CustomClaims struct {
 	// Scope     string `json:"scope"`

@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/kitchens-io/kitchens-api/internal/api"
+	"github.com/kitchens-io/kitchens-api/internal/db"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 
 	"github.com/rs/zerolog/log"
@@ -23,13 +24,12 @@ type AppConfig struct {
 	Env             string        `default:"dev" envconfig:"APP_ENV"`
 
 	// Database configurations
-	// DB struct {
-	// 	User string `default:"kitchens_api_svc" envconfig:"DB_USER"`
-	// 	Pass string `default:"password" envconfig:"DB_PASS"`
-	// 	Host string `default:"localhost:5432" envconfig:"DB_HOST"`
-	// 	Name string `default:"kitchens_app" envconfig:"DB_NAME"`
-	// 	SSL  bool   `default:"false" envconfig:"DB_SSL"`
-	// }
+	DB struct {
+		User string `required:"true" envconfig:"DB_USER"`
+		Pass string `required:"true" envconfig:"DB_PASS"`
+		Host string `required:"true" envconfig:"DB_HOST"`
+		Name string `required:"true" envconfig:"DB_NAME"`
+	}
 
 	// Auth0 Authentication
 	Auth0 struct {
@@ -55,16 +55,20 @@ func main() {
 
 	// Handle database migrations and connections.
 	// ===========================================
-	// dsn := db.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, cfg.DB.Name, cfg.DB.SSL)
-	// if err := db.Migrate("file://migrations", dsn); err != nil {
-	// 	log.Fatal(err)
-	// }
+	dsn := db.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, cfg.DB.Name)
 
-	// primaryDB, err := db.Connect(dsn)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// defer primaryDB.Close()
+	if err := db.Migrate("file://migrations", dsn); err != nil {
+		log.Fatal().Err(err).Msg("could migrate database")
+	}
+
+	primaryDB, err := db.Connect(dsn)
+	if err != nil {
+		log.Fatal().Err(err).Msg("could not start database")
+	}
+	defer primaryDB.Close()
+
+	// Handle application server.
+	// ==========================
 
 	// Create an Auth0 validator.
 	validator, err := auth.NewValidator(cfg.Auth0.Domain, cfg.Auth0.Audience, cfg.Auth0.CacheTTL)
@@ -72,9 +76,9 @@ func main() {
 		log.Fatal().Err(err).Msg("could not create jwt validator")
 	}
 
-	// Handle application server.
-	// ==========================
+	// Create an API instance.
 	app := api.Create(api.CreateInput{
+		DB:            primaryDB,
 		AuthValidator: validator,
 	})
 
