@@ -32,14 +32,6 @@ func Create(input CreateInput) *App {
 	app.API.HideBanner = true
 	app.API.HidePort = true
 
-	// app.API.HTTPErrorHandler = func(err error, c echo.Context) {
-	// 	// Take required information from error and context and send it to a service like New Relic
-	// 	fmt.Println(c.Path(), c.QueryParams(), err.Error())
-
-	// 	// Call the default handler to return the HTTP response
-	// 	app.API.DefaultHTTPErrorHandler(err, c)
-	// }
-
 	// Attach middelware and routes to the Echo instance.
 	app.API.Use(mw.Logger())
 	app.API.Use(mw.RequestID())

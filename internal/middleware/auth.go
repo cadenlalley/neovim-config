@@ -7,6 +7,7 @@ import (
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 type Authorizer struct {
@@ -28,7 +29,7 @@ func (a *Authorizer) ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 
 		validClaims, err := a.validator.ValidateToken(c.Request().Context(), token)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusUnauthorized, err)
+			return echo.NewHTTPError(http.StatusUnauthorized).SetInternal(errors.Wrap(err, "error validating token"))
 		}
 
 		claims := validClaims.(*validator.ValidatedClaims)
