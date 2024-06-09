@@ -49,6 +49,41 @@ func CreateKitchen(ctx context.Context, store Store, input CreateKitchenInput) (
 	return kitchen, nil
 }
 
+type UpdateKitchenInput struct {
+	KitchenID   string
+	KitchenName string
+	Bio         string
+	Handle      string
+	Avatar      string
+	Cover       string
+	Public      bool
+}
+
+func UpdateKitchen(ctx context.Context, store Store, input UpdateKitchenInput) (Kitchen, error) {
+	_, err := store.ExecContext(ctx, `
+		UPDATE kitchens
+		SET
+			kitchen_name = ?,
+			bio = ?,
+			handle = ?,
+			avatar = ?,
+			cover = ?,
+			public = ?
+		WHERE
+			kitchen_id = ?
+	`, input.KitchenName, input.Bio, input.Handle, input.Avatar, input.Cover, input.Public, input.KitchenID)
+	if err != nil {
+		return Kitchen{}, err
+	}
+
+	kitchen, err := GetKitchenByID(ctx, store, input.KitchenID)
+	if err != nil {
+		return Kitchen{}, err
+	}
+
+	return kitchen, nil
+}
+
 func GetKitchenByID(ctx context.Context, store Store, kitchenID string) (Kitchen, error) {
 	var kitchen Kitchen
 	err := store.QueryRowxContext(ctx, `

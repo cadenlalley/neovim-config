@@ -49,6 +49,7 @@ func Create(input CreateInput) *App {
 
 	// Kitchens
 	v1.GET("/kitchen/:kitchen_id", app.GetKitchen)
+	v1.PUT("/kitchen/:kitchen_id", app.UpdateKitchen)
 
 	return app
 }
