@@ -43,27 +43,12 @@ func Create(input CreateInput) *App {
 	v1 := app.API.Group("/v1")
 	v1.Use(authorizer.ValidateToken)
 
-	// Uses the JWT to get the users account.
-	v1.GET("/iam", app.GetIAM)
-
 	// Account Routes
-	// v1.GET("/account/{account_id}", nil)
+	v1.GET("/iam", app.GetIAM)
 	v1.POST("/account", app.CreateAccount)
 
-	// Auth Handler
-	// app.API.POST("/sign-in", app.PostSignIn)
-	// app.API.POST("/sign-up", app.PostSignUp)
-
-	// V1 API routes
-	// v1 := app.API.Group("/v1")
-	// v1.Use(
-	// 	mw.JWT([]byte(app.JWTSignature)),
-	// 	web.MiddlewareSetUserID(),
-	// )
-
-	// user := CreateUserResource(db)
-	// v1.GET("/user", user.Get)
-	// v1.PATCH("/user", user.Patch)
+	// Kitchens
+	v1.GET("/kitchen/:kitchen_id", app.GetKitchen)
 
 	return app
 }

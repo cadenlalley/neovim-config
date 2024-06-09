@@ -8,6 +8,7 @@ import (
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/kitchens-io/kitchens-api/pkg/kitchens"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 )
 
 type GetIAMResponse struct {
@@ -23,7 +24,7 @@ func (a *App) GetIAM(c echo.Context) error {
 	// Lookup the user record for the provided JWT.
 	account, err := accounts.GetAccountByUserID(ctx, a.db, userID)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not get account").SetInternal(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get account by user ID").SetInternal(err)
 	}
 
 	// If the account does not exist, we can populate it partially for the frontend to finish out during setup.
@@ -40,8 +41,21 @@ func (a *App) GetIAM(c echo.Context) error {
 		})
 	}
 
+	// Find all kitchens for the provided account.
+	accountKitchens, errs := kitchens.GetKitchensByAccountID(ctx, a.db, account.AccountID)
+	if len(errs) != 0 {
+		for _, e := range errs {
+			log.Err(e).
+				Str("requestId", c.Response().Header().Get(echo.HeaderXRequestID)).
+				Str("accountId", account.AccountID).
+				Msg("error encountered getting kitchen by accountID")
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get kitchen by account ID")
+	}
+
 	// If the account exists, look up the associated profiles.
 	return c.JSON(http.StatusOK, GetIAMResponse{
-		Account: account,
+		Account:  account,
+		Kitchens: accountKitchens,
 	})
 }
