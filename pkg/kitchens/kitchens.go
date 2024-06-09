@@ -52,10 +52,10 @@ func CreateKitchen(ctx context.Context, store Store, input CreateKitchenInput) (
 type UpdateKitchenInput struct {
 	KitchenID   string
 	KitchenName string
-	Bio         string
+	Bio         null.String
 	Handle      string
-	Avatar      string
-	Cover       string
+	Avatar      null.String
+	Cover       null.String
 	Public      bool
 }
 
