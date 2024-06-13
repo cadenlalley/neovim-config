@@ -17,4 +17,4 @@ To work on the Kitchens API you'll need to follow the below steps.
 
 ## Documentation
 
-The details about each route and requests that can be made are in Postman.
+The details about each route and requests that can be made are in [Postman](https://kitchens-app.postman.co/workspace/89fa7a36-50b1-40e3-ae6b-e3ba8c5f9b9e/documentation/36191591-8aa45609-bc7d-43e8-852c-820feb94999e).
