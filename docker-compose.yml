@@ -1,6 +1,14 @@
-version: '3.2'
+version: '3.8'
 
 services:
+  aws:
+    image: localstack/localstack
+    environment:
+      SERVICES: "s3"
+    ports:
+     - "4566:4566"
+    volumes:
+      - "./.aws/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"
   db:
     image: mysql:8.0.36
     container_name: kitchen_app_db

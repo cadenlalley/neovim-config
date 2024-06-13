@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"time"
 
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/kitchens-io/kitchens-api/internal/api"
@@ -37,6 +39,11 @@ type AppConfig struct {
 		Audience string        `required:"true" envconfig:"AUTH0_AUDIENCE"`
 		CacheTTL time.Duration `default:"5m" envconfig:"AUTH0_CACHE_TTL"`
 	}
+
+	// S3 Object Storage configurations
+	S3 struct {
+		Host string `envconfig:"S3_LOCAL_HOST"`
+	}
 }
 
 func main() {
@@ -53,6 +60,13 @@ func main() {
 		log.Fatal().Err(err).Msg("could not parse application config")
 	}
 
+	// AWS Configurations
+	//===========================================
+	awsCfg, err := awsconfig.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		log.Fatal().Err(err).Msg("could not load aws configurations")
+	}
+
 	// Handle database migrations and connections.
 	// ===========================================
 	dsn := db.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, cfg.DB.Name)
@@ -67,6 +81,14 @@ func main() {
 	}
 	defer primaryDB.Close()
 
+	// Handle Object storage
+	// ==========================
+	s3Client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
+		if cfg.S3.Host != "" {
+			o.BaseEndpoint = &cfg.S3.Host
+		}
+	})
+
 	// Handle application server.
 	// ==========================
 
@@ -79,6 +101,7 @@ func main() {
 	// Create an API instance.
 	app := api.Create(api.CreateInput{
 		DB:            primaryDB,
+		S3:            s3Client,
 		AuthValidator: validator,
 	})
 
