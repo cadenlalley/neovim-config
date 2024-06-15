@@ -2,22 +2,22 @@ package api
 
 import (
 	"github.com/auth0/go-jwt-middleware/v2/validator"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jmoiron/sqlx"
+	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/middleware"
 	"github.com/labstack/echo/v4"
 	mw "github.com/labstack/echo/v4/middleware"
 )
 
 type App struct {
-	db  *sqlx.DB
-	s3  *s3.Client
-	API *echo.Echo
+	db          *sqlx.DB
+	fileManager *media.S3FileManager
+	API         *echo.Echo
 }
 
 type CreateInput struct {
 	DB            *sqlx.DB
-	S3            *s3.Client
+	FileManager   *media.S3FileManager
 	AuthValidator *validator.Validator
 }
 
@@ -25,9 +25,9 @@ type CreateInput struct {
 // and middleware attached.
 func Create(input CreateInput) *App {
 	app := &App{
-		db:  input.DB,
-		s3:  input.S3,
-		API: echo.New(),
+		db:          input.DB,
+		fileManager: input.FileManager,
+		API:         echo.New(),
 	}
 
 	authorizer := middleware.NewAuthorizer(input.AuthValidator)

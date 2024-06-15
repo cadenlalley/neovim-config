@@ -3,7 +3,6 @@ package api
 import (
 	"net/http"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/labstack/echo/v4"
 )
 
@@ -15,9 +14,8 @@ func (a *App) GetHealth(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "database unhealthy").SetInternal(err)
 	}
 
-	_, err := a.s3.ListBuckets(ctx, &s3.ListBucketsInput{})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "object store unhealthy").SetInternal(err)
+	if err := a.fileManager.Ping(ctx); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "file store unhealthy").SetInternal(err)
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{

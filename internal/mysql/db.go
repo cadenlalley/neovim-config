@@ -1,6 +1,7 @@
-package db
+package mysql
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -36,6 +37,24 @@ func Migrate(migrationsPath, dsn string) error {
 	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return err
+	}
+
+	return nil
+}
+
+func Transaction(ctx context.Context, conn *sqlx.DB, f func(tx *sqlx.Tx) error) error {
+	tx, err := conn.BeginTxx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if err := f(tx); err != nil {
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
 		return err
 	}
 

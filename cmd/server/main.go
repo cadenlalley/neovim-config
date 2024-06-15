@@ -12,7 +12,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/kitchens-io/kitchens-api/internal/api"
-	"github.com/kitchens-io/kitchens-api/internal/db"
+	"github.com/kitchens-io/kitchens-api/internal/media"
+	"github.com/kitchens-io/kitchens-api/internal/mysql"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 
 	"github.com/rs/zerolog/log"
@@ -42,7 +43,8 @@ type AppConfig struct {
 
 	// S3 Object Storage configurations
 	S3 struct {
-		Host string `envconfig:"S3_LOCAL_HOST"`
+		Host        string `envconfig:"S3_LOCAL_HOST"`
+		MediaBucket string `required:"true" envconfig:"S3_MEDIA_BUCKET"`
 	}
 }
 
@@ -69,17 +71,17 @@ func main() {
 
 	// Handle database migrations and connections.
 	// ===========================================
-	dsn := db.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, cfg.DB.Name)
+	dsn := mysql.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, cfg.DB.Name)
 
-	if err := db.Migrate("file://migrations", dsn); err != nil {
+	if err := mysql.Migrate("file://migrations", dsn); err != nil {
 		log.Fatal().Err(err).Msg("could migrate database")
 	}
 
-	primaryDB, err := db.Connect(dsn)
+	db, err := mysql.Connect(dsn)
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not start database")
 	}
-	defer primaryDB.Close()
+	defer db.Close()
 
 	// Handle Object storage
 	// ==========================
@@ -89,6 +91,8 @@ func main() {
 			o.UsePathStyle = true
 		}
 	})
+
+	fileManager := media.NewS3FileManager(s3Client, cfg.S3.MediaBucket)
 
 	// Handle application server.
 	// ==========================
@@ -101,8 +105,8 @@ func main() {
 
 	// Create an API instance.
 	app := api.Create(api.CreateInput{
-		DB:            primaryDB,
-		S3:            s3Client,
+		DB:            db,
+		FileManager:   fileManager,
 		AuthValidator: validator,
 	})
 

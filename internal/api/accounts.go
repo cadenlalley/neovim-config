@@ -3,6 +3,8 @@ package api
 import (
 	"net/http"
 
+	"github.com/jmoiron/sqlx"
+	"github.com/kitchens-io/kitchens-api/internal/mysql"
 	"github.com/kitchens-io/kitchens-api/internal/web"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
@@ -56,37 +58,37 @@ func (a *App) CreateAccount(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "account already exists")
 	}
 
-	tx, err := a.db.Beginx()
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not start transaction").SetInternal(err)
-	}
-	defer tx.Rollback()
+	var kitchen kitchens.Kitchen
 
-	account, err = accounts.CreateAccount(ctx, tx, accounts.CreateAccountInput{
-		UserID:    input.UserID,
-		Email:     input.Email,
-		FirstName: input.FirstName,
-		LastName:  input.LastName,
+	err = mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
+		account, err = accounts.CreateAccount(ctx, tx, accounts.CreateAccountInput{
+			UserID:    input.UserID,
+			Email:     input.Email,
+			FirstName: input.FirstName,
+			LastName:  input.LastName,
+		})
+		if err != nil {
+			return err
+		}
+
+		kitchen, err = kitchens.CreateKitchen(ctx, tx, kitchens.CreateKitchenInput{
+			AccountID:   account.AccountID,
+			KitchenName: input.Kitchen.Name,
+			Bio:         input.Kitchen.Bio,
+			Handle:      input.Kitchen.Handle,
+			Avatar:      input.Kitchen.Avatar,
+			Cover:       input.Kitchen.Cover,
+			Public:      input.Kitchen.Public,
+		})
+		if err != nil {
+			return err
+		}
+
+		return nil
 	})
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not create account").SetInternal(err)
-	}
-
-	kitchen, err := kitchens.CreateKitchen(ctx, tx, kitchens.CreateKitchenInput{
-		AccountID:   account.AccountID,
-		KitchenName: input.Kitchen.Name,
-		Bio:         input.Kitchen.Bio,
-		Handle:      input.Kitchen.Handle,
-		Avatar:      input.Kitchen.Avatar,
-		Cover:       input.Kitchen.Cover,
-		Public:      input.Kitchen.Public,
-	})
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not create kitchen").SetInternal(err)
-	}
-
-	if err := tx.Commit(); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not commit account").SetInternal(err)
 	}
 
 	return c.JSON(http.StatusOK, CreateAccountResponse{
