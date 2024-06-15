@@ -86,6 +86,7 @@ func main() {
 	s3Client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
 		if cfg.S3.Host != "" {
 			o.BaseEndpoint = &cfg.S3.Host
+			o.UsePathStyle = true
 		}
 	})
 
