@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/smithy-go/ptr"
+	"github.com/kitchens-io/kitchens-api/pkg/ptr"
 	"github.com/segmentio/ksuid"
 )
 
@@ -26,12 +26,15 @@ func NewS3FileManager(s3 *s3.Client, bucket string) *S3FileManager {
 }
 
 func (u *S3FileManager) UploadFromHeader(ctx context.Context, file *multipart.FileHeader, prefix string) (string, error) {
+	// Validation
 	if prefix[0:1] == "/" {
 		return "", fmt.Errorf("prefix should not start with '/', received: '%s'", prefix)
 	}
 
 	parts := strings.Split(file.Filename, ".")
-	fileType := parts[len(parts)-1]
+	if len(parts) == 1 {
+		return "", fmt.Errorf("file missing extension, received: '%s'", file.Filename)
+	}
 
 	src, err := file.Open()
 	if err != nil {
@@ -45,10 +48,11 @@ func (u *S3FileManager) UploadFromHeader(ctx context.Context, file *multipart.Fi
 	}
 
 	target := prefix + ksuid.New().String()
+	fileType := parts[len(parts)-1]
 
 	key := fmt.Sprintf("%s.%s", target, fileType)
 	_, err = u.s3.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: ptr.String("kitchens-app-local-us-east-1"),
+		Bucket: ptr.String(u.Bucket),
 		Key:    ptr.String(key),
 		Body:   bytes.NewReader(buf.Bytes()),
 	})
@@ -60,9 +64,16 @@ func (u *S3FileManager) UploadFromHeader(ctx context.Context, file *multipart.Fi
 }
 
 func (u *S3FileManager) Ping(ctx context.Context) error {
-	_, err := u.s3.ListBuckets(ctx, &s3.ListBucketsInput{})
+	result, err := u.s3.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {
 		return err
 	}
-	return nil
+
+	for _, bucket := range result.Buckets {
+		if *bucket.Name == u.Bucket {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("'%s' not found in list buckets response", u.Bucket)
 }
