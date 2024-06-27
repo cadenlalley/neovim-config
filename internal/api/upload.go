@@ -39,3 +39,22 @@ func (a *App) Upload(c echo.Context) error {
 		Key: key,
 	})
 }
+
+func (a *App) HandleFormFile(c echo.Context, field, prefix string) (string, error) {
+	file, err := c.FormFile(field)
+	if file != nil && err != nil {
+		return "", err
+	}
+
+	if file == nil {
+		return "", nil
+	}
+
+	ctx := c.Request().Context()
+	key, err := a.fileManager.UploadFromHeader(ctx, file, prefix)
+	if err != nil {
+		return "", err
+	}
+
+	return key, nil
+}

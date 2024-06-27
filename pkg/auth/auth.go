@@ -17,9 +17,10 @@ const UserIDContextKey = "auth0_sub"
 // CustomClaims contains custom data we want from the token.
 type CustomClaims struct {
 	// Scope     string `json:"scope"`
-	FirstName string `json:"given_name"`
-	LastName  string `json:"family_name"`
-	Email     string `json:"email"`
+	FirstName     string `json:"given_name"`
+	LastName      string `json:"family_name"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
 }
 
 // Validate does nothing for this example, but we need

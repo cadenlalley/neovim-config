@@ -39,7 +39,8 @@ func (a *App) UpdateKitchen(c echo.Context) error {
 	kitchenID := c.Param("kitchen_id")
 
 	var input UpdateKitchenRequest
-	if err := web.ValidateRequest(c, &input); err != nil {
+	err := web.ValidateRequest(c, web.ContentTypeApplicationJSON, &input)
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 

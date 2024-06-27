@@ -12,22 +12,38 @@ import (
 // Use a single instance of Validate, it caches struct info
 var validate *validator.Validate
 
+// Valid content types.
+const ContentTypeMultipartFormData = "multipart/form-data"
+const ContentTypeApplicationJSON = "application/json"
+
 func init() {
 	validate = validator.New()
 
 	// Use the json tag names in error output instead of struct names.
 	validate.RegisterTagNameFunc(func(fld reflect.StructField) string {
-		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
-		if name == "-" {
+		jsonTag := fld.Tag.Get("json")
+		formTag := fld.Tag.Get("form")
+
+		name := jsonTag
+		if formTag != "" {
+			name = formTag
+		}
+
+		value := strings.SplitN(name, ",", 2)[0]
+		if value == "-" {
 			return ""
 		}
-		return name
+		return value
 	})
 }
 
 // ValidateRequest checks will bind a request to an interface
 // and validate that the request has the required fields.
-func ValidateRequest(c echo.Context, v interface{}) error {
+func ValidateRequest(c echo.Context, contentType string, v interface{}) error {
+	if !strings.Contains(c.Request().Header.Get("Content-Type"), contentType) {
+		return fmt.Errorf("invalid Content-Type for request, expected: '%s'", contentType)
+	}
+
 	if err := c.Bind(v); err != nil {
 		return fmt.Errorf("could not bind request '%s'", err.Error())
 	}
