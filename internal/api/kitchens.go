@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/kitchens-io/kitchens-api/internal/media"
+	"github.com/kitchens-io/kitchens-api/internal/override"
 	"github.com/kitchens-io/kitchens-api/internal/web"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/kitchens-io/kitchens-api/pkg/kitchens"
 	"github.com/labstack/echo/v4"
-	"gopkg.in/guregu/null.v4"
+	"github.com/rs/zerolog/log"
 )
 
 func (a *App) GetKitchen(c echo.Context) error {
@@ -25,12 +27,17 @@ func (a *App) GetKitchen(c echo.Context) error {
 }
 
 type UpdateKitchenRequest struct {
-	Name   string  `json:"name" validate:"required"`
-	Bio    *string `json:"bio" validate:"required"`
-	Handle string  `json:"handle" validate:"required"`
-	Avatar *string `json:"avatar" validate:"required"`
-	Cover  *string `json:"cover" validate:"required"`
-	Public *bool   `json:"public" validate:"required"`
+	Name    string  `form:"name"`
+	Bio     *string `form:"bio"`
+	Handle  string  `form:"handle"`
+	Private *bool   `form:"private"`
+
+	// The following are manually checked in the CreateAccount handler.
+	// They cannot be bound automatically, and are optional.
+	//
+	// kitchenAvatarFile, kitchenCoverFile
+	AvatarFile  string
+	KitchenFile string
 }
 
 func (a *App) UpdateKitchen(c echo.Context) error {
@@ -39,7 +46,7 @@ func (a *App) UpdateKitchen(c echo.Context) error {
 	kitchenID := c.Param("kitchen_id")
 
 	var input UpdateKitchenRequest
-	err := web.ValidateRequest(c, web.ContentTypeApplicationJSON, &input)
+	err := web.ValidateRequest(c, web.ContentTypeMultipartFormData, &input)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
@@ -61,14 +68,48 @@ func (a *App) UpdateKitchen(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized).SetInternal(err)
 	}
 
+	// Since bio is allowed to be null
+	bio := kitchen.Bio.String
+	if input.Bio != nil {
+		bio = *input.Bio
+	}
+
+	// Handle the file uploads if they have been set.
+	prefix := media.GetAccountMediaPath(account.AccountID)
+	avatarKey, err := a.HandleFormFile(c, "avatarFile", prefix)
+	if err != nil {
+		msg := "could not upload avatar photo"
+		log.Err(err).Str("prefix", prefix).Msg(msg)
+		return echo.NewHTTPError(http.StatusInternalServerError, msg).SetInternal(err)
+	}
+
+	// Since avatarFile is allowed to be null.
+	avatarFile := kitchen.Avatar.String
+	if avatarKey != "" {
+		avatarFile = avatarKey
+	}
+
+	coverKey, err := a.HandleFormFile(c, "coverFile", prefix)
+	if err != nil {
+		msg := "could not upload cover photo"
+		log.Err(err).Str("prefix", prefix).Msg(msg)
+		return echo.NewHTTPError(http.StatusInternalServerError, msg).SetInternal(err)
+	}
+
+	// Since coverFile is allowed to be null.
+	coverFile := kitchen.Cover.String
+	if coverKey != "" {
+		coverFile = coverKey
+	}
+
 	kitchen, err = kitchens.UpdateKitchen(ctx, a.db, kitchens.UpdateKitchenInput{
-		KitchenID:   kitchenID,
-		KitchenName: input.Name,
-		Bio:         null.NewString(*input.Bio, *input.Bio != ""),
-		Handle:      input.Handle,
-		Avatar:      null.NewString(*input.Avatar, *input.Avatar != ""),
-		Cover:       null.NewString(*input.Cover, *input.Cover != ""),
-		Public:      *input.Public,
+		KitchenID: kitchenID,
+		Name:      override.String(input.Name, kitchen.Name),
+		Bio:       override.NullString(bio, kitchen.Bio),
+		Handle:    override.String(input.Handle, kitchen.Handle),
+		Avatar:    override.NullString(avatarFile, kitchen.Avatar),
+		Cover:     override.NullString(coverFile, kitchen.Cover),
+		Private:   override.Bool(input.Private, kitchen.Private),
 	})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not update kitchen").SetInternal(err)

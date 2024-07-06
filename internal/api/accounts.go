@@ -1,17 +1,18 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/jmoiron/sqlx"
+	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/mysql"
 	"github.com/kitchens-io/kitchens-api/internal/web"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/kitchens-io/kitchens-api/pkg/kitchens"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 	"gopkg.in/guregu/null.v4"
 )
 
@@ -19,10 +20,10 @@ type CreateAccountRequest struct {
 	FirstName string `form:"firstName"`
 	LastName  string `form:"lastName"`
 	Kitchen   struct {
-		Name   string `form:"kitchenName" validate:"required"`
-		Bio    string `form:"kitchenBio"`
-		Handle string `form:"kitchenHandle" validate:"required"`
-		Public bool   `form:"kitchenPublic" validate:"required"`
+		Name    string `form:"kitchenName" validate:"required"`
+		Bio     string `form:"kitchenBio"`
+		Handle  string `form:"kitchenHandle" validate:"required"`
+		Private bool   `form:"kitchenPrivate"`
 
 		// The following are manually checked in the CreateAccount handler.
 		// They cannot be bound automatically, and are optional.
@@ -58,27 +59,34 @@ func (a *App) CreateAccount(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "account already exists")
 	}
 
+	// Create an account ID.
+	accountID := accounts.CreateAccountID()
+
 	// Handle the file uploads if they have been set.
 	var kitchen kitchens.Kitchen
 
-	prefix := fmt.Sprintf("uploads/%s/", userID)
-
+	prefix := media.GetAccountMediaPath(accountID)
 	avatarKey, err := a.HandleFormFile(c, "kitchenAvatarFile", prefix)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not upload avatar photo").SetInternal(err)
+		msg := "could not upload avatar photo"
+		log.Err(err).Str("prefix", prefix).Msg(msg)
+		return echo.NewHTTPError(http.StatusInternalServerError, msg).SetInternal(err)
 	} else {
 		kitchen.Avatar = null.NewString(avatarKey, true)
 	}
 
 	coverKey, err := a.HandleFormFile(c, "kitchenCoverFile", prefix)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not upload cover photo").SetInternal(err)
+		msg := "could not upload cover photo"
+		log.Err(err).Str("prefix", prefix).Msg(msg)
+		return echo.NewHTTPError(http.StatusInternalServerError, msg).SetInternal(err)
 	} else {
 		kitchen.Cover = null.NewString(coverKey, true)
 	}
 
 	err = mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
 		account, err = accounts.CreateAccount(ctx, tx, accounts.CreateAccountInput{
+			AccountID: accountID,
 			UserID:    userID,
 			Email:     claims.Email,
 			FirstName: input.FirstName,
@@ -95,7 +103,7 @@ func (a *App) CreateAccount(c echo.Context) error {
 			Handle:      input.Kitchen.Handle,
 			Avatar:      avatarKey,
 			Cover:       coverKey,
-			Public:      input.Kitchen.Public,
+			Private:     input.Kitchen.Private,
 		})
 		if err != nil {
 			return err

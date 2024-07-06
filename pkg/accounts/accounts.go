@@ -13,6 +13,7 @@ type Store interface {
 }
 
 type CreateAccountInput struct {
+	AccountID string
 	UserID    string
 	Email     string
 	FirstName string
@@ -20,18 +21,16 @@ type CreateAccountInput struct {
 }
 
 func CreateAccount(ctx context.Context, store Store, input CreateAccountInput) (Account, error) {
-	accountID := CreateAccountID()
-
 	_, err := store.ExecContext(ctx, `
 		INSERT INTO accounts (account_id, user_id, email, first_name, last_name, created_at)
 		VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-	`, accountID, input.UserID, input.Email, input.FirstName, input.LastName)
+	`, input.AccountID, input.UserID, input.Email, input.FirstName, input.LastName)
 
 	if err != nil {
 		return Account{}, err
 	}
 
-	account, err := GetAccountByID(ctx, store, accountID)
+	account, err := GetAccountByID(ctx, store, input.AccountID)
 	if err != nil {
 		return Account{}, err
 	}

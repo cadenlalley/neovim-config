@@ -21,7 +21,7 @@ type CreateKitchenInput struct {
 	Handle      string
 	Avatar      string
 	Cover       string
-	Public      bool
+	Private     bool
 }
 
 func CreateKitchen(ctx context.Context, store Store, input CreateKitchenInput) (Kitchen, error) {
@@ -33,9 +33,9 @@ func CreateKitchen(ctx context.Context, store Store, input CreateKitchenInput) (
 	cover := null.NewString(input.Cover, input.Cover != "")
 
 	_, err := store.ExecContext(ctx, `
-		INSERT INTO kitchens (kitchen_id, account_id, kitchen_name, bio, handle, avatar, cover, public, created_at)
+		INSERT INTO kitchens (kitchen_id, account_id, kitchen_name, bio, handle, avatar, cover, is_private, created_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
-	`, kitchenID, input.AccountID, input.KitchenName, bio, input.Handle, avatar, cover, input.Public)
+	`, kitchenID, input.AccountID, input.KitchenName, bio, input.Handle, avatar, cover, input.Private)
 
 	if err != nil {
 		return Kitchen{}, err
@@ -50,13 +50,13 @@ func CreateKitchen(ctx context.Context, store Store, input CreateKitchenInput) (
 }
 
 type UpdateKitchenInput struct {
-	KitchenID   string
-	KitchenName string
-	Bio         null.String
-	Handle      string
-	Avatar      null.String
-	Cover       null.String
-	Public      bool
+	KitchenID string
+	Name      string
+	Bio       null.String
+	Handle    string
+	Avatar    null.String
+	Cover     null.String
+	Private   bool
 }
 
 func UpdateKitchen(ctx context.Context, store Store, input UpdateKitchenInput) (Kitchen, error) {
@@ -68,10 +68,10 @@ func UpdateKitchen(ctx context.Context, store Store, input UpdateKitchenInput) (
 			handle = ?,
 			avatar = ?,
 			cover = ?,
-			public = ?
+			is_private = ?
 		WHERE
 			kitchen_id = ?
-	`, input.KitchenName, input.Bio, input.Handle, input.Avatar, input.Cover, input.Public, input.KitchenID)
+	`, input.Name, input.Bio, input.Handle, input.Avatar, input.Cover, input.Private, input.KitchenID)
 	if err != nil {
 		return Kitchen{}, err
 	}
