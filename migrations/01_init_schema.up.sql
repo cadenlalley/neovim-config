@@ -5,7 +5,7 @@
 
 -- Accounts
 CREATE TABLE IF NOT EXISTS accounts (
-  account_id VARCHAR(31) PRIMARY KEY,
+  account_id CHAR(31) PRIMARY KEY,
   user_id VARCHAR(255) UNIQUE NOT NULL,
   email VARCHAR(320) UNIQUE NOT NULL,
   first_name VARCHAR(255),
@@ -17,10 +17,10 @@ CREATE TABLE IF NOT EXISTS accounts (
 
 -- Kitchens
 CREATE TABLE IF NOT EXISTS kitchens (
-  kitchen_id VARCHAR(31) PRIMARY KEY,
-  account_id VARCHAR(31) NOT NULL,
+  kitchen_id CHAR(31) PRIMARY KEY,
+  account_id CHAR(31) NOT NULL,
   kitchen_name VARCHAR(255) NOT NULL,
-  bio VARCHAR(255),
+  bio TINYTEXT,
   handle VARCHAR(30) UNIQUE NOT NULL,
   avatar VARCHAR(255),
   cover VARCHAR(255),

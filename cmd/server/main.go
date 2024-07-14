@@ -34,6 +34,11 @@ type AppConfig struct {
 		Name string `required:"true" envconfig:"DB_NAME"`
 	}
 
+	// Database migrations
+	Migrations struct {
+		Schema *string `default:"schema_migrations" envconfig:"MIGRATIONS_SCHEMAS"`
+	}
+
 	// Auth0 Authentication
 	Auth0 struct {
 		Domain   string        `required:"true" envconfig:"AUTH0_DOMAIN"`
@@ -73,8 +78,8 @@ func main() {
 	// ===========================================
 	dsn := mysql.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, cfg.DB.Name)
 
-	if err := mysql.Migrate("file://migrations", dsn); err != nil {
-		log.Fatal().Err(err).Msg("could migrate database")
+	if err := mysql.Migrate("file://migrations", dsn, cfg.Migrations.Schema); err != nil {
+		log.Fatal().Err(err).Msg("could not migrate schemas for database")
 	}
 
 	db, err := mysql.Connect(dsn)

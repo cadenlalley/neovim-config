@@ -30,8 +30,14 @@ func Connect(dsn string) (*sqlx.DB, error) {
 
 // Migrate applies database migrations from the migrationsPath to the
 // database specified in the dsn string.
-func Migrate(migrationsPath, dsn string) error {
-	m, err := migrate.New(migrationsPath, dsn+"&multiStatements=true")
+func Migrate(migrationsPath, dsn string, migrationsTable *string) error {
+	table := "schema_migrations"
+	if migrationsTable != nil {
+		table = *migrationsTable
+	}
+
+	input := fmt.Sprintf("%s&multiStatements=true&x-migrations-table=%s", dsn, table)
+	m, err := migrate.New(migrationsPath, input)
 	if err != nil {
 		return err
 	}
