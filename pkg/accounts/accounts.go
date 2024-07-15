@@ -30,12 +30,29 @@ func CreateAccount(ctx context.Context, store Store, input CreateAccountInput) (
 		return Account{}, err
 	}
 
-	account, err := GetAccountByID(ctx, store, input.AccountID)
+	return GetAccountByID(ctx, store, input.AccountID)
+}
+
+type UpdateAccountInput struct {
+	AccountID string
+	FirstName string
+	LastName  string
+}
+
+func UpdateAccount(ctx context.Context, store Store, input UpdateAccountInput) (Account, error) {
+	_, err := store.ExecContext(ctx, `
+		UPDATE accounts
+		SET
+			first_name = ?,
+			last_name = ?
+		WHERE
+			account_id = ?
+	`, input.FirstName, input.LastName, input.AccountID)
 	if err != nil {
 		return Account{}, err
 	}
 
-	return account, nil
+	return GetAccountByID(ctx, store, input.AccountID)
 }
 
 func GetAccountByID(ctx context.Context, store Store, accountID string) (Account, error) {
@@ -45,6 +62,9 @@ func GetAccountByID(ctx context.Context, store Store, accountID string) (Account
 	`, accountID).StructScan(&account)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return Account{}, ErrAccountNotFound
+		}
 		return Account{}, err
 	}
 
@@ -57,7 +77,10 @@ func GetAccountByUserID(ctx context.Context, store Store, userID string) (Accoun
 		SELECT * FROM accounts WHERE user_id = ?
 	`, userID).StructScan(&account)
 
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return Account{}, ErrAccountNotFound
+		}
 		return Account{}, err
 	}
 

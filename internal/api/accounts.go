@@ -7,6 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/mysql"
+	"github.com/kitchens-io/kitchens-api/internal/override"
 	"github.com/kitchens-io/kitchens-api/internal/web"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
@@ -51,12 +52,12 @@ func (a *App) CreateAccount(c echo.Context) error {
 
 	// Verify that the account does not already exist.
 	account, err := accounts.GetAccountByUserID(ctx, a.db, userID)
-	if err != nil {
+	if err != nil && err != accounts.ErrAccountNotFound {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get account").SetInternal(err)
 	}
 
 	if account.Exists() {
-		return echo.NewHTTPError(http.StatusBadRequest, "account already exists")
+		return echo.NewHTTPError(http.StatusBadRequest, accounts.ErrDuplicateAccount)
 	}
 
 	// Create an account ID.
@@ -113,6 +114,9 @@ func (a *App) CreateAccount(c echo.Context) error {
 	})
 
 	if err != nil {
+		if err == kitchens.ErrDuplicateHandle {
+			return echo.NewHTTPError(http.StatusBadRequest, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not create account").SetInternal(err)
 	}
 
@@ -120,4 +124,40 @@ func (a *App) CreateAccount(c echo.Context) error {
 		Account: account,
 		Kitchen: kitchen,
 	})
+}
+
+type UpdateAccountRequest struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+}
+
+func (a *App) UpdateAccount(c echo.Context) error {
+	var input UpdateAccountRequest
+	err := web.ValidateRequest(c, web.ContentTypeApplicationJSON, &input)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	ctx := c.Request().Context()
+	userID := c.Get(auth.UserIDContextKey).(string)
+
+	// Verify that the account does not already exist.
+	account, err := accounts.GetAccountByUserID(ctx, a.db, userID)
+	if err != nil {
+		if err == accounts.ErrAccountNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err)
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get account").SetInternal(err)
+	}
+
+	account, err = accounts.UpdateAccount(ctx, a.db, accounts.UpdateAccountInput{
+		AccountID: account.AccountID,
+		FirstName: override.String(input.FirstName, account.FirstName),
+		LastName:  override.String(input.LastName, account.LastName),
+	})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not update account").SetInternal(err)
+	}
+
+	return c.JSON(http.StatusOK, account)
 }

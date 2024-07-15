@@ -3,6 +3,7 @@ package kitchens
 import (
 	"context"
 	"database/sql"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"gopkg.in/guregu/null.v4"
@@ -38,15 +39,13 @@ func CreateKitchen(ctx context.Context, store Store, input CreateKitchenInput) (
 	`, kitchenID, input.AccountID, input.KitchenName, bio, input.Handle, avatar, cover, input.Private)
 
 	if err != nil {
+		if strings.HasPrefix(err.Error(), "Error 1062") && strings.Contains(err.Error(), "key 'kitchens.handle'") {
+			return Kitchen{}, ErrDuplicateHandle
+		}
 		return Kitchen{}, err
 	}
 
-	kitchen, err := GetKitchenByID(ctx, store, kitchenID)
-	if err != nil {
-		return Kitchen{}, err
-	}
-
-	return kitchen, nil
+	return GetKitchenByID(ctx, store, kitchenID)
 }
 
 type UpdateKitchenInput struct {
@@ -76,12 +75,7 @@ func UpdateKitchen(ctx context.Context, store Store, input UpdateKitchenInput) (
 		return Kitchen{}, err
 	}
 
-	kitchen, err := GetKitchenByID(ctx, store, input.KitchenID)
-	if err != nil {
-		return Kitchen{}, err
-	}
-
-	return kitchen, nil
+	return GetKitchenByID(ctx, store, input.KitchenID)
 }
 
 func GetKitchenByID(ctx context.Context, store Store, kitchenID string) (Kitchen, error) {
@@ -90,7 +84,10 @@ func GetKitchenByID(ctx context.Context, store Store, kitchenID string) (Kitchen
 		SELECT * FROM kitchens WHERE kitchen_id = ?;
 	`, kitchenID).StructScan(&kitchen)
 
-	if err != nil && err != sql.ErrNoRows {
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return Kitchen{}, ErrKitchenNotFound
+		}
 		return Kitchen{}, err
 	}
 

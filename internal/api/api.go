@@ -50,6 +50,7 @@ func Create(input CreateInput) *App {
 	// Account Routes
 	v1.GET("/iam", app.GetIAM)
 	v1.POST("/account", app.CreateAccount)
+	v1.PATCH("/account", app.UpdateAccount)
 
 	// Kitchens
 	v1.GET("/kitchen/:kitchen_id", app.GetKitchen)
