@@ -127,13 +127,13 @@ func (a *App) CreateAccount(c echo.Context) error {
 }
 
 type UpdateAccountRequest struct {
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+	FirstName string `form:"firstName"`
+	LastName  string `form:"lastName"`
 }
 
 func (a *App) UpdateAccount(c echo.Context) error {
 	var input UpdateAccountRequest
-	err := web.ValidateRequest(c, web.ContentTypeApplicationJSON, &input)
+	err := web.ValidateRequest(c, web.ContentTypeMultipartFormData, &input)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
