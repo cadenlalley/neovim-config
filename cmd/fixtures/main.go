@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -48,7 +49,9 @@ func main() {
 	// Reset the migrations database to 0 to force a migration.
 	_, err = db.DB.Exec(fmt.Sprintf("DELETE FROM %s WHERE TRUE", *cfg.Migrations.Fixtures))
 	if err != nil {
-		log.Fatal().Err(err).Msg("could not drop migrations database")
+		if !strings.HasPrefix(err.Error(), "Error 1146") {
+			log.Fatal().Err(err).Msg("could not delete from migrations database")
+		}
 	}
 
 	if err := mysql.Migrate("file://fixtures", dsn, cfg.Migrations.Fixtures); err != nil {
