@@ -38,28 +38,29 @@ func main() {
 
 	// Handle database migrations and connections.
 	// ===========================================
-	dsn := mysql.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, "")
 
-	db, err := mysql.Connect(dsn)
+	// 1. Create an initial connection just to th DB with no database selected.
+	//    This will allow for the dropping of the DB.
+	db1, err := mysql.Connect(mysql.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, ""))
 	if err != nil {
-		log.Fatal().Err(err).Msg("could not start database")
+		log.Fatal().Err(err).Msg("could not connect to database")
 	}
-	defer db.Close()
+	defer db1.Close()
 
-	_, err = db.DB.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", cfg.DB.Name))
+	_, err = db1.DB.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", cfg.DB.Name))
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not drop database")
 	}
 
-	_, err = db.DB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", cfg.DB.Name))
+	_, err = db1.DB.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", cfg.DB.Name))
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not create database")
 	}
 
-	//
-	dsn = mysql.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, cfg.DB.Name)
-
-	db, err = mysql.Connect(dsn)
+	// 2. Create a connection directly to the DB with a database selected.
+	//    Run the migrations for the schemas and then apply fixtures.
+	dsn := mysql.DSN(cfg.DB.User, cfg.DB.Pass, cfg.DB.Host, cfg.DB.Name)
+	db, err := mysql.Connect(dsn)
 	if err != nil {
 		log.Fatal().Err(err).Msg("could not start database")
 	}
@@ -68,14 +69,6 @@ func main() {
 	if err := mysql.Migrate("file://migrations", dsn, cfg.Migrations.Schema); err != nil {
 		log.Fatal().Err(err).Msg("could not migrate schemas for database")
 	}
-
-	// Reset the migrations database to 0 to force a migration.
-	// _, err = db.DB.Exec(fmt.Sprintf("DELETE FROM %s WHERE TRUE", *cfg.Migrations.Fixtures))
-	// if err != nil {
-	// 	if !strings.HasPrefix(err.Error(), "Error 1146") {
-	// 		log.Fatal().Err(err).Msg("could not delete from migrations database")
-	// 	}
-	// }
 
 	if err := mysql.Migrate("file://fixtures", dsn, cfg.Migrations.Fixtures); err != nil {
 		log.Fatal().Err(err).Msg("could not migrate fixtures for database")
