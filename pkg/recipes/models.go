@@ -19,24 +19,31 @@ type Recipe struct {
 	CreatedAt time.Time   `json:"createdAt" db:"created_at"`
 	UpdatedAt time.Time   `json:"updatedAt" db:"updated_at"`
 	DeletedAt null.Time   `json:"deletedAt" db:"deleted_at"`
+
+	// Attached for full recipe
+	Steps []RecipeStep `json:"steps"`
 }
 
 type RecipeStep struct {
-	RecipeID    string `json:"recipeId" db:"recipe_id"`
+	RecipeID    string `json:"-" db:"recipe_id"`
 	StepID      int    `json:"stepId" db:"step_id"`
 	Instruction string `json:"instruction" db:"instruction"`
+
+	// Attached for full step
+	Images []string    `json:"images"`
+	Notes  null.String `json:"notes"`
 }
 
 type RecipeNote struct {
-	RecipeID string `json:"recipeId" db:"recipe_id"`
-	StepID   int    `json:"stepId" db:"step_id"`
-	Note     string `json:"note" db:"note"`
+	RecipeID string `db:"recipe_id"`
+	StepID   int    `db:"step_id"`
+	Note     string `db:"note"`
 }
 
 type RecipeImage struct {
-	RecipeID string `json:"recipeId" db:"recipe_id"`
-	StepID   int    `json:"stepId" db:"step_id"`
-	ImageURL string `json:"imageUrl" db:"image_url"`
+	RecipeID string `db:"recipe_id"`
+	StepID   int    `db:"step_id"`
+	ImageURL string `db:"image_url"`
 }
 
 // type RecipeIngredient struct {

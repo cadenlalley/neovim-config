@@ -16,7 +16,19 @@ func (a *App) GetKitchenRecipe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get recipe by ID").SetInternal(err)
 	}
 
-	// TODO: Add fetching recipe dependencies.
+	steps, err := recipes.GetRecipeStepsByRecipeID(ctx, a.db, recipeID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get recipe steps").SetInternal(err)
+	}
+
+	// If there are no steps, return early.
+	if len(steps) == 0 {
+		return c.JSON(http.StatusOK, recipe)
+	}
+
+	recipe.Steps = steps
+
+	// TODO: Add images and notes to steps.
 
 	return c.JSON(http.StatusOK, recipe)
 }
