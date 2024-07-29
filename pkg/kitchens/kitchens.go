@@ -94,29 +94,28 @@ func GetKitchenByID(ctx context.Context, store Store, kitchenID string) (Kitchen
 	return kitchen, nil
 }
 
-func GetKitchensByAccountID(ctx context.Context, store Store, accountID string) ([]Kitchen, []error) {
+func ListKitchensByAccountID(ctx context.Context, store Store, accountID string) ([]Kitchen, error) {
 	kitchens := make([]Kitchen, 0)
-	errs := make([]error, 0)
 
 	rows, err := store.QueryxContext(ctx, `
 		SELECT * FROM kitchens WHERE account_id = ?
 	`, accountID)
 
 	if err != nil {
-		return nil, []error{err}
+		return nil, err
 	}
 
 	for rows.Next() {
 		var kitchen Kitchen
 		if err := rows.StructScan(&kitchen); err != nil {
-			errs = append(errs, err)
+			return kitchens, err
 		}
 		kitchens = append(kitchens, kitchen)
 	}
 
 	if err := rows.Err(); err != nil {
-		errs = append(errs, err)
+		return kitchens, err
 	}
 
-	return kitchens, errs
+	return kitchens, nil
 }
