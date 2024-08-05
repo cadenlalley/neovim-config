@@ -1,8 +1,6 @@
 package accounts
 
 import (
-	"fmt"
-
 	"github.com/segmentio/ksuid"
 	"gopkg.in/guregu/null.v4"
 )
@@ -23,5 +21,5 @@ func (a *Account) Exists() bool {
 }
 
 func CreateAccountID() string {
-	return fmt.Sprintf("acc_%s", ksuid.New().String())
+	return "acc_" + ksuid.New().String()
 }

@@ -1,7 +1,6 @@
 package kitchens
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/segmentio/ksuid"
@@ -23,5 +22,5 @@ type Kitchen struct {
 }
 
 func CreateKitchenID() string {
-	return fmt.Sprintf("ktc_%s", ksuid.New().String())
+	return "ktc_" + ksuid.New().String()
 }

@@ -3,6 +3,7 @@ package recipes
 import (
 	"time"
 
+	"github.com/segmentio/ksuid"
 	"gopkg.in/guregu/null.v4"
 )
 
@@ -22,6 +23,10 @@ type Recipe struct {
 
 	// Attached for full recipe
 	Steps []RecipeStep `json:"steps"`
+}
+
+func CreateRecipeID() string {
+	return "rcp_" + ksuid.New().String()
 }
 
 type RecipeStep struct {

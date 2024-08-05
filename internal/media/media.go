@@ -1,7 +1,16 @@
 package media
 
-import "fmt"
-
+// uploads/accounts/{accountID}/
 func GetAccountMediaPath(accountID string) string {
-	return fmt.Sprintf("uploads/account/%s/", accountID)
+	return "uploads/accounts/" + accountID + "/"
+}
+
+// uploads/kitchens/{kitchenID}/
+func GetKitchenMediaPath(kitchenID string) string {
+	return "uploads/kitchens/" + kitchenID + "/"
+}
+
+// uploads/recipes/{recipeID}/
+func GetRecipeMediaPath(recipeID string) string {
+	return "uploads/recipes/" + recipeID + "/"
 }

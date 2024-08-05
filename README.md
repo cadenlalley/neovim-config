@@ -19,3 +19,11 @@ To work on the Kitchens API you'll need to follow the below steps.
 ## Documentation
 
 The details about each route and requests that can be made are in [Postman](https://kitchens-app.postman.co/workspace/89fa7a36-50b1-40e3-ae6b-e3ba8c5f9b9e/documentation/36191591-8aa45609-bc7d-43e8-852c-820feb94999e).
+
+## Technical Debt
+
+The following are areas that need to be revisited after initial release into beta.
+
+- [ ] Add validation to mysql DB inputs, in particular empty string values being accepted when they should not be.
+- [ ] Middleware to pull the current user up into context to reduce repeated code across endpoints.
+- [ ] Middleware for URL parameter validation to reduce code across endpoints.

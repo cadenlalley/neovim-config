@@ -75,7 +75,7 @@ func (a *App) UpdateKitchen(c echo.Context) error {
 	}
 
 	// Handle the file uploads if they have been set.
-	prefix := media.GetAccountMediaPath(account.AccountID)
+	prefix := media.GetKitchenMediaPath(kitchenID)
 	avatarKey, err := a.HandleFormFile(c, "avatarFile", prefix)
 	if err != nil {
 		msg := "could not upload avatar photo"

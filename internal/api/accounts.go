@@ -62,11 +62,12 @@ func (a *App) CreateAccount(c echo.Context) error {
 
 	// Create an account ID.
 	accountID := accounts.CreateAccountID()
+	kitchenID := kitchens.CreateKitchenID()
 
 	// Handle the file uploads if they have been set.
 	var kitchen kitchens.Kitchen
 
-	prefix := media.GetAccountMediaPath(accountID)
+	prefix := media.GetKitchenMediaPath(kitchenID)
 	avatarKey, err := a.HandleFormFile(c, "kitchenAvatarFile", prefix)
 	if err != nil {
 		msg := "could not upload avatar photo"
@@ -98,6 +99,7 @@ func (a *App) CreateAccount(c echo.Context) error {
 		}
 
 		kitchen, err = kitchens.CreateKitchen(ctx, tx, kitchens.CreateKitchenInput{
+			KitchenID:   kitchenID,
 			AccountID:   account.AccountID,
 			KitchenName: input.Kitchen.Name,
 			Bio:         input.Kitchen.Bio,

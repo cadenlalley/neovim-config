@@ -16,6 +16,7 @@ type Store interface {
 }
 
 type CreateKitchenInput struct {
+	KitchenID   string
 	AccountID   string
 	KitchenName string
 	Bio         string
@@ -26,7 +27,6 @@ type CreateKitchenInput struct {
 }
 
 func CreateKitchen(ctx context.Context, store Store, input CreateKitchenInput) (Kitchen, error) {
-	kitchenID := CreateKitchenID()
 
 	// Handle nullable values.
 	bio := null.NewString(input.Bio, input.Bio != "")
@@ -36,7 +36,7 @@ func CreateKitchen(ctx context.Context, store Store, input CreateKitchenInput) (
 	_, err := store.ExecContext(ctx, `
 		INSERT INTO kitchens (kitchen_id, account_id, kitchen_name, bio, handle, avatar, cover, is_private, created_at)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
-	`, kitchenID, input.AccountID, input.KitchenName, bio, input.Handle, avatar, cover, input.Private)
+	`, input.KitchenID, input.AccountID, input.KitchenName, bio, input.Handle, avatar, cover, input.Private)
 
 	if err != nil {
 		if strings.HasPrefix(err.Error(), "Error 1062") && strings.Contains(err.Error(), "key 'kitchens.handle'") {
@@ -45,7 +45,7 @@ func CreateKitchen(ctx context.Context, store Store, input CreateKitchenInput) (
 		return Kitchen{}, err
 	}
 
-	return GetKitchenByID(ctx, store, kitchenID)
+	return GetKitchenByID(ctx, store, input.KitchenID)
 }
 
 type UpdateKitchenInput struct {
