@@ -18,20 +18,15 @@ type CreateRecipeInput struct {
 	RecipeID  string
 	KitchenID string
 	Name      string
-	Summary   string
+	Summary   null.String
 	PrepTime  int
 	CookTime  int
 	Servings  int
-	Cover     string
-	Source    string
+	Cover     null.String
+	Source    null.String
 }
 
 func CreateRecipe(ctx context.Context, store Store, input CreateRecipeInput) (Recipe, error) {
-	// Handle nullable values
-	summary := null.NewString(input.Summary, input.Summary != "")
-	cover := null.NewString(input.Cover, input.Cover != "")
-	source := null.NewString(input.Source, input.Source != "")
-
 	_, err := store.ExecContext(ctx, `
 		INSERT INTO recipes (
 			recipe_id,
@@ -45,7 +40,7 @@ func CreateRecipe(ctx context.Context, store Store, input CreateRecipeInput) (Re
 			source,
 			created_at
 		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
-	`, input.RecipeID, input.KitchenID, input.Name, summary, input.PrepTime, input.CookTime, input.Servings, cover, source)
+	`, input.RecipeID, input.KitchenID, input.Name, input.Summary, input.PrepTime, input.CookTime, input.Servings, input.Cover, input.Source)
 
 	if err != nil {
 		return Recipe{}, err

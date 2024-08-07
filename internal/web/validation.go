@@ -50,10 +50,9 @@ func ValidateRequest(c echo.Context, contentType string, v interface{}) error {
 
 	if err := validate.Struct(v); err != nil {
 		for _, e := range err.(validator.ValidationErrors) {
-
 			switch e.ActualTag() {
 			case "required":
-				return fmt.Errorf("missing required field '%s'", e.Field())
+				return fmt.Errorf("missing required field '%s'", strings.ToLower(e.Namespace()))
 			case "email":
 				return fmt.Errorf("invalid email address '%s' supplied for field '%s'", e.Value(), e.Field())
 			default:

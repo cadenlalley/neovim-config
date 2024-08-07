@@ -10,11 +10,11 @@ import (
 type Recipe struct {
 	RecipeID  string      `json:"recipeId" db:"recipe_id"`
 	KitchenID string      `json:"kitchenId" db:"kitchen_id"`
-	Name      string      `json:"name" db:"recipe_name"`
+	Name      string      `json:"name" db:"recipe_name" validate:"required"`
 	Summary   null.String `json:"summary" db:"summary"`
-	PrepTime  int         `json:"prepTime" db:"prep_time"`
-	CookTime  int         `json:"cookTime" db:"cook_time"`
-	Servings  int         `json:"servings" db:"servings"`
+	PrepTime  *int        `json:"prepTime" db:"prep_time" validate:"required"`
+	CookTime  *int        `json:"cookTime" db:"cook_time" validate:"required"`
+	Servings  *int        `json:"servings" db:"servings" validate:"required"`
 	Cover     null.String `json:"cover" db:"cover"`
 	Source    null.String `json:"source" db:"source"`
 	CreatedAt time.Time   `json:"createdAt" db:"created_at"`
@@ -22,7 +22,8 @@ type Recipe struct {
 	DeletedAt null.Time   `json:"deletedAt" db:"deleted_at"`
 
 	// Attached for full recipe
-	Steps []RecipeStep `json:"steps"`
+	Ingredients []RecipeIngredient `json:"ingredients" db:"-" validate:"required,dive"`
+	Steps       []RecipeStep       `json:"steps" db:"-" validate:"required,dive"`
 }
 
 func CreateRecipeID() string {
@@ -31,12 +32,13 @@ func CreateRecipeID() string {
 
 type RecipeStep struct {
 	RecipeID    string `json:"-" db:"recipe_id"`
-	StepID      int    `json:"stepId" db:"step_id"`
-	Instruction string `json:"instruction" db:"instruction"`
+	StepID      int    `json:"stepId" db:"step_id" validate:"required"`
+	Instruction string `json:"instruction" db:"instruction" validate:"required"`
 
 	// Attached for full step
-	Images []string    `json:"images"`
-	Notes  null.String `json:"notes"`
+	Images []string `json:"images" db:"-"`
+	Note   string   `json:"note" db:"-"`
+	Group  string   `json:"group" db:"-"`
 }
 
 type RecipeNote struct {
@@ -51,10 +53,13 @@ type RecipeImage struct {
 	ImageURL string `db:"image_url"`
 }
 
-// type RecipeIngredient struct {
-// 	RecipeID     string  `json:"recipeId" db:"recipe_id"`
-// 	IngredientID int     `json:"ingredientId" db:"ingredient_id"`
-// 	Name         string  `json:"name" db:"name"`
-// 	Quantity     float64 `json:"quantity" db:"quantity"`
-// 	Unit         string  `json:"unit" db:"unit"`
-// }
+type RecipeIngredient struct {
+	RecipeID     string  `json:"-" db:"recipe_id"`
+	IngredientID int     `json:"ingredientId" db:"ingredient_id" validate:"required"`
+	Name         string  `json:"name" db:"name" validate:"required"`
+	Quantity     float64 `json:"quantity" db:"quantity" validate:"required"`
+	Unit         string  `json:"unit" db:"unit" validate:"required"`
+
+	// Attached for full ingredient
+	Group string `json:"group" db:"-"`
+}
