@@ -12,14 +12,18 @@ serve:
 fixtures:
 	go run cmd/fixtures/main.go
 
+# Log into Docker
 docker-login:
 	aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
 
+# Build the image
 docker-build:
 	docker build -t kitchens-api .
 
+# Tag the image with Latest
 docker-tag:
 	docker tag kitchens-api:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/kitchens_api_production:latest
 
+# Push the Docker image to ECR
 docker-push:
 	docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/kitchens_api_production:latest
