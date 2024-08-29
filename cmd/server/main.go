@@ -22,7 +22,7 @@ import (
 // Application Configuration
 type AppConfig struct {
 	Debug           bool          `default:"false" envconfig:"DEBUG"`
-	Port            string        `default:":1313" envconfig:"PORT"`
+	Port            string        `default:"1313" envconfig:"PORT"`
 	ShutdownTimeout time.Duration `default:"10s" envconfig:"SHUTDOWN_TIMEOUT"`
 	Env             string        `default:"dev" envconfig:"APP_ENV"`
 
@@ -120,7 +120,7 @@ func main() {
 	defer stop()
 
 	go func() {
-		if err := app.API.Start(cfg.Port); err != nil && err != http.ErrServerClosed {
+		if err := app.API.Start(":" + cfg.Port); err != nil && err != http.ErrServerClosed {
 			log.Fatal().Err(err).Msg("shutting down server")
 		}
 	}()
