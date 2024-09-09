@@ -88,6 +88,17 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 					}
 				}
 			}
+
+			if step.Note != "" {
+				err = recipes.CreateRecipeNotes(ctx, tx, recipes.CreateRecipeNotesInput{
+					RecipeID: recipeID,
+					StepID:   step.StepID,
+					Note:     step.Note,
+				})
+				if err != nil {
+					return err
+				}
+			}
 		}
 
 		return nil
@@ -124,10 +135,21 @@ func (a *App) GetKitchenRecipe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get images for recipe steps").SetInternal(err)
 	}
 
+	notes, err := recipes.GetRecipeNotesByRecipeID(ctx, a.db, recipe.RecipeID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get notes for recipes steps").SetInternal(err)
+	}
+
 	for i, step := range steps {
 		for _, image := range images {
 			if step.StepID == image.StepID {
 				step.Images = append(step.Images, image.ImageURL)
+			}
+		}
+
+		for _, note := range notes {
+			if step.StepID == note.StepID {
+				step.Note = note.Note
 			}
 		}
 

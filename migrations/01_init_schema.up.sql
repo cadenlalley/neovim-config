@@ -70,28 +70,3 @@ CREATE TABLE IF NOT EXISTS recipe_notes (
   note TEXT NOT NULL,
   FOREIGN KEY (recipe_id, step_id) REFERENCES recipe_steps (recipe_id, step_id)
 );
-
--- Recipe Ingredients
--- CREATE TABLE IF NOT EXISTS recipe_ingredients (
---   recipe_id CHAR(31),
---   ingredient_id TINYINT NOT NULL,
---   ingredient_name VARCHAR(255) NOT NULL,
---   quantity DECIMAL(2,2) NOT NULL,
---   unit VARCHAR(255) NOT NULL,
---   FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id)
--- );
-
--- Recipe Step Groups
--- CREATE TABLE IF NOT EXISTS recipe_step_groups (
---   recipe_id CHAR(31),
---   group_id TINYINT,
---   group_name VARCHAR(255) NOT NULL,
---   FOREIGN KEY (recipe_id) REFERENCES recipe_steps(recipe_id),
---   PRIMARY KEY (recipe_id, group_name)
--- );
-
--- Ingredient Groups
--- CREATE TABLE IF NOT EXISTS recipe_ingredient_groups (
---   group_id INT
---   group_name VARCHAR(255)
--- );
