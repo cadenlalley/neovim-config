@@ -4,6 +4,28 @@ import (
 	"context"
 )
 
+type CreateRecipeStepInput struct {
+	RecipeID    string
+	StepID      int
+	Instruction string
+}
+
+func CreateRecipeSteps(ctx context.Context, store Store, input CreateRecipeStepInput) error {
+	_, err := store.ExecContext(ctx, `
+		INSERT INTO recipe_steps (
+			recipe_id,
+			step_id,
+			instruction
+		) VALUES (?, ?, ?)
+	`, input.RecipeID, input.StepID, input.Instruction)
+
+	if err != nil {
+		return nil
+	}
+
+	return nil
+}
+
 func GetRecipeStepsByRecipeID(ctx context.Context, store Store, recipeID string) ([]RecipeStep, error) {
 	steps := make([]RecipeStep, 0)
 

@@ -18,12 +18,19 @@ docker-login:
 
 # Build the image
 docker-build:
-	docker build -t kitchens-api .
+	docker build -t kitchens-api:${API_VERSION} .
 
 # Tag the image with Latest
 docker-tag:
 	docker tag kitchens-api:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/kitchens_api_production:latest
 
+# Version
+docker-version:
+	docker tag kitchens-api:${API_VERSION} ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/kitchens_api_production:${API_VERSION}
+
 # Push the Docker image to ECR
 docker-push:
 	docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/kitchens_api_production:latest
+
+docker-version-push:
+	docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/kitchens_api_production:${API_VERSION}

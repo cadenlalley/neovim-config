@@ -65,6 +65,31 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 			return err
 		}
 
+		// Handle step processing (images, notes)
+		for _, step := range input.Steps {
+			err = recipes.CreateRecipeSteps(ctx, tx, recipes.CreateRecipeStepInput{
+				RecipeID:    recipeID,
+				StepID:      step.StepID,
+				Instruction: step.Instruction,
+			})
+			if err != nil {
+				return err
+			}
+
+			if len(step.Images) != 0 {
+				for _, image := range step.Images {
+					err = recipes.CreateRecipeImages(ctx, tx, recipes.CreateRecipeImagesInput{
+						RecipeID: recipeID,
+						StepID:   step.StepID,
+						ImageURL: image,
+					})
+					if err != nil {
+						return err
+					}
+				}
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
@@ -93,9 +118,23 @@ func (a *App) GetKitchenRecipe(c echo.Context) error {
 		return c.JSON(http.StatusOK, recipe)
 	}
 
-	recipe.Steps = steps
+	// Handle step hydration (images, notes)
+	images, err := recipes.GetRecipeImagesByRecipeID(ctx, a.db, recipe.RecipeID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get images for recipe steps").SetInternal(err)
+	}
 
-	// TODO: Add images and notes to steps.
+	for i, step := range steps {
+		for _, image := range images {
+			if step.StepID == image.StepID {
+				step.Images = append(step.Images, image.ImageURL)
+			}
+		}
+
+		steps[i] = step
+	}
+
+	recipe.Steps = steps
 
 	return c.JSON(http.StatusOK, recipe)
 }

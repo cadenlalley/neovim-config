@@ -4,6 +4,28 @@ import (
 	"context"
 )
 
+type CreateRecipeImagesInput struct {
+	RecipeID string
+	StepID   int
+	ImageURL string
+}
+
+func CreateRecipeImages(ctx context.Context, store Store, input CreateRecipeImagesInput) error {
+	_, err := store.ExecContext(ctx, `
+		INSERT INTO recipe_images (
+			recipe_id,
+			step_id,
+			image_url
+		) VALUES (?, ?, ?)
+	`, input.RecipeID, input.StepID, input.ImageURL)
+
+	if err != nil {
+		return nil
+	}
+
+	return nil
+}
+
 func GetRecipeImagesByRecipeID(ctx context.Context, store Store, recipeID string) ([]RecipeImage, error) {
 	images := make([]RecipeImage, 0)
 
