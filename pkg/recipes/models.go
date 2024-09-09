@@ -38,7 +38,7 @@ type RecipeStep struct {
 	// Attached for full step
 	Images []string `json:"images" db:"-"`
 	Note   string   `json:"note" db:"-"`
-	Group  string   `json:"group" db:"-"`
+	// Group  string   `json:"group" db:"-"`
 }
 
 type RecipeNote struct {
@@ -56,10 +56,10 @@ type RecipeImage struct {
 type RecipeIngredient struct {
 	RecipeID     string  `json:"-" db:"recipe_id"`
 	IngredientID int     `json:"ingredientId" db:"ingredient_id" validate:"required"`
-	Name         string  `json:"name" db:"name" validate:"required"`
+	Name         string  `json:"name" db:"ingredient_name" validate:"required"`
 	Quantity     float64 `json:"quantity" db:"quantity" validate:"required"`
 	Unit         string  `json:"unit" db:"unit" validate:"required"`
 
 	// Attached for full ingredient
-	Group string `json:"group" db:"-"`
+	// Group string `json:"group" db:"-"`
 }

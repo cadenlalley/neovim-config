@@ -101,10 +101,24 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 			}
 		}
 
+		// Handle ingredient processing
+		for _, ingredient := range input.Ingredients {
+			err = recipes.CreateRecipeIngredients(ctx, tx, recipes.CreateRecipeIngredientInput{
+				RecipeID:     recipeID,
+				IngredientID: ingredient.IngredientID,
+				Name:         ingredient.Name,
+				Quantity:     ingredient.Quantity,
+				Unit:         ingredient.Unit,
+			})
+			if err != nil {
+				return err
+			}
+		}
+
 		return nil
 	})
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err).SetInternal(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not create recipe").SetInternal(err)
 	}
 
 	return c.JSON(http.StatusOK, recipe)
@@ -157,6 +171,13 @@ func (a *App) GetKitchenRecipe(c echo.Context) error {
 	}
 
 	recipe.Steps = steps
+
+	ingredients, err := recipes.GetRecipeIngredientsByRecipeID(ctx, a.db, recipe.RecipeID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get ingredients for recipe").SetInternal(err)
+	}
+
+	recipe.Ingredients = ingredients
 
 	return c.JSON(http.StatusOK, recipe)
 }
