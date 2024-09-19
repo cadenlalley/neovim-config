@@ -71,6 +71,7 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 				RecipeID:    recipeID,
 				StepID:      step.StepID,
 				Instruction: step.Instruction,
+				Group:       step.Group,
 			})
 			if err != nil {
 				return err
@@ -109,6 +110,7 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 				Name:         ingredient.Name,
 				Quantity:     ingredient.Quantity,
 				Unit:         ingredient.Unit,
+				Group:        ingredient.Group,
 			})
 			if err != nil {
 				return err

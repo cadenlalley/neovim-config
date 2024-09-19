@@ -8,6 +8,7 @@ type CreateRecipeStepInput struct {
 	RecipeID    string
 	StepID      int
 	Instruction string
+	Group       string
 }
 
 func CreateRecipeSteps(ctx context.Context, store Store, input CreateRecipeStepInput) error {
@@ -15,12 +16,13 @@ func CreateRecipeSteps(ctx context.Context, store Store, input CreateRecipeStepI
 		INSERT INTO recipe_steps (
 			recipe_id,
 			step_id,
-			instruction
-		) VALUES (?, ?, ?)
-	`, input.RecipeID, input.StepID, input.Instruction)
+			instruction,
+			group_name
+		) VALUES (?, ?, ?, ?)
+	`, input.RecipeID, input.StepID, input.Instruction, input.Group)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return nil

@@ -43,7 +43,7 @@ func (a *App) GetIAM(c echo.Context) error {
 	// Find all kitchens for the provided account.
 	accountKitchens, err := kitchens.ListKitchensByAccountID(ctx, a.db, account.AccountID)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not get kitchen(s)by account ID")
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get kitchen(s) by account ID")
 	}
 
 	// If the account exists, look up the associated profiles.

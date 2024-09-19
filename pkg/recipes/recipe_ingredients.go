@@ -2,6 +2,8 @@ package recipes
 
 import (
 	"context"
+
+	"gopkg.in/guregu/null.v4"
 )
 
 type CreateRecipeIngredientInput struct {
@@ -9,7 +11,8 @@ type CreateRecipeIngredientInput struct {
 	IngredientID int
 	Name         string
 	Quantity     float64
-	Unit         string
+	Unit         null.String
+	Group        string
 }
 
 func CreateRecipeIngredients(ctx context.Context, store Store, input CreateRecipeIngredientInput) error {
@@ -19,9 +22,10 @@ func CreateRecipeIngredients(ctx context.Context, store Store, input CreateRecip
 			ingredient_id,
 			ingredient_name,
 			quantity,
-			unit
-		) VALUES (?, ?, ?, ?, ?)
-	`, input.RecipeID, input.IngredientID, input.Name, input.Quantity, input.Unit)
+			unit,
+			group_name
+		) VALUES (?, ?, ?, ?, ?, ?)
+	`, input.RecipeID, input.IngredientID, input.Name, input.Quantity, input.Unit, input.Group)
 
 	if err != nil {
 		return err

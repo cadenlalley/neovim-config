@@ -19,21 +19,37 @@ INSERT INTO recipes (recipe_id, kitchen_id, recipe_name, summary, prep_time, coo
 VALUES
   ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Homemade pumpkin pie', "With a combination of heavy cream and whole milk, this pumpkin pie has the creamiest filling, with warm spices and lovely flavor. It's baked in a flaky, buttery single crust.", 40, 60, 12);
 
-INSERT INTO recipe_steps(recipe_id, step_id, instruction)
+INSERT INTO recipe_steps(recipe_id, step_id, instruction, group_name)
 VALUES
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 1, 'Cut the butter into slices (8-10 slices per stick). Put the butter in a bowl and place in the freezer. Fill a medium-sized measuring cup up with water, and add plenty of ice. Let both the butter and the ice sit for 5-10 minutes.'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 2, 'In the bowl of a standing mixer fitted with a paddle attachment, combine the flour, sugar, and salt. Add half of the chilled butter and mix on low, until the butter is just starting to break down, about a minute. Add the rest of the butter and continue mixing, until the butter is broken down and in various sizes. Slowly add the water, a few tablespoons at a time, and mix until the dough starts to come together but still is quite shaggy.'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 3, 'Dump the dough out on your work surface and flatten it slightly into a square. Gently fold the dough over onto itself and flatten again. Repeat this process 3 or 4 more times, until all the loose pieces are worked into the dough. Flatten the dough one last time into a circle, and wrap in plastic wrap. Refrigerate for 30 minutes (and up to 2 days) before using.'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 4, 'Adjust oven rack to lowest position, place rimmed baking sheet on rack, and heat oven to 400°F. Remove dough from refrigerator and roll out on generously floured (up to 1/4 cup) work surface to 12-inch circle about 1/8 inch thick. Roll dough loosely around rolling pin and unroll into pie plate, leaving at least 1-inch overhang on each side. Ease dough into plate by gently lifting edge of dough with one hand while pressing into plate bottom with the other.'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 5, 'Preheat oven to 400F. While the pie shell is baking, whisk cream, milk, eggs, yolks, and vanilla together in medium bowl. Combine pumpkin puree, sugars, maple syrup, cinnamon, ginger, nutmeg, and salt in large heavy-bottomed saucepan; bring to sputtering simmer over medium heat, 5 to 7 minutes. Continue to simmer pumpkin mixture, stirring constantly until thick and shiny, 10 to 15 minutes.'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 6, 'Remove pan from heat and stir in the black strap rum if using. Whisk in cream mixture until fully incorporated. Strain the mixture through fine-mesh strainer set over a medium bowl, using a spatula to press the solids through the strainer. Re-whisk the mixture and transfer to warm pre-baked pie shell. Return the pie plate with baking sheet to the oven and bake pie for 10 minutes. Reduce the heat to 300°F and continue baking until the edges of the pie are set and slightly puffed, and the center jiggles only slightly, 27 to 35 minutes longer. Transfer the pie to wire rack and cool to room temperature, 2 to 3 hours. Cut into wedges and serve with whipped cream.');
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 1, 'Cut the butter into slices (8-10 slices per stick). Put the butter in a bowl and place in the freezer. Fill a medium-sized measuring cup up with water, and add plenty of ice. Let both the butter and the ice sit for 5-10 minutes.', 'Pie crust'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 2, 'In the bowl of a standing mixer fitted with a paddle attachment, combine the flour, sugar, and salt. Add half of the chilled butter and mix on low, until the butter is just starting to break down, about a minute. Add the rest of the butter and continue mixing, until the butter is broken down and in various sizes. Slowly add the water, a few tablespoons at a time, and mix until the dough starts to come together but still is quite shaggy.', 'Pie crust'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 3, 'Dump the dough out on your work surface and flatten it slightly into a square. Gently fold the dough over onto itself and flatten again. Repeat this process 3 or 4 more times, until all the loose pieces are worked into the dough. Flatten the dough one last time into a circle, and wrap in plastic wrap. Refrigerate for 30 minutes (and up to 2 days) before using.', 'Pie crust'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 4, 'Adjust oven rack to lowest position, place rimmed baking sheet on rack, and heat oven to 400°F. Remove dough from refrigerator and roll out on generously floured (up to 1/4 cup) work surface to 12-inch circle about 1/8 inch thick. Roll dough loosely around rolling pin and unroll into pie plate, leaving at least 1-inch overhang on each side. Ease dough into plate by gently lifting edge of dough with one hand while pressing into plate bottom with the other.', 'Pie crust'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 5, 'Preheat oven to 400F. While the pie shell is baking, whisk cream, milk, eggs, yolks, and vanilla together in medium bowl. Combine pumpkin puree, sugars, maple syrup, cinnamon, ginger, nutmeg, and salt in large heavy-bottomed saucepan; bring to sputtering simmer over medium heat, 5 to 7 minutes. Continue to simmer pumpkin mixture, stirring constantly until thick and shiny, 10 to 15 minutes.', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 6, 'Remove pan from heat and stir in the black strap rum if using. Whisk in cream mixture until fully incorporated. Strain the mixture through fine-mesh strainer set over a medium bowl, using a spatula to press the solids through the strainer. Re-whisk the mixture and transfer to warm pre-baked pie shell. Return the pie plate with baking sheet to the oven and bake pie for 10 minutes. Reduce the heat to 300°F and continue baking until the edges of the pie are set and slightly puffed, and the center jiggles only slightly, 27 to 35 minutes longer. Transfer the pie to wire rack and cool to room temperature, 2 to 3 hours. Cut into wedges and serve with whipped cream.', 'Pie filling');
 
-  INSERT INTO recipe_images(recipe_id, step_id, image_url)
-  VALUES
-    ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 3, '/path-to-step-3-1.jpg'),
-    ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 6, '/path-to-step-6-1.jpg'),
-    ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 6, '/path-to-step-6-2.jpg');
+INSERT INTO recipe_images(recipe_id, step_id, image_url)
+VALUES
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 3, '/path-to-step-3-1.jpg'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 6, '/path-to-step-6-1.jpg'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 6, '/path-to-step-6-2.jpg');
 
 INSERT INTO recipe_notes(recipe_id, step_id, note)
 VALUES
   ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 2, 'If the dough is not coming together, add more water 1 tablespoon at a time until it does.');
+
+INSERT INTO recipe_ingredients(recipe_id, ingredient_id, ingredient_name, quantity, unit, group_name)
+VALUES
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 1, 'unsalted butter, cold', 9.00, 'tbsp', 'Pie crust'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 2, 'all-purpose flour', 1.25, 'cups', 'Pie crust'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 3, 'heavy cream', 1.00, 'cup', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 4, 'whole milk', .5, 'cup', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 5, 'large eggs plus 2 large yolks', 3.00, NULL, 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 6, 'vanilla extract', 1.00, 'tsp', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 7, 'pumpkin puree', 1.00, '15 oz can', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 8, 'brown sugar', .5, 'cup', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 9, 'maple syrup', .25, 'cup', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 10, 'ground cinnamon', .75, 'tsp', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 11, 'ground ginger', .5, 'tsp', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 12, 'nutmeg', .25, 'tsp', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 13, 'salt', .75, 'tsp', 'Pie filling');
