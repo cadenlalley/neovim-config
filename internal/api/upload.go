@@ -1,12 +1,13 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
+	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 )
 
 type UploadResponse struct {
@@ -23,16 +24,12 @@ func (a *App) Upload(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get account by user ID").SetInternal(err)
 	}
 
-	file, err := c.FormFile("file")
+	prefix := media.GetAccountMediaPath(account.AccountID)
+	key, err := a.HandleFormFile(c, "file", prefix)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err)
-	}
-
-	prefix := fmt.Sprintf("uploads/%s/", account.AccountID)
-
-	key, err := a.fileManager.UploadFromHeader(ctx, file, prefix)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not upload file").SetInternal(err)
+		msg := "could not upload file"
+		log.Err(err).Str("prefix", prefix).Msg(msg)
+		return echo.NewHTTPError(http.StatusInternalServerError, msg).SetInternal(err)
 	}
 
 	return c.JSON(http.StatusOK, UploadResponse{

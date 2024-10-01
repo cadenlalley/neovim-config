@@ -42,3 +42,4 @@ The following are areas that need to be revisited after initial release into bet
 - [ ] Middleware to pull the current user up into context to reduce repeated code across endpoints.
 - [ ] Middleware for URL parameter validation to reduce code across endpoints.
 - [ ] Automate the deployment of ECR images via GHA.
+- [ ] True up process for image uploads during recipe creation.
