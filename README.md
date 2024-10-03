@@ -43,3 +43,4 @@ The following are areas that need to be revisited after initial release into bet
 - [ ] Middleware for URL parameter validation to reduce code across endpoints.
 - [ ] Automate the deployment of ECR images via GHA.
 - [ ] True up process for image uploads during recipe creation.
+- [ ] Handle recipe, kitchen, and account clean ups after soft deletes.

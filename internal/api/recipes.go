@@ -195,3 +195,15 @@ func (a *App) GetKitchenRecipes(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, recipes)
 }
+
+func (a *App) DeleteKitchenRecipe(c echo.Context) error {
+	ctx := c.Request().Context()
+	recipeID := c.Param("recipe_id")
+
+	err := recipes.DeleteRecipeByID(ctx, a.db, recipeID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not delete recipe by ID").SetInternal(err)
+	}
+
+	return c.NoContent(http.StatusOK)
+}
