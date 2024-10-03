@@ -31,6 +31,7 @@ func Create(input CreateInput) *App {
 	}
 
 	authorizer := middleware.NewAuthorizer(input.AuthValidator)
+	kitchenAuth := middleware.NewKitchenAuthorizer(input.DB)
 
 	// Disable the Echo banners on app start.
 	app.API.HideBanner = true
@@ -54,13 +55,13 @@ func Create(input CreateInput) *App {
 
 	// Kitchens
 	v1.GET("/kitchen/:kitchen_id", app.GetKitchen)
-	v1.PATCH("/kitchen/:kitchen_id", app.UpdateKitchen)
+	v1.PATCH("/kitchen/:kitchen_id", app.UpdateKitchen, kitchenAuth.ValidateWriter)
 
 	// Kitchen Recipes
 	v1.GET("/kitchen/:kitchen_id/recipes", app.GetKitchenRecipes)
 	v1.GET("/kitchen/:kitchen_id/recipes/:recipe_id", app.GetKitchenRecipe)
-	v1.DELETE("/kitchen/:kitchen_id/recipes/:recipe_id", app.DeleteKitchenRecipe)
-	v1.POST("/kitchen/:kitchen_id/recipes", app.CreateKitchenRecipe)
+	v1.DELETE("/kitchen/:kitchen_id/recipes/:recipe_id", app.DeleteKitchenRecipe, kitchenAuth.ValidateWriter)
+	v1.POST("/kitchen/:kitchen_id/recipes", app.CreateKitchenRecipe, kitchenAuth.ValidateWriter)
 
 	// Uploads
 	v1.POST("/upload", app.Upload)
