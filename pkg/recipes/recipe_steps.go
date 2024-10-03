@@ -28,6 +28,18 @@ func CreateRecipeSteps(ctx context.Context, store Store, input CreateRecipeStepI
 	return nil
 }
 
+func DeleteRecipeStepsByRecipeID(ctx context.Context, store Store, recipeID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM recipe_steps WHERE recipe_id = ?;
+	`, recipeID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetRecipeStepsByRecipeID(ctx context.Context, store Store, recipeID string) ([]RecipeStep, error) {
 	steps := make([]RecipeStep, 0)
 

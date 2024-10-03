@@ -26,6 +26,18 @@ func CreateRecipeImages(ctx context.Context, store Store, input CreateRecipeImag
 	return nil
 }
 
+func DeleteRecipeImagesByRecipeID(ctx context.Context, store Store, recipeID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM recipe_images WHERE recipe_id = ?;
+	`, recipeID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetRecipeImagesByRecipeID(ctx context.Context, store Store, recipeID string) ([]RecipeImage, error) {
 	images := make([]RecipeImage, 0)
 

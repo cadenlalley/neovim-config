@@ -34,6 +34,18 @@ func CreateRecipeIngredients(ctx context.Context, store Store, input CreateRecip
 	return nil
 }
 
+func DeleteRecipeIngredientsByRecipeID(ctx context.Context, store Store, recipeID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM recipe_ingredients WHERE recipe_id = ?;
+	`, recipeID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetRecipeIngredientsByRecipeID(ctx context.Context, store Store, recipeID string) ([]RecipeIngredient, error) {
 	ingredients := make([]RecipeIngredient, 0)
 

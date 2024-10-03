@@ -102,9 +102,117 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 	return c.JSON(http.StatusOK, recipe)
 }
 
-// func (a *App) UpdateKitchenRecipe(c echo.Context) error {
+func (a *App) UpdateKitchenRecipe(c echo.Context) error {
+	var input recipes.Recipe
+	err := web.ValidateRequest(c, web.ContentTypeApplicationJSON, &input)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
 
-// }
+	ctx := c.Request().Context()
+	recipeID := c.Param("recipe_id")
+
+	recipe, err := recipes.GetRecipeByID(ctx, a.db, recipeID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get recipe by ID").SetInternal(err)
+	}
+
+	err = mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
+		recipe, err = recipes.UpdateRecipe(ctx, tx, recipes.UpdateRecipeInput{
+			RecipeID: recipeID,
+			Name:     input.Name,
+			Summary:  input.Summary,
+			PrepTime: *input.PrepTime,
+			CookTime: *input.CookTime,
+			Servings: *input.Servings,
+			Cover:    input.Cover,
+			Source:   input.Source,
+		})
+		if err != nil {
+			return err
+		}
+
+		// Delete all existing references for recipe steps for a full replacement.
+		err = recipes.DeleteRecipeImagesByRecipeID(ctx, tx, recipeID)
+		if err != nil {
+			return err
+		}
+
+		err = recipes.DeleteRecipeNotesByRecipeID(ctx, tx, recipeID)
+		if err != nil {
+			return err
+		}
+
+		err = recipes.DeleteRecipeStepsByRecipeID(ctx, tx, recipeID)
+		if err != nil {
+			return err
+		}
+
+		err = recipes.DeleteRecipeIngredientsByRecipeID(ctx, tx, recipeID)
+		if err != nil {
+			return err
+		}
+
+		// Handle step processing (images, notes)
+		for _, step := range input.Steps {
+			err = recipes.CreateRecipeSteps(ctx, tx, recipes.CreateRecipeStepInput{
+				RecipeID:    recipeID,
+				StepID:      step.StepID,
+				Instruction: step.Instruction,
+				Group:       step.Group,
+			})
+			if err != nil {
+				return err
+			}
+
+			if len(step.Images) != 0 {
+				for _, image := range step.Images {
+					err = recipes.CreateRecipeImages(ctx, tx, recipes.CreateRecipeImagesInput{
+						RecipeID: recipeID,
+						StepID:   step.StepID,
+						ImageURL: image,
+					})
+					if err != nil {
+						return err
+					}
+				}
+			}
+
+			if step.Note != "" {
+				err = recipes.CreateRecipeNotes(ctx, tx, recipes.CreateRecipeNotesInput{
+					RecipeID: recipeID,
+					StepID:   step.StepID,
+					Note:     step.Note,
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		// Handle ingredient processing
+		for _, ingredient := range input.Ingredients {
+			err = recipes.CreateRecipeIngredients(ctx, tx, recipes.CreateRecipeIngredientInput{
+				RecipeID:     recipeID,
+				IngredientID: ingredient.IngredientID,
+				Name:         ingredient.Name,
+				Quantity:     ingredient.Quantity,
+				Unit:         ingredient.Unit,
+				Group:        ingredient.Group,
+			})
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not update recipe").SetInternal(err)
+	}
+
+	return c.JSON(http.StatusOK, recipe)
+}
 
 func (a *App) GetKitchenRecipe(c echo.Context) error {
 	ctx := c.Request().Context()

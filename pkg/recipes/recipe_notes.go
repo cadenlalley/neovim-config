@@ -26,6 +26,18 @@ func CreateRecipeNotes(ctx context.Context, store Store, input CreateRecipeNotes
 	return nil
 }
 
+func DeleteRecipeNotesByRecipeID(ctx context.Context, store Store, recipeID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM recipe_notes WHERE recipe_id = ?;
+	`, recipeID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetRecipeNotesByRecipeID(ctx context.Context, store Store, recipeID string) ([]RecipeNote, error) {
 	notes := make([]RecipeNote, 0)
 

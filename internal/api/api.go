@@ -62,6 +62,7 @@ func Create(input CreateInput) *App {
 	v1.GET("/kitchen/:kitchen_id/recipes/:recipe_id", app.GetKitchenRecipe)
 	v1.DELETE("/kitchen/:kitchen_id/recipes/:recipe_id", app.DeleteKitchenRecipe, kitchenAuth.ValidateWriter)
 	v1.POST("/kitchen/:kitchen_id/recipes", app.CreateKitchenRecipe, kitchenAuth.ValidateWriter)
+	v1.PUT("/kitchen/:kitchen_id/recipes/:recipe_id", app.UpdateKitchenRecipe, kitchenAuth.ValidateWriter)
 
 	// Uploads
 	v1.POST("/upload", app.Upload)

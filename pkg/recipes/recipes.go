@@ -49,6 +49,38 @@ func CreateRecipe(ctx context.Context, store Store, input CreateRecipeInput) (Re
 	return GetRecipeByID(ctx, store, input.RecipeID)
 }
 
+type UpdateRecipeInput struct {
+	RecipeID string
+	Name     string
+	Summary  null.String
+	PrepTime int
+	CookTime int
+	Servings int
+	Cover    null.String
+	Source   null.String
+}
+
+func UpdateRecipe(ctx context.Context, store Store, input UpdateRecipeInput) (Recipe, error) {
+	_, err := store.ExecContext(ctx, `
+		UPDATE recipes
+		SET
+			recipe_name = ?,
+			summary = ?,
+			prep_time = ?,
+			cook_time = ?,
+			servings = ?,
+			cover = ?,
+			source = ?
+		WHERE
+			recipe_id = ?;
+	`, input.Name, input.Summary, input.PrepTime, input.CookTime, input.Servings, input.Cover, input.Source, input.RecipeID)
+	if err != nil {
+		return Recipe{}, err
+	}
+
+	return GetRecipeByID(ctx, store, input.RecipeID)
+}
+
 func GetRecipeByID(ctx context.Context, store Store, recipeID string) (Recipe, error) {
 	var recipe Recipe
 	err := store.QueryRowxContext(ctx, `
