@@ -14,6 +14,7 @@ import (
 	"github.com/kitchens-io/kitchens-api/internal/api"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/mysql"
+	"github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 
 	"github.com/rs/zerolog/log"
@@ -50,6 +51,12 @@ type AppConfig struct {
 	S3 struct {
 		Host        string `envconfig:"S3_LOCAL_HOST"`
 		MediaBucket string `required:"true" envconfig:"S3_MEDIA_BUCKET"`
+	}
+
+	// OpenAI
+	OpenAI struct {
+		Host  string `required:"true" envconfig:"OPENAI_HOST"`
+		Token string `required:"true" envconfig:"OPENAI_TOKEN"`
 	}
 }
 
@@ -99,6 +106,10 @@ func main() {
 
 	fileManager := media.NewS3FileManager(s3Client, cfg.S3.MediaBucket)
 
+	// Handle OpenAI client
+	// ==========================
+	aiClient := openai.NewOpenAIClient(cfg.OpenAI.Host, cfg.OpenAI.Token)
+
 	// Handle application server.
 	// ==========================
 
@@ -113,6 +124,7 @@ func main() {
 		DB:            db,
 		FileManager:   fileManager,
 		AuthValidator: validator,
+		AIClient:      aiClient,
 	})
 
 	// Start server

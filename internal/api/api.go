@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/middleware"
+	"github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/labstack/echo/v4"
 	mw "github.com/labstack/echo/v4/middleware"
 )
@@ -12,6 +13,7 @@ import (
 type App struct {
 	db          *sqlx.DB
 	fileManager *media.S3FileManager
+	aiClient    *openai.OpenAIClient
 	API         *echo.Echo
 }
 
@@ -19,6 +21,7 @@ type CreateInput struct {
 	DB            *sqlx.DB
 	FileManager   *media.S3FileManager
 	AuthValidator *validator.Validator
+	AIClient      *openai.OpenAIClient
 }
 
 // Create will establish an instance of the app with all routes
@@ -27,6 +30,7 @@ func Create(input CreateInput) *App {
 	app := &App{
 		db:          input.DB,
 		fileManager: input.FileManager,
+		aiClient:    input.AIClient,
 		API:         echo.New(),
 	}
 
@@ -63,6 +67,10 @@ func Create(input CreateInput) *App {
 	v1.DELETE("/kitchen/:kitchen_id/recipes/:recipe_id", app.DeleteKitchenRecipe, kitchenAuth.ValidateWriter)
 	v1.POST("/kitchen/:kitchen_id/recipes", app.CreateKitchenRecipe, kitchenAuth.ValidateWriter)
 	v1.PUT("/kitchen/:kitchen_id/recipes/:recipe_id", app.UpdateKitchenRecipe, kitchenAuth.ValidateWriter)
+
+	// Recipe import routes
+	v1.POST("/import/url", app.ImportURL)
+	// v1.POST("/import/image", app.ImportImage)
 
 	// Uploads
 	v1.POST("/upload", app.Upload)
