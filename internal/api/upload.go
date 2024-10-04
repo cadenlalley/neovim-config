@@ -1,7 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
@@ -27,6 +29,9 @@ func (a *App) Upload(c echo.Context) error {
 	prefix := media.GetAccountMediaPath(account.AccountID)
 	key, err := a.HandleFormFile(c, "file", prefix)
 	if err != nil {
+		if strings.HasPrefix(err.Error(), "no file provided") {
+			return echo.NewHTTPError(http.StatusBadRequest, err)
+		}
 		msg := "could not upload file"
 		log.Err(err).Str("prefix", prefix).Msg(msg)
 		return echo.NewHTTPError(http.StatusInternalServerError, msg).SetInternal(err)
@@ -44,7 +49,7 @@ func (a *App) HandleFormFile(c echo.Context, field, prefix string) (string, erro
 	}
 
 	if file == nil {
-		return "", nil
+		return "", fmt.Errorf("no file provided in field '%s'", field)
 	}
 
 	ctx := c.Request().Context()
