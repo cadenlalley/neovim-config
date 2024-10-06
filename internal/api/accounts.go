@@ -13,7 +13,7 @@ import (
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/kitchens-io/kitchens-api/pkg/kitchens"
 	"github.com/labstack/echo/v4"
-	"github.com/rs/zerolog/log"
+	"github.com/pkg/errors"
 	"gopkg.in/guregu/null.v4"
 )
 
@@ -68,20 +68,18 @@ func (a *App) CreateAccount(c echo.Context) error {
 	var kitchen kitchens.Kitchen
 
 	prefix := media.GetKitchenMediaPath(kitchenID)
-	avatarKey, err := a.HandleFormFile(c, "kitchenAvatarFile", prefix)
-	if err != nil {
-		msg := "could not upload avatar photo"
-		log.Err(err).Str("prefix", prefix).Msg(msg)
-		return echo.NewHTTPError(http.StatusInternalServerError, msg).SetInternal(err)
+	avatarKey, err := a.handleFormFile(c, "kitchenAvatarFile", prefix)
+	if err != nil && err != http.ErrMissingFile {
+		err = errors.Wrapf(err, "could not upload kitchenAvatarFile to prefix '%s'", prefix)
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not upload avatar photo").SetInternal(err)
 	} else {
 		kitchen.Avatar = null.NewString(avatarKey, true)
 	}
 
-	coverKey, err := a.HandleFormFile(c, "kitchenCoverFile", prefix)
-	if err != nil {
-		msg := "could not upload cover photo"
-		log.Err(err).Str("prefix", prefix).Msg(msg)
-		return echo.NewHTTPError(http.StatusInternalServerError, msg).SetInternal(err)
+	coverKey, err := a.handleFormFile(c, "kitchenCoverFile", prefix)
+	if err != nil && err != http.ErrMissingFile {
+		err = errors.Wrapf(err, "could not upload kitchenCoverFile to prefix '%s'", prefix)
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not upload cover photo").SetInternal(err)
 	} else {
 		kitchen.Cover = null.NewString(coverKey, true)
 	}

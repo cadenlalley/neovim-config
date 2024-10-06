@@ -1,15 +1,13 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/labstack/echo/v4"
-	"github.com/rs/zerolog/log"
+	"github.com/pkg/errors"
 )
 
 type UploadResponse struct {
@@ -27,14 +25,13 @@ func (a *App) Upload(c echo.Context) error {
 	}
 
 	prefix := media.GetAccountMediaPath(account.AccountID)
-	key, err := a.HandleFormFile(c, "file", prefix)
+	key, err := a.handleFormFile(c, "file", prefix)
 	if err != nil {
-		if strings.HasPrefix(err.Error(), "no file provided") {
-			return echo.NewHTTPError(http.StatusBadRequest, err)
+		if err == http.ErrMissingFile {
+			return echo.NewHTTPError(http.StatusBadRequest, "no file provided")
 		}
-		msg := "could not upload file"
-		log.Err(err).Str("prefix", prefix).Msg(msg)
-		return echo.NewHTTPError(http.StatusInternalServerError, msg).SetInternal(err)
+		err = errors.Wrapf(err, "could not upload file to prefix '%s'", prefix)
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not upload file").SetInternal(err)
 	}
 
 	return c.JSON(http.StatusOK, UploadResponse{
@@ -42,14 +39,10 @@ func (a *App) Upload(c echo.Context) error {
 	})
 }
 
-func (a *App) HandleFormFile(c echo.Context, field, prefix string) (string, error) {
+func (a *App) handleFormFile(c echo.Context, field, prefix string) (string, error) {
 	file, err := c.FormFile(field)
-	if file != nil && err != nil {
+	if err != nil {
 		return "", err
-	}
-
-	if file == nil {
-		return "", fmt.Errorf("no file provided in field '%s'", field)
 	}
 
 	ctx := c.Request().Context()
