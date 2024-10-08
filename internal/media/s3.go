@@ -63,6 +63,18 @@ func (u *S3FileManager) UploadFromHeader(ctx context.Context, file *multipart.Fi
 	return key, nil
 }
 
+func (u *S3FileManager) Get(ctx context.Context, key string) (io.ReadCloser, string, error) {
+	result, err := u.s3.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: ptr.String(u.Bucket),
+		Key:    ptr.String(key),
+	})
+	if err != nil {
+		return nil, "", err
+	}
+
+	return result.Body, *result.ContentType, nil
+}
+
 func (u *S3FileManager) Ping(ctx context.Context) error {
 	result, err := u.s3.ListBuckets(ctx, &s3.ListBucketsInput{})
 	if err != nil {

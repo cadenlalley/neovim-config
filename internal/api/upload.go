@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
@@ -37,6 +38,27 @@ func (a *App) Upload(c echo.Context) error {
 	return c.JSON(http.StatusOK, UploadResponse{
 		Key: key,
 	})
+}
+
+func (a *App) CDN(c echo.Context) error {
+	if a.env != "dev" {
+		return echo.NewHTTPError(http.StatusBadRequest, "not implemented")
+	}
+
+	ctx := c.Request().Context()
+	parts := strings.Split(c.Request().URL.Path, "/cdn/")
+	key := parts[len(parts)-1]
+
+	if key == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "no file requested")
+	}
+
+	file, contentType, err := a.fileManager.Get(ctx, key)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+
+	return c.Stream(http.StatusOK, contentType, file)
 }
 
 func (a *App) handleFormFile(c echo.Context, field, prefix string) (string, error) {

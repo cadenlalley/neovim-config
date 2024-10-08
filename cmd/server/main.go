@@ -124,6 +124,7 @@ func main() {
 		DB:            db,
 		FileManager:   fileManager,
 		AuthValidator: validator,
+		Env:           cfg.Env,
 		AIClient:      aiClient,
 	})
 

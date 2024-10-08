@@ -14,6 +14,7 @@ type App struct {
 	db          *sqlx.DB
 	fileManager *media.S3FileManager
 	aiClient    *openai.OpenAIClient
+	env         string
 	API         *echo.Echo
 }
 
@@ -21,6 +22,7 @@ type CreateInput struct {
 	DB            *sqlx.DB
 	FileManager   *media.S3FileManager
 	AuthValidator *validator.Validator
+	Env           string
 	AIClient      *openai.OpenAIClient
 }
 
@@ -31,6 +33,7 @@ func Create(input CreateInput) *App {
 		db:          input.DB,
 		fileManager: input.FileManager,
 		aiClient:    input.AIClient,
+		env:         input.Env,
 		API:         echo.New(),
 	}
 
@@ -47,6 +50,7 @@ func Create(input CreateInput) *App {
 
 	// Health Handler
 	app.API.GET("/health", app.GetHealth)
+	app.API.GET("/cdn/*", app.CDN)
 
 	// V1 API routes
 	v1 := app.API.Group("/v1")
