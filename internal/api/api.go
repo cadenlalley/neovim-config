@@ -60,6 +60,7 @@ func Create(input CreateInput) *App {
 	v1.GET("/iam", app.GetIAM)
 	v1.POST("/account", app.CreateAccount)
 	v1.PATCH("/account", app.UpdateAccount)
+	v1.DELETE("/account", app.DeleteAccount)
 
 	// Kitchens
 	v1.GET("/kitchen/:kitchen_id", app.GetKitchen)

@@ -86,3 +86,15 @@ func GetAccountByUserID(ctx context.Context, store Store, userID string) (Accoun
 
 	return account, nil
 }
+
+func DeleteAccountByID(ctx context.Context, store Store, accountID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM accounts WHERE account_id = ?
+	`, accountID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

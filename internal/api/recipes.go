@@ -25,7 +25,7 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 
 	var recipe recipes.Recipe
 
-	err = mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
+	txErr := mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
 		recipe, err = recipes.CreateRecipe(ctx, tx, recipes.CreateRecipeInput{
 			RecipeID:  recipeID,
 			KitchenID: kitchenID,
@@ -95,7 +95,7 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 
 		return nil
 	})
-	if err != nil {
+	if txErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not create recipe").SetInternal(err)
 	}
 
@@ -117,7 +117,7 @@ func (a *App) UpdateKitchenRecipe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get recipe by ID").SetInternal(err)
 	}
 
-	err = mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
+	txErr := mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
 		recipe, err = recipes.UpdateRecipe(ctx, tx, recipes.UpdateRecipeInput{
 			RecipeID: recipeID,
 			Name:     input.Name,
@@ -207,7 +207,7 @@ func (a *App) UpdateKitchenRecipe(c echo.Context) error {
 
 		return nil
 	})
-	if err != nil {
+	if txErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not update recipe").SetInternal(err)
 	}
 

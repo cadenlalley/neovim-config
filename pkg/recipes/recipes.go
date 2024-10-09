@@ -101,7 +101,7 @@ func ListRecipesByKitchenID(ctx context.Context, store Store, kitchenID string) 
 	recipes := make([]Recipe, 0)
 
 	rows, err := store.QueryxContext(ctx, `
-		SELECT * FROM recipes WHERE kitchen_id = ? AND deleted_at IS NULL
+		SELECT * FROM recipes WHERE kitchen_id = ? AND deleted_at IS NULL ORDER BY created_at
 	`, kitchenID)
 
 	if err != nil {
@@ -131,5 +131,15 @@ func DeleteRecipeByID(ctx context.Context, store Store, recipeID string) error {
 		return err
 	}
 
+	return nil
+}
+
+func DeleteRecipesByKitchenID(ctx context.Context, store Store, kitchenID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM recipes WHERE kitchen_id = ?
+	`, kitchenID)
+	if err != nil {
+		return err
+	}
 	return nil
 }

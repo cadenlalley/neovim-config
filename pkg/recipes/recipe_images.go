@@ -38,6 +38,16 @@ func DeleteRecipeImagesByRecipeID(ctx context.Context, store Store, recipeID str
 	return nil
 }
 
+func DeleteRecipeImagesByKitchenID(ctx context.Context, store Store, kitchenID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM recipe_images WHERE recipe_id IN (SELECT recipe_id FROM recipes WHERE kitchen_id = ?)
+	`, kitchenID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func GetRecipeImagesByRecipeID(ctx context.Context, store Store, recipeID string) ([]RecipeImage, error) {
 	images := make([]RecipeImage, 0)
 

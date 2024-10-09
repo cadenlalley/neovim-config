@@ -98,7 +98,7 @@ func ListKitchensByAccountID(ctx context.Context, store Store, accountID string)
 	kitchens := make([]Kitchen, 0)
 
 	rows, err := store.QueryxContext(ctx, `
-		SELECT * FROM kitchens WHERE account_id = ?
+		SELECT * FROM kitchens WHERE account_id = ? ORDER BY created_at
 	`, accountID)
 
 	if err != nil {
@@ -118,4 +118,15 @@ func ListKitchensByAccountID(ctx context.Context, store Store, accountID string)
 	}
 
 	return kitchens, nil
+}
+
+func DeleteKitchenByKitchenID(ctx context.Context, store Store, kitchenID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM kitchens WHERE kitchen_id = ?
+	`, kitchenID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

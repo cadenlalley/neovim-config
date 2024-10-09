@@ -12,6 +12,7 @@ import (
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/kitchens-io/kitchens-api/pkg/kitchens"
+	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"gopkg.in/guregu/null.v4"
@@ -84,7 +85,7 @@ func (a *App) CreateAccount(c echo.Context) error {
 		kitchen.Cover = null.NewString(coverKey, true)
 	}
 
-	err = mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
+	txErr := mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
 		account, err = accounts.CreateAccount(ctx, tx, accounts.CreateAccountInput{
 			AccountID: accountID,
 			UserID:    userID,
@@ -113,7 +114,7 @@ func (a *App) CreateAccount(c echo.Context) error {
 		return nil
 	})
 
-	if err != nil {
+	if txErr != nil {
 		if err == kitchens.ErrDuplicateHandle {
 			return echo.NewHTTPError(http.StatusBadRequest, err)
 		}
@@ -160,4 +161,71 @@ func (a *App) UpdateAccount(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, account)
+}
+
+func (a *App) DeleteAccount(c echo.Context) error {
+	ctx := c.Request().Context()
+	userID := c.Get(auth.UserIDContextKey).(string)
+
+	account, err := accounts.GetAccountByUserID(ctx, a.db, userID)
+	if err != nil {
+		if err == accounts.ErrAccountNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err)
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get account").SetInternal(err)
+	}
+
+	accountKitchens, err := kitchens.ListKitchensByAccountID(ctx, a.db, account.AccountID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get kitchens").SetInternal(err)
+	}
+
+	for _, kitchen := range accountKitchens {
+		if kitchen.AccountID == account.AccountID {
+			txErr := mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
+				err = recipes.DeleteRecipeImagesByKitchenID(ctx, tx, kitchen.KitchenID)
+				if err != nil {
+					return errors.Wrap(err, "could not delete recipe images")
+				}
+
+				err = recipes.DeleteRecipeIngredientsByKitchenID(ctx, tx, kitchen.KitchenID)
+				if err != nil {
+					return errors.Wrap(err, "could not delete recipe ingredients")
+				}
+
+				err = recipes.DeleteRecipeNotesByKitchenID(ctx, tx, kitchen.KitchenID)
+				if err != nil {
+					return errors.Wrap(err, "could not delete recipe notes")
+				}
+
+				err = recipes.DeleteRecipeStepsByKitchenID(ctx, tx, kitchen.KitchenID)
+				if err != nil {
+					return errors.Wrap(err, "could not delete recipe steps")
+				}
+
+				err = recipes.DeleteRecipesByKitchenID(ctx, tx, kitchen.KitchenID)
+				if err != nil {
+					return errors.Wrap(err, "could not delete recipes")
+				}
+
+				err = kitchens.DeleteKitchenByKitchenID(ctx, tx, kitchen.KitchenID)
+				if err != nil {
+					return errors.Wrap(err, "could not delete kitchen")
+				}
+
+				return nil
+			})
+			if txErr != nil {
+				txErr = errors.Wrapf(txErr, "could not delete kitchen: '%s'", kitchen.KitchenID)
+				return echo.NewHTTPError(http.StatusInternalServerError, "could not delete account").SetInternal(txErr)
+			}
+		}
+	}
+
+	err = accounts.DeleteAccountByID(ctx, a.db, account.AccountID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not delete account").SetInternal(err)
+	}
+
+	return c.NoContent(http.StatusOK)
 }
