@@ -1,6 +1,7 @@
 package recipes
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/segmentio/ksuid"
@@ -24,6 +25,17 @@ type Recipe struct {
 	// Attached for full recipe
 	Ingredients []RecipeIngredient `json:"ingredients" db:"-" validate:"required,dive"`
 	Steps       []RecipeStep       `json:"steps" db:"-" validate:"required,dive"`
+}
+
+// Model validation not handled by the validator
+func (r *Recipe) Validate() error {
+	if len(r.Ingredients) == 0 {
+		return fmt.Errorf("missing items for field 'ingredients'")
+	}
+	if len(r.Steps) == 0 {
+		return fmt.Errorf("missing items for field 'steps'")
+	}
+	return nil
 }
 
 func CreateRecipeID() string {

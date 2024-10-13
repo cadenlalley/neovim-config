@@ -31,18 +31,24 @@ func (a *KitchenAuthorizer) ValidateWriter(next echo.HandlerFunc) echo.HandlerFu
 		// Lookup the user record for the provided JWT.
 		account, err := accounts.GetAccountByUserID(ctx, a.db, userID)
 		if err != nil {
+			if err == accounts.ErrAccountNotFound {
+				return echo.NewHTTPError(http.StatusNotFound, err)
+			}
 			return echo.NewHTTPError(http.StatusInternalServerError, "could not get account by user ID").SetInternal(err)
 		}
 
 		kitchen, err := kitchens.GetKitchenByID(ctx, a.db, kitchenID)
 		if err != nil {
+			if err == kitchens.ErrKitchenNotFound {
+				return echo.NewHTTPError(http.StatusNotFound, err)
+			}
 			return echo.NewHTTPError(http.StatusInternalServerError, "could not get kitchen by ID").SetInternal(err)
 		}
 
 		// Validate that the user has permissions to be modifying this kitchen.
 		if account.AccountID != kitchen.AccountID {
 			err := fmt.Errorf("account '%s' attempted to create in kitchen '%s' without authorization", account.AccountID, kitchen.KitchenID)
-			return echo.NewHTTPError(http.StatusUnauthorized).SetInternal(err)
+			return echo.NewHTTPError(http.StatusForbidden).SetInternal(err)
 		}
 
 		return next(c)

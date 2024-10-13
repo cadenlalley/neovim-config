@@ -17,6 +17,9 @@ func (a *App) GetKitchen(c echo.Context) error {
 
 	kitchen, err := kitchens.GetKitchenByID(ctx, a.db, kitchenID)
 	if err != nil {
+		if err == kitchens.ErrKitchenNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get kitchen by ID").SetInternal(err)
 	}
 
@@ -49,6 +52,9 @@ func (a *App) UpdateKitchen(c echo.Context) error {
 
 	kitchen, err := kitchens.GetKitchenByID(ctx, a.db, kitchenID)
 	if err != nil {
+		if err == kitchens.ErrKitchenNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get kitchen by ID").SetInternal(err)
 	}
 

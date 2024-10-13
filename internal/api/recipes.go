@@ -17,6 +17,12 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
+	// Additional validation that ingredients and steps were required.
+	err = input.Validate()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
 	ctx := c.Request().Context()
 	kitchenID := c.Param("kitchen_id")
 
@@ -114,6 +120,9 @@ func (a *App) UpdateKitchenRecipe(c echo.Context) error {
 
 	recipe, err := recipes.GetRecipeByID(ctx, a.db, recipeID)
 	if err != nil {
+		if err == recipes.ErrRecipeNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get recipe by ID").SetInternal(err)
 	}
 
@@ -220,6 +229,9 @@ func (a *App) GetKitchenRecipe(c echo.Context) error {
 
 	recipe, err := recipes.GetRecipeByID(ctx, a.db, recipeID)
 	if err != nil {
+		if err == recipes.ErrRecipeNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get recipe by ID").SetInternal(err)
 	}
 
@@ -290,6 +302,9 @@ func (a *App) DeleteKitchenRecipe(c echo.Context) error {
 
 	err := recipes.DeleteRecipeByID(ctx, a.db, recipeID)
 	if err != nil {
+		if err == recipes.ErrRecipeNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not delete recipe by ID").SetInternal(err)
 	}
 
