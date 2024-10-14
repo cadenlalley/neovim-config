@@ -23,6 +23,9 @@ func (a *App) GetIAM(c echo.Context) error {
 	// Lookup the user record for the provided JWT.
 	account, err := accounts.GetAccountByUserID(ctx, a.db, userID)
 	if err != nil {
+		if err == accounts.ErrAccountNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get account by user ID").SetInternal(err)
 	}
 
