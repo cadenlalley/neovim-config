@@ -15,6 +15,7 @@ type App struct {
 	fileManager *media.S3FileManager
 	aiClient    *openai.OpenAIClient
 	env         string
+	cdnHost     string
 	API         *echo.Echo
 }
 
@@ -23,6 +24,7 @@ type CreateInput struct {
 	FileManager   *media.S3FileManager
 	AuthValidator *validator.Validator
 	Env           string
+	CDNHost       string
 	AIClient      *openai.OpenAIClient
 }
 
@@ -34,6 +36,7 @@ func Create(input CreateInput) *App {
 		fileManager: input.FileManager,
 		aiClient:    input.AIClient,
 		env:         input.Env,
+		cdnHost:     input.CDNHost,
 		API:         echo.New(),
 	}
 
@@ -75,7 +78,7 @@ func Create(input CreateInput) *App {
 
 	// Recipe import routes
 	v1.POST("/import/url", app.ImportURL)
-	// v1.POST("/import/image", app.ImportImage)
+	v1.POST("/import/image", app.ImportImage)
 
 	// Uploads
 	v1.POST("/upload", app.Upload)

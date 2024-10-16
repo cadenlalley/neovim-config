@@ -24,9 +24,14 @@ type ChatCompletionResponse struct {
 	SystemFingerprint string `json:"system_fingerprint"`
 }
 
+type ChatCompletionContentImageURL struct {
+	URL string `json:"url,omitempty"`
+}
+
 type ChatCompletionContent struct {
-	Type string `json:"type"`
-	Text string `json:"text,omitempty"`
+	Type     string                         `json:"type"`
+	Text     string                         `json:"text,omitempty"`
+	ImageURL *ChatCompletionContentImageURL `json:"image_url,omitempty"`
 }
 
 type ChatCompletionMessage struct {

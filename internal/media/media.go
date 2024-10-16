@@ -14,3 +14,8 @@ func GetKitchenMediaPath(kitchenID string) string {
 func GetRecipeMediaPath(recipeID string) string {
 	return "uploads/recipes/" + recipeID + "/"
 }
+
+// uploads/imports/{accountID}/
+func GetImportMediaPath(accountID string) string {
+	return "uploads/imports/" + accountID + "/"
+}

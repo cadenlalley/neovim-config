@@ -7,10 +7,15 @@ import (
 	"net/http"
 
 	"github.com/kitchens-io/kitchens-api/internal/extractor"
+	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/kitchens-io/kitchens-api/internal/web"
+	"github.com/kitchens-io/kitchens-api/pkg/accounts"
+	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
+	"gopkg.in/guregu/null.v4"
 )
 
 type ImportURLRequest struct {
@@ -35,6 +40,8 @@ func (a *App) ImportURL(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
+
+	res.Source = null.NewString(input.Source, true)
 
 	return c.JSON(http.StatusOK, res)
 }
@@ -63,54 +70,91 @@ func (a *App) getRecipeFromText(text string) (recipes.Recipe, error) {
 				},
 			},
 		},
-		ResponseFormat: json.RawMessage(`{
-        "type": "json_schema",
-        "json_schema": {
-            "name": "url_recipe_response",
-            "schema": {
-                "type": "object",
-                "properties": {
-                    "name": {"type": "string"},
-                    "summary": {"type": "string"},
-                    "prepTime": {"type": "integer", "description": "the preparation time in minutes"},
-                    "cookTime": {"type": "integer", "description": "the cook time in minutes"},
-                    "servings": {"type": "integer", "description": "the number of servings"},
-                    "ingredients": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "ingredientId": {"type": "integer"},
-                                "name": {"type": "string"},
-                                "quantity": {"type": "number"},
-                                "unit": {"type": ["string", "null"], "description": "the unit of measurement"},
-                                "group": {"type": ["string", "null"]}
-                            },
-                            "required": ["ingredientId","name","quantity","group","unit"],
-                            "additionalProperties": false
-                        }
-                    },
-                    "steps": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "stepId": {"type": "integer"},
-                                "instruction": {"type": "string"},
-                                "note": {"type": ["string", "null"]},
-                                "group": {"type": ["string", "null"]}
-                            },
-                            "required": ["stepId","instruction","note","group"],
-                            "additionalProperties": false
-                        }
-                    }
-                },
-                "required": ["name","summary","prepTime","cookTime","servings","ingredients","steps"],
-                "additionalProperties": false
-            },
-            "strict": true
-        }
-    }`),
+		ResponseFormat: recipes.JsonSchema,
+	})
+	if err != nil {
+		return recipes.Recipe{}, err
+	}
+
+	// Handle the escaped HTML that comes back from Open AI.
+	if len(res.Choices) == 0 {
+		return recipes.Recipe{}, fmt.Errorf("unexpected response payload from Open AI: %v", res)
+	}
+
+	recipeText := html.UnescapeString(res.Choices[0].Message.Content)
+
+	// Marshal the response into a recipe struct.
+	var recipe recipes.Recipe
+	err = json.Unmarshal(json.RawMessage(recipeText), &recipe)
+	if err != nil {
+		return recipes.Recipe{}, err
+	}
+
+	return recipe, nil
+}
+
+func (a *App) ImportImage(c echo.Context) error {
+	ctx := c.Request().Context()
+	userID := c.Get(auth.UserIDContextKey).(string)
+
+	// Lookup the user record for the provided JWT.
+	account, err := accounts.GetAccountByUserID(ctx, a.db, userID)
+	if err != nil {
+		if err == accounts.ErrAccountNotFound {
+			return echo.NewHTTPError(http.StatusNotFound, err)
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get account by user ID").SetInternal(err)
+	}
+
+	prefix := media.GetImportMediaPath(account.AccountID)
+	key, err := a.handleFormFile(c, "file", prefix)
+	if err != nil {
+		if err == http.ErrMissingFile {
+			return echo.NewHTTPError(http.StatusBadRequest, "no file provided")
+		}
+		err = errors.Wrapf(err, "could not upload file to prefix '%s'", prefix)
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not upload file").SetInternal(err)
+	}
+
+	res, err := a.getRecipeFromImage(a.cdnHost + "/" + key)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from image").SetInternal(err)
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
+
+func (a *App) getRecipeFromImage(url string) (recipes.Recipe, error) {
+	res, err := a.aiClient.PostChatCompletion(openai.ChatCompletionRequest{
+		Model:     "gpt-4o-mini",
+		MaxTokens: 1600,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role: "system",
+				Content: []openai.ChatCompletionContent{
+					{
+						Type: "text",
+						Text: "You are a helpful assistant.",
+					},
+				},
+			},
+			{
+				Role: "user",
+				Content: []openai.ChatCompletionContent{
+					{
+						Type: "text",
+						Text: "Retrieve the complete recipe from the following image, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text.",
+					},
+					{
+						Type: "image_url",
+						ImageURL: &openai.ChatCompletionContentImageURL{
+							URL: url,
+						},
+					},
+				},
+			},
+		},
+		ResponseFormat: recipes.JsonSchema,
 	})
 	if err != nil {
 		return recipes.Recipe{}, err

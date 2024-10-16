@@ -53,6 +53,10 @@ type AppConfig struct {
 		MediaBucket string `required:"true" envconfig:"S3_MEDIA_BUCKET"`
 	}
 
+	CDN struct {
+		Host string `required:"true" envconfig:"CDN_HOST"`
+	}
+
 	// OpenAI
 	OpenAI struct {
 		Host  string `required:"true" envconfig:"OPENAI_HOST"`
@@ -125,6 +129,7 @@ func main() {
 		FileManager:   fileManager,
 		AuthValidator: validator,
 		Env:           cfg.Env,
+		CDNHost:       cfg.CDN.Host,
 		AIClient:      aiClient,
 	})
 
