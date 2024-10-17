@@ -43,10 +43,10 @@ func CreateRecipeID() string {
 }
 
 type RecipeStep struct {
-	RecipeID    string `json:"-" db:"recipe_id"`
-	StepID      int    `json:"stepId" db:"step_id" validate:"required"`
-	Instruction string `json:"instruction" db:"instruction" validate:"required"`
-	Group       string `json:"group" db:"group_name"`
+	RecipeID    string      `json:"-" db:"recipe_id"`
+	StepID      int         `json:"stepId" db:"step_id" validate:"required"`
+	Instruction string      `json:"instruction" db:"instruction" validate:"required"`
+	Group       null.String `json:"group" db:"group_name"`
 
 	// Attached for full step
 	Images []string `json:"images" db:"-"`
@@ -71,5 +71,5 @@ type RecipeIngredient struct {
 	Name         string      `json:"name" db:"ingredient_name" validate:"required"`
 	Quantity     float64     `json:"quantity" db:"quantity" validate:"required"`
 	Unit         null.String `json:"unit" db:"unit"`
-	Group        string      `json:"group" db:"group_name"`
+	Group        null.String `json:"group" db:"group_name"`
 }

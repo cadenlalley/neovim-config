@@ -2,6 +2,7 @@ package recipes
 
 import (
 	"context"
+	"strings"
 
 	"gopkg.in/guregu/null.v4"
 )
@@ -12,10 +13,19 @@ type CreateRecipeIngredientInput struct {
 	Name         string
 	Quantity     float64
 	Unit         null.String
-	Group        string
+	Group        null.String
 }
 
 func CreateRecipeIngredients(ctx context.Context, store Store, input CreateRecipeIngredientInput) error {
+	// Handle nullable values.
+	if strings.TrimSpace(input.Group.String) == "" {
+		input.Group = null.NewString(input.Group.String, false)
+	}
+
+	// Handle nullable values.
+	if strings.TrimSpace(input.Unit.String) == "" {
+		input.Unit = null.NewString(input.Unit.String, false)
+	}
 	_, err := store.ExecContext(ctx, `
 		INSERT INTO recipe_ingredients (
 			recipe_id,

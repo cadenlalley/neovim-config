@@ -2,16 +2,24 @@ package recipes
 
 import (
 	"context"
+	"strings"
+
+	"gopkg.in/guregu/null.v4"
 )
 
 type CreateRecipeStepInput struct {
 	RecipeID    string
 	StepID      int
 	Instruction string
-	Group       string
+	Group       null.String
 }
 
 func CreateRecipeSteps(ctx context.Context, store Store, input CreateRecipeStepInput) error {
+	// Handle nullable values.
+	if strings.TrimSpace(input.Group.String) == "" {
+		input.Group = null.NewString(input.Group.String, false)
+	}
+
 	_, err := store.ExecContext(ctx, `
 		INSERT INTO recipe_steps (
 			recipe_id,
