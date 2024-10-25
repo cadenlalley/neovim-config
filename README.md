@@ -45,3 +45,5 @@ The following are areas that need to be revisited after initial release into bet
 - [ ] True up process for image uploads during recipe creation.
 - [ ] Handle recipe, kitchen, and account clean ups after soft deletes.
 - [ ] Investigate Yoast Schema Graph on pages to see if it improves results or lowers token count.
+- [ ] Body limit for uploads
+- [ ] Timeouts for all routes
