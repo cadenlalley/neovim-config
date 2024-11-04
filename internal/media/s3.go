@@ -64,7 +64,7 @@ func (u *S3FileManager) UploadFromHeader(ctx context.Context, file *multipart.Fi
 }
 
 func (u *S3FileManager) UploadFromHeaders(ctx context.Context, files []*multipart.FileHeader, prefix string) ([]string, error) {
-	keys := make([]string, len(files))
+	keys := make([]string, 0)
 
 	// Validation
 	if prefix[0:1] == "/" {
