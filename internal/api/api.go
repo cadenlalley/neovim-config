@@ -1,6 +1,8 @@
 package api
 
 import (
+	"time"
+
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/jmoiron/sqlx"
 	"github.com/kitchens-io/kitchens-api/internal/media"
@@ -8,6 +10,11 @@ import (
 	"github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/labstack/echo/v4"
 	mw "github.com/labstack/echo/v4/middleware"
+)
+
+const (
+	ENV_DEV  = "development"
+	ENV_PROD = "production"
 )
 
 type App struct {
@@ -50,6 +57,12 @@ func Create(input CreateInput) *App {
 	// Attach middelware and routes to the Echo instance.
 	app.API.Use(mw.Logger())
 	app.API.Use(mw.RequestID())
+	app.API.Use(mw.BodyLimitWithConfig(mw.BodyLimitConfig{
+		Limit: "10M",
+	}))
+	app.API.Use(mw.TimeoutWithConfig(mw.TimeoutConfig{
+		Timeout: 20 * time.Second,
+	}))
 
 	// Health Handler
 	app.API.GET("/health", app.GetHealth)

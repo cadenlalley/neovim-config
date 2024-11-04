@@ -25,7 +25,7 @@ type AppConfig struct {
 	Debug           bool          `default:"false" envconfig:"DEBUG"`
 	Port            string        `default:"1313" envconfig:"PORT"`
 	ShutdownTimeout time.Duration `default:"10s" envconfig:"SHUTDOWN_TIMEOUT"`
-	Env             string        `default:"dev" envconfig:"APP_ENV"`
+	Env             string        `default:"development" envconfig:"APP_ENV"`
 
 	// Database configurations
 	DB struct {
