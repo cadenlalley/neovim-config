@@ -61,7 +61,7 @@ func Create(input CreateInput) *App {
 		Limit: "10M",
 	}))
 	app.API.Use(mw.TimeoutWithConfig(mw.TimeoutConfig{
-		Timeout: 20 * time.Second,
+		Timeout: 30 * time.Second,
 	}))
 
 	// Health Handler

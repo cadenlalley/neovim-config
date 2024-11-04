@@ -22,7 +22,11 @@ var JsonSchema json.RawMessage = json.RawMessage(`{
 														"ingredientId": {"type": "integer"},
 														"name": {"type": "string"},
 														"quantity": {"type": "number"},
-														"unit": {"type": ["string", "null"], "description": "the unit of measurement"},
+														"unit": {
+															"type": ["string", "null"],
+															"description": "optional unit of measurement, if a unit doesn't make sense for the ingredient set it to n/a",
+															"enum": ["bag","bottle","box","can","clove","cup","dash","drop","gallon","gram","jar","kilogram","liter","milliliter","ounce","packet","piece","pint","pinch","pound","quart","slice","stick","tbsp","tsp", "n/a"]
+														},
 														"group": {"type": ["string", "null"]}
 												},
 												"required": ["ingredientId","name","quantity","group","unit"],

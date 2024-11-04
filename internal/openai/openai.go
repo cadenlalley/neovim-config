@@ -7,21 +7,25 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 type OpenAIClient struct {
 	BaseURL    string
 	HTTPClient *http.Client
 	APIKey     string
+	Debug      bool
 }
 
-func NewOpenAIClient(baseURL, apiKey string) *OpenAIClient {
+func NewOpenAIClient(baseURL, apiKey string, debug bool) *OpenAIClient {
 	return &OpenAIClient{
 		BaseURL: baseURL,
 		APIKey:  apiKey,
 		HTTPClient: &http.Client{
 			Timeout: 60 * time.Second,
 		},
+		Debug: debug,
 	}
 }
 
@@ -33,6 +37,10 @@ func (c *OpenAIClient) PostChatCompletion(payload ChatCompletionRequest) (ChatCo
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return ChatCompletionResponse{}, err
+	}
+
+	if c.Debug {
+		log.Debug().RawJSON("data", data).Msg("openai request")
 	}
 
 	req, err := http.NewRequest("POST", reqURL, bytes.NewBuffer(data))
@@ -60,6 +68,10 @@ func (c *OpenAIClient) PostChatCompletion(payload ChatCompletionRequest) (ChatCo
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return ChatCompletionResponse{}, err
+	}
+
+	if c.Debug {
+		log.Debug().RawJSON("body", body).Msg("openai response")
 	}
 
 	var result ChatCompletionResponse

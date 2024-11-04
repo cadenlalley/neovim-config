@@ -85,7 +85,7 @@ func (a *App) getRecipeFromText(text string) (recipes.Recipe, error) {
 
 	// Marshal the response into a recipe struct.
 	var recipe recipes.Recipe
-	err = json.Unmarshal(json.RawMessage(recipeText), &recipe)
+	err = recipe.Import(json.RawMessage(recipeText))
 	if err != nil {
 		return recipes.Recipe{}, err
 	}
@@ -93,7 +93,20 @@ func (a *App) getRecipeFromText(text string) (recipes.Recipe, error) {
 	return recipe, nil
 }
 
+type ImportImageRequest struct {
+	Count int `form:"count" validate:"required"`
+
+	// The following are manually checked in the handler based on the provided count.
+	// file_1, file_2, file_n...
+}
+
 func (a *App) ImportImage(c echo.Context) error {
+	var input ImportImageRequest
+	err := web.ValidateRequest(c, web.ContentTypeMultipartFormData, &input)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
 	ctx := c.Request().Context()
 	userID := c.Get(auth.UserIDContextKey).(string)
 
@@ -106,8 +119,15 @@ func (a *App) ImportImage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not get account by user ID").SetInternal(err)
 	}
 
+	// Based on the count provided, generate the number of files there should be.
+	fields := make([]string, 0)
+	for i := 1; i < input.Count+1; i++ {
+		fields = append(fields, fmt.Sprintf("file_%d", i))
+	}
+
 	prefix := media.GetImportMediaPath(account.AccountID)
-	key, err := a.handleFormFile(c, "file", prefix)
+
+	keys, err := a.handleFormFiles(c, fields, prefix)
 	if err != nil {
 		if err == http.ErrMissingFile {
 			return echo.NewHTTPError(http.StatusBadRequest, "no file provided")
@@ -116,7 +136,22 @@ func (a *App) ImportImage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not upload file").SetInternal(err)
 	}
 
-	res, err := a.getRecipeFromImage(a.cdnHost + "/" + key)
+	urls := make([]string, 0)
+	for _, key := range keys {
+		urls = append(urls, a.cdnHost+"/"+key)
+	}
+
+	// Image Uploads don't work in development, however we can return an empty recipe for debugging.
+	if a.env == ENV_DEV {
+		var sample recipes.Recipe
+		err := json.Unmarshal(recipes.Sample, &sample)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "could not parse sample recipe for development").SetInternal(err)
+		}
+		return c.JSON(http.StatusOK, sample)
+	}
+
+	res, err := a.getRecipeFromImages(urls)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from image").SetInternal(err)
 	}
@@ -124,7 +159,25 @@ func (a *App) ImportImage(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-func (a *App) getRecipeFromImage(url string) (recipes.Recipe, error) {
+func (a *App) getRecipeFromImages(urls []string) (recipes.Recipe, error) {
+
+	chatCompletion := []openai.ChatCompletionContent{
+		{
+			Type: "text",
+			Text: "Retrieve the complete recipe from the following images, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text.",
+		},
+	}
+
+	// Append each URL that has been provided to completion.
+	for _, url := range urls {
+		chatCompletion = append(chatCompletion, openai.ChatCompletionContent{
+			Type: "image_url",
+			ImageURL: &openai.ChatCompletionContentImageURL{
+				URL: url,
+			},
+		})
+	}
+
 	res, err := a.aiClient.PostChatCompletion(openai.ChatCompletionRequest{
 		Model:     "gpt-4o-mini",
 		MaxTokens: 1600,
@@ -139,19 +192,8 @@ func (a *App) getRecipeFromImage(url string) (recipes.Recipe, error) {
 				},
 			},
 			{
-				Role: "user",
-				Content: []openai.ChatCompletionContent{
-					{
-						Type: "text",
-						Text: "Retrieve the complete recipe from the following image, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text.",
-					},
-					{
-						Type: "image_url",
-						ImageURL: &openai.ChatCompletionContentImageURL{
-							URL: url,
-						},
-					},
-				},
+				Role:    "user",
+				Content: chatCompletion,
 			},
 		},
 		ResponseFormat: recipes.JsonSchema,
@@ -169,7 +211,7 @@ func (a *App) getRecipeFromImage(url string) (recipes.Recipe, error) {
 
 	// Marshal the response into a recipe struct.
 	var recipe recipes.Recipe
-	err = json.Unmarshal(json.RawMessage(recipeText), &recipe)
+	err = recipe.Import(json.RawMessage(recipeText))
 	if err != nil {
 		return recipes.Recipe{}, err
 	}

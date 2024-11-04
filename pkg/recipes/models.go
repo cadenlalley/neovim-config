@@ -1,6 +1,7 @@
 package recipes
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -40,6 +41,45 @@ func (r *Recipe) Validate() error {
 
 func CreateRecipeID() string {
 	return "rcp_" + ksuid.New().String()
+}
+
+// Create from Import
+func (r *Recipe) Import(v json.RawMessage) error {
+	var input Recipe
+	err := json.Unmarshal(v, &input)
+	if err != nil {
+		return err
+	}
+
+	r.Name = input.Name
+	r.Summary = input.Summary
+	r.PrepTime = input.PrepTime
+	r.CookTime = input.CookTime
+	r.Servings = input.Servings
+	r.Source = input.Source
+	r.Ingredients = make([]RecipeIngredient, len(input.Ingredients))
+	r.Steps = make([]RecipeStep, len(input.Steps))
+
+	for i, ingredient := range input.Ingredients {
+		r.Ingredients[i] = RecipeIngredient{
+			IngredientID: ingredient.IngredientID,
+			Name:         ingredient.Name,
+			Quantity:     ingredient.Quantity,
+			Unit:         ParseNullString(ingredient.Unit),
+			Group:        ParseNullString(ingredient.Group),
+		}
+	}
+
+	for i, step := range input.Steps {
+		r.Steps[i] = RecipeStep{
+			StepID:      step.StepID,
+			Instruction: step.Instruction,
+			Group:       ParseNullString(step.Group),
+			Note:        step.Note,
+		}
+	}
+
+	return nil
 }
 
 type RecipeStep struct {

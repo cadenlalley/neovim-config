@@ -1,6 +1,7 @@
 package api
 
 import (
+	"mime/multipart"
 	"net/http"
 	"strings"
 
@@ -44,7 +45,7 @@ func (a *App) Upload(c echo.Context) error {
 }
 
 func (a *App) CDN(c echo.Context) error {
-	if a.env != "dev" {
+	if a.env != ENV_DEV {
 		return echo.NewHTTPError(http.StatusBadRequest, "not implemented")
 	}
 
@@ -77,4 +78,24 @@ func (a *App) handleFormFile(c echo.Context, field, prefix string) (string, erro
 	}
 
 	return key, nil
+}
+
+func (a *App) handleFormFiles(c echo.Context, fields []string, prefix string) ([]string, error) {
+	files := make([]*multipart.FileHeader, 0)
+
+	for _, field := range fields {
+		file, err := c.FormFile(field)
+		if err != nil {
+			return nil, err
+		}
+		files = append(files, file)
+	}
+
+	ctx := c.Request().Context()
+	keys, err := a.fileManager.UploadFromHeaders(ctx, files, prefix)
+	if err != nil {
+		return nil, err
+	}
+
+	return keys, nil
 }

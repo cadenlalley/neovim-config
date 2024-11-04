@@ -112,7 +112,7 @@ func main() {
 
 	// Handle OpenAI client
 	// ==========================
-	aiClient := openai.NewOpenAIClient(cfg.OpenAI.Host, cfg.OpenAI.Token)
+	aiClient := openai.NewOpenAIClient(cfg.OpenAI.Host, cfg.OpenAI.Token, cfg.Debug)
 
 	// Handle application server.
 	// ==========================
