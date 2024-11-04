@@ -61,7 +61,11 @@ func (c *OpenAIClient) PostChatCompletion(payload ChatCompletionRequest) (ChatCo
 
 	// Handle errors
 	if resp.StatusCode != http.StatusOK {
-		return ChatCompletionResponse{}, fmt.Errorf("error: status code %d", resp.StatusCode)
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return ChatCompletionResponse{}, fmt.Errorf("error: status code %d, could not read response body", resp.StatusCode)
+		}
+		return ChatCompletionResponse{}, fmt.Errorf("error: status code %d, response body: %s", resp.StatusCode, string(body))
 	}
 
 	// Read response body

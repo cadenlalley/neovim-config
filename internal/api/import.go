@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html"
 	"net/http"
+	"time"
 
 	"github.com/kitchens-io/kitchens-api/internal/extractor"
 	"github.com/kitchens-io/kitchens-api/internal/media"
@@ -150,6 +151,9 @@ func (a *App) ImportImage(c echo.Context) error {
 		}
 		return c.JSON(http.StatusOK, sample)
 	}
+
+	// Delay the request to model analysis, give time for the URLs to populate.
+	time.Sleep(1 * time.Second)
 
 	res, err := a.getRecipeFromImages(urls)
 	if err != nil {
