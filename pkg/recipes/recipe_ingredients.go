@@ -11,7 +11,7 @@ type CreateRecipeIngredientInput struct {
 	RecipeID     string
 	IngredientID int
 	Name         string
-	Quantity     float64
+	Quantity     null.Float
 	Unit         null.String
 	Group        null.String
 }
@@ -21,11 +21,13 @@ func CreateRecipeIngredients(ctx context.Context, store Store, input CreateRecip
 	if strings.TrimSpace(input.Group.String) == "" {
 		input.Group = null.NewString(input.Group.String, false)
 	}
-
-	// Handle nullable values.
 	if strings.TrimSpace(input.Unit.String) == "" {
 		input.Unit = null.NewString(input.Unit.String, false)
 	}
+	if input.Quantity.Float64 == 0 {
+		input.Quantity = null.NewFloat(input.Quantity.Float64, false)
+	}
+
 	_, err := store.ExecContext(ctx, `
 		INSERT INTO recipe_ingredients (
 			recipe_id,

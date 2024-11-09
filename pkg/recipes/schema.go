@@ -21,7 +21,10 @@ var JsonSchema json.RawMessage = json.RawMessage(`{
 												"properties": {
 														"ingredientId": {"type": "integer"},
 														"name": {"type": "string"},
-														"quantity": {"type": "number"},
+														"quantity": {
+															"type": "number",
+															"description": "the amount of the ingredient, if an amount doesn't make sense for the ingredient set it to 0"
+														},
 														"unit": {
 															"type": ["string", "null"],
 															"description": "optional unit of measurement, if a unit doesn't make sense for the ingredient set it to n/a",

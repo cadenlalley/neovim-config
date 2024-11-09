@@ -94,6 +94,12 @@ func GetRecipeByID(ctx context.Context, store Store, recipeID string) (Recipe, e
 		return Recipe{}, err
 	}
 
+	// TODO: Revisit if this is the best way to handle this.
+	err = recipe.ComputeValues()
+	if err != nil {
+		return recipe, err
+	}
+
 	return recipe, nil
 }
 

@@ -3,6 +3,7 @@ package recipes
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/segmentio/ksuid"
@@ -24,8 +25,9 @@ type Recipe struct {
 	DeletedAt null.Time   `json:"deletedAt" db:"deleted_at"`
 
 	// Attached for full recipe
-	Ingredients []RecipeIngredient `json:"ingredients" db:"-" validate:"required,dive"`
-	Steps       []RecipeStep       `json:"steps" db:"-" validate:"required,dive"`
+	SourceDomain null.String        `json:"sourceDomain" db:"-"`
+	Ingredients  []RecipeIngredient `json:"ingredients" db:"-" validate:"required,dive"`
+	Steps        []RecipeStep       `json:"steps" db:"-" validate:"required,dive"`
 }
 
 // Model validation not handled by the validator
@@ -36,11 +38,32 @@ func (r *Recipe) Validate() error {
 	if len(r.Steps) == 0 {
 		return fmt.Errorf("missing items for field 'steps'")
 	}
+
+	for _, i := range r.Ingredients {
+		if i.Quantity.Float64 == 0 && i.Unit.Valid {
+			return fmt.Errorf("ingredient '%d': field 'quantity' required when providing value for 'unit'", i.IngredientID)
+		}
+	}
+
 	return nil
 }
 
 func CreateRecipeID() string {
 	return "rcp_" + ksuid.New().String()
+}
+
+// Handle computed values
+func (r *Recipe) ComputeValues() error {
+	// Source Domain
+	if r.Source.Valid {
+		parsedURL, err := url.Parse(r.Source.String)
+		if err != nil {
+			return err
+		}
+		host := parsedURL.Hostname()
+		r.SourceDomain = null.NewString(host, host != "")
+	}
+	return nil
 }
 
 // Create from Import
@@ -64,7 +87,7 @@ func (r *Recipe) Import(v json.RawMessage) error {
 		r.Ingredients[i] = RecipeIngredient{
 			IngredientID: ingredient.IngredientID,
 			Name:         ingredient.Name,
-			Quantity:     ingredient.Quantity,
+			Quantity:     ParseNullFloat(ingredient.Quantity),
 			Unit:         ParseNullString(ingredient.Unit),
 			Group:        ParseNullString(ingredient.Group),
 		}
@@ -109,7 +132,7 @@ type RecipeIngredient struct {
 	RecipeID     string      `json:"-" db:"recipe_id"`
 	IngredientID int         `json:"ingredientId" db:"ingredient_id" validate:"required"`
 	Name         string      `json:"name" db:"ingredient_name" validate:"required"`
-	Quantity     float64     `json:"quantity" db:"quantity" validate:"required"`
+	Quantity     null.Float  `json:"quantity" db:"quantity"`
 	Unit         null.String `json:"unit" db:"unit"`
 	Group        null.String `json:"group" db:"group_name"`
 }

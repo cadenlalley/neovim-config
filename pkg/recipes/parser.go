@@ -73,3 +73,15 @@ func ParseNullString(input null.String) null.String {
 
 	return input
 }
+
+func ParseNullFloat(input null.Float) null.Float {
+	if input.IsZero() {
+		return input
+	}
+
+	if input.Float64 == 0 {
+		return null.NewFloat(0, false)
+	}
+
+	return input
+}
