@@ -32,6 +32,9 @@ func (a *App) ImportURL(c echo.Context) error {
 	// Load the requested source
 	str, err := extractor.GetTextFromURL(input.Source)
 	if err != nil {
+		if err == extractor.ErrRequestBlocked {
+			return echo.NewHTTPError(http.StatusBadRequest, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
 
@@ -85,7 +88,7 @@ func (a *App) getRecipeFromText(text string) (recipes.Recipe, error) {
 
 	// Marshal the response into a recipe struct.
 	var recipe recipes.Recipe
-	err = recipe.Import(json.RawMessage(recipeText))
+	err = recipe.Import(json.RawMessage(recipeText), true)
 	if err != nil {
 		return recipes.Recipe{}, err
 	}
@@ -211,7 +214,7 @@ func (a *App) getRecipeFromImages(urls []string) (recipes.Recipe, error) {
 
 	// Marshal the response into a recipe struct.
 	var recipe recipes.Recipe
-	err = recipe.Import(json.RawMessage(recipeText))
+	err = recipe.Import(json.RawMessage(recipeText), false)
 	if err != nil {
 		return recipes.Recipe{}, err
 	}
