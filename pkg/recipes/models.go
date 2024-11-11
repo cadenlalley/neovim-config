@@ -41,7 +41,7 @@ func (r *Recipe) Validate() error {
 
 	for _, i := range r.Ingredients {
 		// NOTE: Fix for the UI sending 'Unit' as the default value.
-		if i.Quantity.Float64 == 0 && (i.Unit.Valid && i.Unit.String != "Unit") {
+		if i.Quantity.Float64 == 0 && (i.Unit.Valid && i.Unit.String != "") {
 			return fmt.Errorf("ingredient '%s': field 'quantity' required when providing value for 'unit'", i.Name)
 		}
 	}

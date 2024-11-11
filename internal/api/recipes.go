@@ -8,7 +8,6 @@ import (
 	"github.com/kitchens-io/kitchens-api/internal/web"
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/labstack/echo/v4"
-	"gopkg.in/guregu/null.v4"
 )
 
 func (a *App) CreateKitchenRecipe(c echo.Context) error {
@@ -87,19 +86,12 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 
 		// Handle ingredient processing
 		for _, ingredient := range input.Ingredients {
-
-			// NOTE: Fix fo the UI sending 'Unit' as the default value.
-			ingredientUnit := ingredient.Unit
-			if ingredient.Unit.Valid && ingredient.Unit.String == "Unit" {
-				ingredientUnit = null.NewString("", false)
-			}
-
 			err = recipes.CreateRecipeIngredients(ctx, tx, recipes.CreateRecipeIngredientInput{
 				RecipeID:     recipeID,
 				IngredientID: ingredient.IngredientID,
 				Name:         ingredient.Name,
 				Quantity:     ingredient.Quantity,
-				Unit:         ingredientUnit,
+				Unit:         ingredient.Unit,
 				Group:        ingredient.Group,
 			})
 			if err != nil {
