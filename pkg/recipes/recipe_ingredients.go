@@ -28,6 +28,9 @@ func CreateRecipeIngredients(ctx context.Context, store Store, input CreateRecip
 		input.Quantity = null.NewFloat(input.Quantity.Float64, false)
 	}
 
+	// Convert the ingredient to lower case.
+	input.Name = strings.ToLower(input.Name)
+
 	_, err := store.ExecContext(ctx, `
 		INSERT INTO recipe_ingredients (
 			recipe_id,
@@ -84,6 +87,10 @@ func GetRecipeIngredientsByRecipeID(ctx context.Context, store Store, recipeID s
 		if err := rows.StructScan(&ingredient); err != nil {
 			return ingredients, err
 		}
+
+		// Convert the ingredient to lower case
+		ingredient.Name = strings.ToLower(ingredient.Name)
+
 		ingredients = append(ingredients, ingredient)
 	}
 
