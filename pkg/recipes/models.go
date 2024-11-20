@@ -3,6 +3,7 @@ package recipes
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/segmentio/ksuid"
@@ -24,8 +25,9 @@ type Recipe struct {
 	DeletedAt null.Time   `json:"deletedAt" db:"deleted_at"`
 
 	// Attached for full recipe
-	Ingredients []RecipeIngredient `json:"ingredients" db:"-" validate:"required,dive"`
-	Steps       []RecipeStep       `json:"steps" db:"-" validate:"required,dive"`
+	SourceDomain null.String        `json:"sourceDomain" db:"-"`
+	Ingredients  []RecipeIngredient `json:"ingredients" db:"-" validate:"required,dive"`
+	Steps        []RecipeStep       `json:"steps" db:"-" validate:"required,dive"`
 }
 
 // Model validation not handled by the validator
@@ -36,6 +38,14 @@ func (r *Recipe) Validate() error {
 	if len(r.Steps) == 0 {
 		return fmt.Errorf("missing items for field 'steps'")
 	}
+
+	for _, i := range r.Ingredients {
+		// NOTE: Fix for the UI sending 'Unit' as the default value.
+		if i.Quantity.Float64 == 0 && (i.Unit.Valid && i.Unit.String != "") {
+			return fmt.Errorf("ingredient '%s': field 'quantity' required when providing value for 'unit'", i.Name)
+		}
+	}
+
 	return nil
 }
 
@@ -43,8 +53,22 @@ func CreateRecipeID() string {
 	return "rcp_" + ksuid.New().String()
 }
 
+// Handle computed values
+func (r *Recipe) ComputeValues() error {
+	// Source Domain
+	if r.Source.Valid {
+		parsedURL, err := url.Parse(r.Source.String)
+		if err != nil {
+			return err
+		}
+		host := parsedURL.Hostname()
+		r.SourceDomain = null.NewString(host, host != "")
+	}
+	return nil
+}
+
 // Create from Import
-func (r *Recipe) Import(v json.RawMessage) error {
+func (r *Recipe) Import(v json.RawMessage, includeGroup bool) error {
 	var input Recipe
 	err := json.Unmarshal(v, &input)
 	if err != nil {
@@ -61,20 +85,32 @@ func (r *Recipe) Import(v json.RawMessage) error {
 	r.Steps = make([]RecipeStep, len(input.Steps))
 
 	for i, ingredient := range input.Ingredients {
+		// NOTE: Temporary fix for import URL failing to handle groups well.
+		group := ParseNullString(ingredient.Group)
+		if !includeGroup {
+			group = null.NewString("", false)
+		}
+
 		r.Ingredients[i] = RecipeIngredient{
 			IngredientID: ingredient.IngredientID,
 			Name:         ingredient.Name,
-			Quantity:     ingredient.Quantity,
+			Quantity:     ParseNullFloat(ingredient.Quantity),
 			Unit:         ParseNullString(ingredient.Unit),
-			Group:        ParseNullString(ingredient.Group),
+			Group:        group,
 		}
 	}
 
 	for i, step := range input.Steps {
+		// NOTE: Temporary fix for import URL failing to handle groups well.
+		group := ParseNullString(step.Group)
+		if !includeGroup {
+			group = null.NewString("", false)
+		}
+
 		r.Steps[i] = RecipeStep{
 			StepID:      step.StepID,
 			Instruction: step.Instruction,
-			Group:       ParseNullString(step.Group),
+			Group:       group,
 			Note:        step.Note,
 		}
 	}
@@ -109,7 +145,7 @@ type RecipeIngredient struct {
 	RecipeID     string      `json:"-" db:"recipe_id"`
 	IngredientID int         `json:"ingredientId" db:"ingredient_id" validate:"required"`
 	Name         string      `json:"name" db:"ingredient_name" validate:"required"`
-	Quantity     float64     `json:"quantity" db:"quantity" validate:"required"`
+	Quantity     null.Float  `json:"quantity" db:"quantity"`
 	Unit         null.String `json:"unit" db:"unit"`
 	Group        null.String `json:"group" db:"group_name"`
 }

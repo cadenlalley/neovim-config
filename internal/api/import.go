@@ -19,7 +19,13 @@ import (
 )
 
 type ImportURLRequest struct {
-	Source string `json:"source"`
+	Source   string `json:"source"`
+	Features struct {
+		Groups bool `json:"groups"`
+	} `json:"features"`
+	Debug struct {
+		Prompt string `json:"prompt"`
+	} `json:"debug"`
 }
 
 func (a *App) ImportURL(c echo.Context) error {
@@ -32,11 +38,14 @@ func (a *App) ImportURL(c echo.Context) error {
 	// Load the requested source
 	str, err := extractor.GetTextFromURL(input.Source)
 	if err != nil {
+		if err == extractor.ErrRequestBlocked {
+			return echo.NewHTTPError(http.StatusBadRequest, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
 
 	// Ask OpenAI to convert the string to a structured recipe.
-	res, err := a.getRecipeFromText(str)
+	res, err := a.getRecipeFromText(str, input)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
@@ -46,7 +55,12 @@ func (a *App) ImportURL(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-func (a *App) getRecipeFromText(text string) (recipes.Recipe, error) {
+func (a *App) getRecipeFromText(text string, req ImportURLRequest) (recipes.Recipe, error) {
+	prompt := "Retrieve the complete recipe from the following text, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text:"
+	if req.Debug.Prompt != "" {
+		prompt = req.Debug.Prompt
+	}
+
 	res, err := a.aiClient.PostChatCompletion(openai.ChatCompletionRequest{
 		Model:     "gpt-4o-mini",
 		MaxTokens: 1600,
@@ -65,7 +79,7 @@ func (a *App) getRecipeFromText(text string) (recipes.Recipe, error) {
 				Content: []openai.ChatCompletionContent{
 					{
 						Type: "text",
-						Text: "Retrieve the complete recipe from the following text, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text: " + text,
+						Text: prompt + " " + text,
 					},
 				},
 			},
@@ -85,7 +99,7 @@ func (a *App) getRecipeFromText(text string) (recipes.Recipe, error) {
 
 	// Marshal the response into a recipe struct.
 	var recipe recipes.Recipe
-	err = recipe.Import(json.RawMessage(recipeText))
+	err = recipe.Import(json.RawMessage(recipeText), req.Features.Groups)
 	if err != nil {
 		return recipes.Recipe{}, err
 	}
@@ -94,7 +108,13 @@ func (a *App) getRecipeFromText(text string) (recipes.Recipe, error) {
 }
 
 type ImportImageRequest struct {
-	Count int `form:"count" validate:"required"`
+	Count    int `form:"count" validate:"required"`
+	Features struct {
+		Groups bool `form:"featureGroups"`
+	}
+	Debug struct {
+		Prompt string `form:"prompt"`
+	}
 
 	// The following are manually checked in the handler based on the provided count.
 	// file_1, file_2, file_n...
@@ -151,7 +171,7 @@ func (a *App) ImportImage(c echo.Context) error {
 		return c.JSON(http.StatusOK, sample)
 	}
 
-	res, err := a.getRecipeFromImages(urls)
+	res, err := a.getRecipeFromImages(urls, input)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from image").SetInternal(err)
 	}
@@ -159,12 +179,16 @@ func (a *App) ImportImage(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-func (a *App) getRecipeFromImages(urls []string) (recipes.Recipe, error) {
+func (a *App) getRecipeFromImages(urls []string, req ImportImageRequest) (recipes.Recipe, error) {
+	prompt := "Retrieve the complete recipe from the following images, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text."
+	if req.Debug.Prompt != "" {
+		prompt = req.Debug.Prompt
+	}
 
 	chatCompletion := []openai.ChatCompletionContent{
 		{
 			Type: "text",
-			Text: "Retrieve the complete recipe from the following images, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text.",
+			Text: prompt,
 		},
 	}
 
@@ -211,7 +235,7 @@ func (a *App) getRecipeFromImages(urls []string) (recipes.Recipe, error) {
 
 	// Marshal the response into a recipe struct.
 	var recipe recipes.Recipe
-	err = recipe.Import(json.RawMessage(recipeText))
+	err = recipe.Import(json.RawMessage(recipeText), req.Features.Groups)
 	if err != nil {
 		return recipes.Recipe{}, err
 	}

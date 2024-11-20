@@ -1,10 +1,16 @@
 package extractor
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
 	"golang.org/x/net/html"
+)
+
+var (
+	ErrRequestBlocked = errors.New("request blocked")
 )
 
 type EntityTags struct {
@@ -22,6 +28,13 @@ func fetchURL(url string) (*html.Node, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		if resp.StatusCode == 401 || resp.StatusCode == 403 {
+			return nil, ErrRequestBlocked
+		}
+		return nil, fmt.Errorf("unexpected response from source domain '%d'", resp.StatusCode)
+	}
 
 	// Parse the HTML content
 	doc, err := html.Parse(resp.Body)

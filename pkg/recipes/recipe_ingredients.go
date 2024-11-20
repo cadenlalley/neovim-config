@@ -11,7 +11,7 @@ type CreateRecipeIngredientInput struct {
 	RecipeID     string
 	IngredientID int
 	Name         string
-	Quantity     float64
+	Quantity     null.Float
 	Unit         null.String
 	Group        null.String
 }
@@ -21,11 +21,16 @@ func CreateRecipeIngredients(ctx context.Context, store Store, input CreateRecip
 	if strings.TrimSpace(input.Group.String) == "" {
 		input.Group = null.NewString(input.Group.String, false)
 	}
-
-	// Handle nullable values.
 	if strings.TrimSpace(input.Unit.String) == "" {
 		input.Unit = null.NewString(input.Unit.String, false)
 	}
+	if input.Quantity.Float64 == 0 {
+		input.Quantity = null.NewFloat(input.Quantity.Float64, false)
+	}
+
+	// Convert the ingredient to lower case.
+	input.Name = strings.ToLower(input.Name)
+
 	_, err := store.ExecContext(ctx, `
 		INSERT INTO recipe_ingredients (
 			recipe_id,
@@ -82,6 +87,10 @@ func GetRecipeIngredientsByRecipeID(ctx context.Context, store Store, recipeID s
 		if err := rows.StructScan(&ingredient); err != nil {
 			return ingredients, err
 		}
+
+		// Convert the ingredient to lower case
+		ingredient.Name = strings.ToLower(ingredient.Name)
+
 		ingredients = append(ingredients, ingredient)
 	}
 
