@@ -68,7 +68,7 @@ func (r *Recipe) ComputeValues() error {
 }
 
 // Create from Import
-func (r *Recipe) Import(v json.RawMessage, skipGroup bool) error {
+func (r *Recipe) Import(v json.RawMessage, includeGroup bool) error {
 	var input Recipe
 	err := json.Unmarshal(v, &input)
 	if err != nil {
@@ -87,7 +87,7 @@ func (r *Recipe) Import(v json.RawMessage, skipGroup bool) error {
 	for i, ingredient := range input.Ingredients {
 		// NOTE: Temporary fix for import URL failing to handle groups well.
 		group := ParseNullString(ingredient.Group)
-		if skipGroup {
+		if !includeGroup {
 			group = null.NewString("", false)
 		}
 
@@ -103,7 +103,7 @@ func (r *Recipe) Import(v json.RawMessage, skipGroup bool) error {
 	for i, step := range input.Steps {
 		// NOTE: Temporary fix for import URL failing to handle groups well.
 		group := ParseNullString(step.Group)
-		if skipGroup {
+		if !includeGroup {
 			group = null.NewString("", false)
 		}
 
