@@ -91,6 +91,12 @@ func (r *Recipe) Import(v json.RawMessage, includeGroup bool) error {
 			group = null.NewString("", false)
 		}
 
+		// NOTE: Frontend expects 1/3 as 0.333
+		quantity := ParseNullFloat(ingredient.Quantity)
+		if quantity.Float64 == 0.33 {
+			quantity = null.NewFloat(0.333, true)
+		}
+
 		r.Ingredients[i] = RecipeIngredient{
 			IngredientID: ingredient.IngredientID,
 			Name:         ingredient.Name,
