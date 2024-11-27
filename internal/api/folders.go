@@ -187,9 +187,20 @@ func (a *App) CreateKitchenFolderRecipes(c echo.Context) error {
 	ctx := c.Request().Context()
 	folderID := c.Param("folder_id")
 
-	err = folders.CreateFolderRecipes(ctx, a.db, folderID, input.RecipeIDs)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not create folder recipes").SetInternal(err)
+	txErr := mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
+		for _, recipeID := range input.RecipeIDs {
+			err = folders.CreateFolderRecipe(ctx, tx, folders.CreateFolderRecipeInput{
+				FolderID: folderID,
+				RecipeID: recipeID,
+			})
+			if err != nil {
+				return errors.Wrapf(err, "could not create folder recipe: %s", recipeID)
+			}
+		}
+		return nil
+	})
+	if txErr != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not create folder recipes").SetInternal(txErr)
 	}
 
 	return c.NoContent(http.StatusNoContent)

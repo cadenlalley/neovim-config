@@ -2,6 +2,7 @@ package folders
 
 import (
 	"context"
+	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 )
@@ -18,21 +19,10 @@ func CreateFolderRecipe(ctx context.Context, store Store, input CreateFolderReci
 	`, input.FolderID, input.RecipeID)
 
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CreateFolderRecipes(ctx context.Context, store Store, folderID string, recipeIDs []string) error {
-	for _, recipeID := range recipeIDs {
-		err := CreateFolderRecipe(ctx, store, CreateFolderRecipeInput{
-			FolderID: folderID,
-			RecipeID: recipeID,
-		})
-		if err != nil {
-			return err
+		if strings.HasPrefix(err.Error(), "Error 1062") {
+			return nil
 		}
+		return err
 	}
 
 	return nil
