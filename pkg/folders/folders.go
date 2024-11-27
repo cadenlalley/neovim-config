@@ -3,6 +3,7 @@ package folders
 import (
 	"context"
 	"database/sql"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"gopkg.in/guregu/null.v4"
@@ -23,11 +24,14 @@ type CreateFolderInput struct {
 
 func CreateFolder(ctx context.Context, store Store, input CreateFolderInput) (Folder, error) {
 	_, err := store.ExecContext(ctx, `
-		INSERT INTO folders (folder_id, kitchen_id, folder_name, cover)
-		VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP);
+		INSERT INTO folders (folder_id, kitchen_id, folder_name, cover, created_at)
+		VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
 	`, input.FolderID, input.KitchenID, input.Name, input.Cover)
 
 	if err != nil {
+		if strings.HasPrefix(err.Error(), "Error 1062") && strings.Contains(err.Error(), "key 'folders.folder_name'") {
+			return Folder{}, ErrDuplicateFolderName
+		}
 		return Folder{}, err
 	}
 
@@ -51,7 +55,7 @@ func UpdateFolder(ctx context.Context, store Store, input UpdateFolderInput) (Fo
 	`, input.Name, input.Cover, input.FolderID)
 
 	if err != nil {
-		return Folder{}, nil
+		return Folder{}, err
 	}
 
 	return GetFolderByID(ctx, store, input.FolderID)
@@ -62,7 +66,7 @@ func ListFoldersByKitchenID(ctx context.Context, store Store, kitchenID string) 
 
 	rows, err := store.QueryxContext(ctx, `
 		SELECT * FROM folders WHERE kitchen_id = ? ORDER BY created_at DESC
-	`)
+	`, kitchenID)
 
 	if err != nil {
 		return nil, err
@@ -97,4 +101,14 @@ func GetFolderByID(ctx context.Context, store Store, folderID string) (Folder, e
 	}
 
 	return folder, nil
+}
+
+func DeleteFolderByID(ctx context.Context, store Store, folderID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM folders WHERE folder_id = ?
+	`, folderID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

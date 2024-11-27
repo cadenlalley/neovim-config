@@ -89,6 +89,17 @@ func Create(input CreateInput) *App {
 	v1.POST("/kitchen/:kitchen_id/recipes", app.CreateKitchenRecipe, kitchenAuth.ValidateWriter)
 	v1.PUT("/kitchen/:kitchen_id/recipes/:recipe_id", app.UpdateKitchenRecipe, kitchenAuth.ValidateWriter)
 
+	// Kitchen Folders
+	v1.GET("/kitchen/:kitchen_id/folders", app.GetKitchenFolders)
+	v1.GET("/kitchen/:kitchen_id/folders/:folder_id", app.GetKitchenFolder)
+	v1.DELETE("/kitchen/:kitchen_id/folders/:folder_id", app.DeleteKitchenFolder, kitchenAuth.ValidateWriter)
+	v1.POST("/kitchen/:kitchen_id/folders", app.CreateKitchenFolder, kitchenAuth.ValidateWriter)
+	v1.PUT("/kitchen/:kitchen_id/folders/:folder_id", app.UpdateKitchenFolder, kitchenAuth.ValidateWriter)
+
+	// Kitchen Folder Recipes
+	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/add", app.CreateKitchenFolderRecipes, kitchenAuth.ValidateWriter)
+	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/delete", app.DeleteKitchenFolderRecipes, kitchenAuth.ValidateWriter)
+
 	// Recipe import routes
 	v1.POST("/import/url", app.ImportURL)
 	v1.POST("/import/image", app.ImportImage)

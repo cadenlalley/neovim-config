@@ -13,6 +13,9 @@ type Folder struct {
 	Name      string      `json:"name" db:"folder_name" validate:"required"`
 	Cover     null.String `json:"cover" db:"cover"`
 	CreatedAt time.Time   `json:"createdAt" db:"created_at"`
+
+	// Attached for full response
+	Recipes []FolderRecipe `json:"recipes" db:"-"`
 }
 
 type FolderRecipe struct {

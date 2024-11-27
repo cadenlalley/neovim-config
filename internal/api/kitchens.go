@@ -100,6 +100,9 @@ func (a *App) UpdateKitchen(c echo.Context) error {
 		Private:   override.Bool(input.Private, kitchen.Private),
 	})
 	if err != nil {
+		if err == kitchens.ErrDuplicateHandle {
+			return echo.NewHTTPError(http.StatusBadRequest, err)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not update kitchen").SetInternal(err)
 	}
 

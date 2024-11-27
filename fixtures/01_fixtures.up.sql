@@ -102,4 +102,12 @@ VALUES
 
 -- FOLDERS
 -- =================
--- TODO
+INSERT INTO folders (folder_id, kitchen_id, folder_name, created_at)
+VALUES
+  ('fld_2pPgQjn08dQzr5vjSk8WYSBTATo', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Breakfast', CURRENT_TIMESTAMP),
+  ('fld_2jEx1eCS13KMS8udlPoK12e5KPW', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Healthy Lunch', CURRENT_TIMESTAMP),
+  ('fld_2jEx1j3CVPIIAaOwGIORKqHfK89', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Mediteranean', CURRENT_TIMESTAMP);
+
+INSERT INTO folder_recipes (folder_id, recipe_id, created_at)
+VALUES
+  ('fld_2pPgQjn08dQzr5vjSk8WYSBTATo', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', CURRENT_TIMESTAMP);

@@ -34,3 +34,5 @@ docker-push:
 
 docker-version-push:
 	docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/kitchens_api_production:${API_VERSION}
+
+docker-release: docker-build docker-version docker-version-push

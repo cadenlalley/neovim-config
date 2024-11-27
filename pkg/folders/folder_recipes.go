@@ -24,6 +24,20 @@ func CreateFolderRecipe(ctx context.Context, store Store, input CreateFolderReci
 	return nil
 }
 
+func CreateFolderRecipes(ctx context.Context, store Store, folderID string, recipeIDs []string) error {
+	for _, recipeID := range recipeIDs {
+		err := CreateFolderRecipe(ctx, store, CreateFolderRecipeInput{
+			FolderID: folderID,
+			RecipeID: recipeID,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func ListFolderRecipesByFolderID(ctx context.Context, store Store, folderID string) ([]FolderRecipe, error) {
 	folderRecipes := make([]FolderRecipe, 0)
 
@@ -68,6 +82,16 @@ func DeleteFolderRecipesByIDs(ctx context.Context, store Store, folderID string,
 	}
 
 	_, err = store.ExecContext(ctx, sql, args...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteFolderRecipesByFolderID(ctx context.Context, store Store, folderID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM folder_recipes WHERE folder_id = ?
+	`, folderID)
 	if err != nil {
 		return err
 	}
