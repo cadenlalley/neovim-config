@@ -72,12 +72,12 @@ func (a *App) handleFormFile(c echo.Context, field, prefix string) (string, erro
 	}
 
 	ctx := c.Request().Context()
-	key, err := a.fileManager.UploadFromHeader(ctx, file, prefix)
+	keys, err := a.fileManager.UploadFromHeaders(ctx, []*multipart.FileHeader{file}, prefix)
 	if err != nil {
 		return "", err
 	}
 
-	return key, nil
+	return keys[0], nil
 }
 
 func (a *App) handleFormFiles(c echo.Context, fields []string, prefix string) ([]string, error) {

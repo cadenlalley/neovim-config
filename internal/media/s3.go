@@ -1,7 +1,6 @@
 package media
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -25,42 +24,17 @@ func NewS3FileManager(s3 *s3.Client, bucket string) *S3FileManager {
 	}
 }
 
-func (u *S3FileManager) UploadFromHeader(ctx context.Context, file *multipart.FileHeader, prefix string) (string, error) {
-	// Validation
-	if prefix[0:1] == "/" {
-		return "", fmt.Errorf("prefix should not start with '/', received: '%s'", prefix)
-	}
-
-	parts := strings.Split(file.Filename, ".")
-	if len(parts) == 1 {
-		return "", fmt.Errorf("file missing extension, received: '%s'", file.Filename)
-	}
-
-	src, err := file.Open()
-	if err != nil {
-		return "", err
-	}
-	defer src.Close()
-
-	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, src); err != nil {
-		return "", err
-	}
-
-	target := prefix + ksuid.New().String()
-	fileType := parts[len(parts)-1]
-
-	key := fmt.Sprintf("%s.%s", target, fileType)
-	_, err = u.s3.PutObject(ctx, &s3.PutObjectInput{
+func (u *S3FileManager) Upload(ctx context.Context, source io.Reader, key string) error {
+	_, err := u.s3.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: ptr.String(u.Bucket),
 		Key:    ptr.String(key),
-		Body:   bytes.NewReader(buf.Bytes()),
+		Body:   source,
 	})
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return key, nil
+	return nil
 }
 
 func (u *S3FileManager) UploadFromHeaders(ctx context.Context, files []*multipart.FileHeader, prefix string) ([]string, error) {
@@ -78,18 +52,6 @@ func (u *S3FileManager) UploadFromHeaders(ctx context.Context, files []*multipar
 		if len(parts) == 1 {
 			return nil, fmt.Errorf("file missing extension, received: '%s'", file.Filename)
 		}
-
-		src, err := file.Open()
-		if err != nil {
-			return nil, err
-		}
-		defer src.Close()
-
-		var buf bytes.Buffer
-		if _, err := io.Copy(&buf, src); err != nil {
-			return nil, err
-		}
-
 		fileType := parts[len(parts)-1]
 
 		target := prefix + uuid
@@ -97,13 +59,14 @@ func (u *S3FileManager) UploadFromHeaders(ctx context.Context, files []*multipar
 			target = fmt.Sprintf("%s_%d", prefix+uuid, i)
 		}
 
-		key := fmt.Sprintf("%s.%s", target, fileType)
-		_, err = u.s3.PutObject(ctx, &s3.PutObjectInput{
-			Bucket: ptr.String(u.Bucket),
-			Key:    ptr.String(key),
-			Body:   bytes.NewReader(buf.Bytes()),
-		})
+		src, err := file.Open()
 		if err != nil {
+			return nil, err
+		}
+		defer src.Close()
+
+		key := fmt.Sprintf("%s.%s", target, fileType)
+		if err := u.Upload(ctx, src, key); err != nil {
 			return nil, err
 		}
 

@@ -14,19 +14,19 @@ VALUES
 
 -- KITCHENS
 -- =================
-INSERT INTO kitchens (kitchen_id, account_id, kitchen_name, bio, handle)
+INSERT INTO kitchens (kitchen_id, account_id, kitchen_name, bio, handle, avatar, cover)
 VALUES
-  ('ktc_2jEx1e1esA5292rBisRGuJwXc14', 'acc_2jEwcS7Rla6E5ik5ELa8uoULKOW', "Sam's Kitchen", NULL, 'sammycooks'),
-  ('ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 'acc_2jEx1hZPbnNEoZRmkWqP2BDBB87', 'The Campbell Kitchen', "The Campbell's ladle out delicious delights with soup-erb flavor", 'Campbell_Soup'),
-  ('ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 'acc_2jEx1fZrWeWKxxAciNcc1ng3fq5', 'Bill in the Kitchen', NULL, 'bbq_bill');
+  ('ktc_2jEx1e1esA5292rBisRGuJwXc14', 'acc_2jEwcS7Rla6E5ik5ELa8uoULKOW', "Sam's Kitchen", NULL, 'sammycooks', "uploads/kitchens/ktc_2jEx1e1esA5292rBisRGuJwXc14/2pR9Azi4FC8IkJO3J6ZvjUqgz5Z.png", "uploads/kitchens/ktc_2jEx1e1esA5292rBisRGuJwXc14/2pR9B1iDNJ7EXddtd1mDzCvXaJt.png"),
+  ('ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 'acc_2jEx1hZPbnNEoZRmkWqP2BDBB87', 'The Campbell Kitchen', "The Campbell's ladle out delicious delights with soup-erb flavor", 'Campbell_Soup', NULL, NULL),
+  ('ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 'acc_2jEx1fZrWeWKxxAciNcc1ng3fq5', 'Bill in the Kitchen', NULL, 'bbq_bill', NULL, NULL);
 
 -- RECIPES
 -- =================
-INSERT INTO recipes (recipe_id, kitchen_id, recipe_name, summary, prep_time, cook_time, servings)
+INSERT INTO recipes (recipe_id, kitchen_id, recipe_name, summary, prep_time, cook_time, servings, cover)
 VALUES
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Homemade pumpkin pie', "With a combination of heavy cream and whole milk, this pumpkin pie has the creamiest filling, with warm spices and lovely flavor. It's baked in a flaky, buttery single crust.", 40, 60, 12),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 'ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 'Spaghetti Bolognese', 'A classic Italian pasta dish made with a rich and savory meat sauce.', 20, 60, 4),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 'ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 'Chocolate Chip Cookies', 'Classic chocolate chip cookies with a soft and chewy texture.', 15, 12, 24);
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Homemade pumpkin pie', "With a combination of heavy cream and whole milk, this pumpkin pie has the creamiest filling, with warm spices and lovely flavor. It's baked in a flaky, buttery single crust.", 40, 60, 12, "uploads/recipes/rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T/2pR9B2cIFxj82GDTDB44lpMzYHu.png"),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 'ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 'Spaghetti Bolognese', 'A classic Italian pasta dish made with a rich and savory meat sauce.', 20, 60, 4, NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 'ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 'Chocolate Chip Cookies', 'Classic chocolate chip cookies with a soft and chewy texture.', 15, 12, 24, NULL);
 
 INSERT INTO recipe_steps(recipe_id, step_id, instruction, group_name)
 VALUES
@@ -102,12 +102,12 @@ VALUES
 
 -- FOLDERS
 -- =================
-INSERT INTO folders (folder_id, kitchen_id, folder_name, created_at)
+INSERT INTO folders (folder_id, kitchen_id, folder_name, cover)
 VALUES
-  ('fld_2pPgQjn08dQzr5vjSk8WYSBTATo', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Breakfast', CURRENT_TIMESTAMP),
-  ('fld_2jEx1eCS13KMS8udlPoK12e5KPW', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Healthy Lunch', CURRENT_TIMESTAMP),
-  ('fld_2jEx1j3CVPIIAaOwGIORKqHfK89', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Mediteranean', CURRENT_TIMESTAMP);
+  ('fld_2pPgQjn08dQzr5vjSk8WYSBTATo', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Breakfast', '/uploads/folders/fld_2pPgQjn08dQzr5vjSk8WYSBTATo/2pR6BliLuDCHYJKq7Eqkb9l55bS.png'),
+  ('fld_2jEx1eCS13KMS8udlPoK12e5KPW', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Healthy Lunch', "uploads/folders/fld_2pPgQjn08dQzr5vjSk8WYSBTATo/2pR6Bouca6LsCl1fXHDK9p264bi.png"),
+  ('fld_2jEx1j3CVPIIAaOwGIORKqHfK89', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Mediteranean', "uploads/folders/fld_2pPgQjn08dQzr5vjSk8WYSBTATo/2pR6BrWvEtBW5uBwoNc213qALBc.png");
 
-INSERT INTO folder_recipes (folder_id, recipe_id, created_at)
+INSERT INTO folder_recipes (folder_id, recipe_id)
 VALUES
-  ('fld_2pPgQjn08dQzr5vjSk8WYSBTATo', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', CURRENT_TIMESTAMP);
+  ('fld_2pPgQjn08dQzr5vjSk8WYSBTATo', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T');
