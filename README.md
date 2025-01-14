@@ -39,11 +39,8 @@ The details about each route and requests that can be made are in [Postman](http
 The following are areas that need to be revisited after initial release into beta.
 
 - [ ] Add validation to mysql DB inputs, in particular empty string values being accepted when they should not be.
-- [x] Middleware to pull the current user up into context to reduce repeated code across endpoints.
 - [ ] Middleware for URL parameter validation to reduce code across endpoints.
 - [ ] Automate the deployment of ECR images via GHA.
 - [ ] True up process for image uploads during recipe creation.
 - [ ] Handle recipe, kitchen, and account clean ups after soft deletes.
 - [ ] Investigate Yoast Schema Graph on pages to see if it improves results or lowers token count.
-- [ ] Body limit for uploads
-- [ ] Timeouts for all routes

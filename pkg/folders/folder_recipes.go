@@ -40,6 +40,7 @@ func ListFolderRecipesByFolderID(ctx context.Context, store Store, folderID stri
 		FROM folder_recipes fr
 			LEFT JOIN recipes r ON fr.recipe_id = r.recipe_id
 		WHERE fr.folder_id = ?
+		  AND r.deleted_at IS NULL
 		ORDER BY fr.created_at DESC
 	`, folderID)
 
