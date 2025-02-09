@@ -6,7 +6,7 @@
 -- Folders
 CREATE TABLE IF NOT EXISTS folders (
   folder_id CHAR(31) PRIMARY KEY,
-  kitchen_id CHAR(31),
+  kitchen_id CHAR(31) NOT NULL,
   folder_name VARCHAR(255) NOT NULL,
   cover VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS folders (
 );
 
 CREATE TABLE IF NOT EXISTS folder_recipes (
-  folder_id CHAR(31),
-  recipe_id CHAR(31),
+  folder_id CHAR(31) NOT NULL,
+  recipe_id CHAR(31) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (folder_id) REFERENCES folders(folder_id),
   FOREIGN KEY (recipe_id) REFERENCES recipes(recipe_id),

@@ -102,8 +102,9 @@ func main() {
 	// 1. Iterate over the fixtures/media directory and upload all files.
 	media := map[string]string{
 		// Kitchens
-		"kitchen_avatar.png": "kitchens/ktc_2jEx1e1esA5292rBisRGuJwXc14/2pR9Azi4FC8IkJO3J6ZvjUqgz5Z.png",
-		"kitchen_cover.png":  "kitchens/ktc_2jEx1e1esA5292rBisRGuJwXc14/2pR9B1iDNJ7EXddtd1mDzCvXaJt.png",
+		"kitchen_avatar_sammycooks.png": "kitchens/ktc_2jEx1e1esA5292rBisRGuJwXc14/2pR9Azi4FC8IkJO3J6ZvjUqgz5Z.png",
+		"kitchen_cover_sammycooks.png":  "kitchens/ktc_2jEx1e1esA5292rBisRGuJwXc14/2pR9B1iDNJ7EXddtd1mDzCvXaJt.png",
+		"kitchen_avatar_bbq_bill.jpg":   "kitchens/ktc_2jEx1j3CVPIIAaOwGIORKqHfK89/2qwGAZKuTbHO96b6VXZohC6VBes.png",
 
 		// Recipes
 		"recipe_pumpkin_pie.png": "recipes/rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T/2pR9B2cIFxj82GDTDB44lpMzYHu.png",

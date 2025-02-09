@@ -1,8 +1,11 @@
 package api
 
 import (
+	"cmp"
 	"net/http"
+	"slices"
 
+	"github.com/adrg/strutil/metrics"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/override"
 	"github.com/kitchens-io/kitchens-api/internal/web"
@@ -107,4 +110,33 @@ func (a *App) UpdateKitchen(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, kitchen)
+}
+
+func (a *App) SearchKitchens(c echo.Context) error {
+	ctx := c.Request().Context()
+	query := c.QueryParam("q")
+
+	// This applies an initial LIKE filter to reduce the search space of the query
+	// before applying similarity comparisons.
+	foundKitchens, err := kitchens.SearchKitchens(ctx, a.db, query)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not search kitchens").SetInternal(err)
+	}
+
+	comparator := metrics.NewLevenshtein()
+	comparator.CaseSensitive = false
+
+	for i, k := range foundKitchens {
+		ownerSimilarity := comparator.Compare(k.Owner, query)
+		handleSimilarity := comparator.Compare(k.Handle, query)
+		nameSimilarity := comparator.Compare(k.Name, query)
+
+		foundKitchens[i].QuerySimilarity = ownerSimilarity + handleSimilarity + nameSimilarity
+	}
+
+	slices.SortFunc(foundKitchens, func(a, b kitchens.Kitchen) int {
+		return cmp.Compare(b.QuerySimilarity, a.QuerySimilarity)
+	})
+
+	return c.JSON(http.StatusOK, foundKitchens)
 }

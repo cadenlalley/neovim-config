@@ -81,7 +81,9 @@ func UpdateKitchen(ctx context.Context, store Store, input UpdateKitchenInput) (
 func GetKitchenByID(ctx context.Context, store Store, kitchenID string) (Kitchen, error) {
 	var kitchen Kitchen
 	err := store.QueryRowxContext(ctx, `
-		SELECT * FROM kitchens WHERE kitchen_id = ?;
+		SELECT k.*, concat(a.first_name, ' ', a.last_name) as owner FROM kitchens k
+			LEFT JOIN accounts a ON k.account_id = a.account_id
+		WHERE k.kitchen_id = ?;
 	`, kitchenID).StructScan(&kitchen)
 
 	if err != nil {
@@ -98,7 +100,9 @@ func ListKitchensByAccountID(ctx context.Context, store Store, accountID string)
 	kitchens := make([]Kitchen, 0)
 
 	rows, err := store.QueryxContext(ctx, `
-		SELECT * FROM kitchens WHERE account_id = ? ORDER BY created_at
+		SELECT k.*, concat(a.first_name, ' ', a.last_name) as owner FROM kitchens k
+			LEFT JOIN accounts a ON k.account_id = a.account_id
+		WHERE a.account_id = ? ORDER BY k.created_at
 	`, accountID)
 
 	if err != nil {
@@ -129,4 +133,34 @@ func DeleteKitchenByKitchenID(ctx context.Context, store Store, kitchenID string
 	}
 
 	return nil
+}
+
+func SearchKitchens(ctx context.Context, store Store, query string) ([]Kitchen, error) {
+	kitchens := make([]Kitchen, 0)
+
+	// Prepend and append "%" to the query to perform a LIKE search.
+	q := "%" + query + "%"
+
+	rows, err := store.QueryxContext(ctx, `
+		SELECT k.*, concat(a.first_name, ' ', a.last_name) as owner FROM kitchens k
+			LEFT JOIN accounts a ON k.account_id = a.account_id
+		WHERE k.kitchen_name LIKE ? OR k.handle LIKE ? OR CONCAT(a.first_name, '', a.last_name) LIKE ?;
+	`, q, q, q)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var kitchen Kitchen
+		if err := rows.StructScan(&kitchen); err != nil {
+			return kitchens, err
+		}
+		kitchens = append(kitchens, kitchen)
+	}
+
+	if err := rows.Err(); err != nil {
+		return kitchens, err
+	}
+
+	return kitchens, nil
 }

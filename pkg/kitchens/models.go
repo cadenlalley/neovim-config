@@ -11,6 +11,7 @@ type Kitchen struct {
 	KitchenID string      `json:"kitchenId" db:"kitchen_id"`
 	AccountID string      `json:"accountId" db:"account_id"`
 	Name      string      `json:"name" db:"kitchen_name"`
+	Owner     string      `json:"owner" db:"owner"`
 	Bio       null.String `json:"bio" db:"bio"`
 	Handle    string      `json:"handle" db:"handle"`
 	Avatar    null.String `json:"avatarPhoto" db:"avatar"`
@@ -19,6 +20,8 @@ type Kitchen struct {
 	CreatedAt time.Time   `json:"createdAt" db:"created_at"`
 	UpdatedAt time.Time   `json:"updatedAt" db:"updated_at"`
 	DeletedAt null.Time   `json:"deletedAt" db:"deleted_at"`
+
+	QuerySimilarity float64 `json:"-" db:"-"`
 }
 
 func CreateKitchenID() string {

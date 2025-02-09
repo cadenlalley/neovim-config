@@ -100,6 +100,15 @@ func Create(input CreateInput) *App {
 	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/add", app.CreateKitchenFolderRecipes, kitchenAuth.ValidateWriter)
 	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/delete", app.DeleteKitchenFolderRecipes, kitchenAuth.ValidateWriter)
 
+	// Kitchen Followers
+	v1.GET("/kitchen/:kitchen_id/followers", app.GetKitchenFollowers)
+	v1.GET("/kitchen/:kitchen_id/followed", app.GetKitchensFollowing)
+	v1.POST("/kitchen/:kitchen_id/follow", app.FollowKitchen, kitchenAuth.ValidateWriter)
+	v1.POST("/kitchen/:kitchen_id/unfollow", app.UnfollowKitchen, kitchenAuth.ValidateWriter)
+
+	// Search
+	v1.GET("/kitchens/search", app.SearchKitchens)
+
 	// Recipe import routes
 	v1.POST("/import/url", app.ImportURL)
 	v1.POST("/import/image", app.ImportImage)

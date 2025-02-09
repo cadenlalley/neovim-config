@@ -5,6 +5,12 @@ filippo.io/edwards25519/field
 # github.com/Masterminds/squirrel v1.5.4
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
+# github.com/adrg/strutil v0.3.1
+## explicit; go 1.14
+github.com/adrg/strutil/internal/mathutil
+github.com/adrg/strutil/internal/ngram
+github.com/adrg/strutil/internal/stringutil
+github.com/adrg/strutil/metrics
 # github.com/auth0/go-jwt-middleware/v2 v2.2.1
 ## explicit; go 1.19
 github.com/auth0/go-jwt-middleware/v2
