@@ -17,6 +17,11 @@ const (
 	ENV_PROD = "production"
 )
 
+var adminUserIDs = []string{
+	"auth0|665e3646139d9f6300bad5e9", // Test Service
+	"auth0|670c621fa584f0ad733a5bb8", // kristi
+}
+
 type App struct {
 	db          *sqlx.DB
 	fileManager *media.S3FileManager
@@ -49,6 +54,7 @@ func Create(input CreateInput) *App {
 
 	authorizer := middleware.NewAuthorizer(input.AuthValidator)
 	kitchenAuth := middleware.NewKitchenAuthorizer(input.DB)
+	adminAuth := middleware.NewAdminAuthorizer(adminUserIDs)
 
 	// Disable the Echo banners on app start.
 	app.API.HideBanner = true
@@ -115,6 +121,17 @@ func Create(input CreateInput) *App {
 
 	// Uploads
 	v1.POST("/upload", app.Upload)
+
+	// Admin Routes
+	admin := app.API.Group("/admin")
+	admin.Use(authorizer.ValidateToken)
+	admin.Use(adminAuth.ValidateAdmin)
+	admin.GET("/accounts", app.AdminListAccounts)
+
+	// Used only for syncing in development.
+	if app.env == ENV_DEV {
+		admin.POST("/kitchen/:kitchen_id/recipes", app.CreateKitchenRecipe)
+	}
 
 	return app
 }

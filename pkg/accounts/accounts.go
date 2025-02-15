@@ -10,6 +10,7 @@ import (
 type Store interface {
 	ExecContext(ctx context.Context, query string, args ...any) (sql.Result, error)
 	QueryRowxContext(ctx context.Context, query string, args ...interface{}) *sqlx.Row
+	QueryxContext(ctx context.Context, query string, args ...interface{}) (*sqlx.Rows, error)
 }
 
 type CreateAccountInput struct {
@@ -53,6 +54,25 @@ func UpdateAccount(ctx context.Context, store Store, input UpdateAccountInput) (
 	}
 
 	return GetAccountByID(ctx, store, input.AccountID)
+}
+
+func ListAccounts(ctx context.Context, store Store) ([]Account, error) {
+	accounts := make([]Account, 0)
+
+	rows, err := store.QueryxContext(ctx, `SELECT * FROM accounts`)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var account Account
+		if err := rows.StructScan(&account); err != nil {
+			return accounts, err
+		}
+		accounts = append(accounts, account)
+	}
+
+	return accounts, nil
 }
 
 func GetAccountByID(ctx context.Context, store Store, accountID string) (Account, error) {
