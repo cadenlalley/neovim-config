@@ -131,6 +131,8 @@ func Create(input CreateInput) *App {
 	// Used only for syncing in development.
 	if app.env == ENV_DEV {
 		admin.POST("/kitchen/:kitchen_id/recipes", app.CreateKitchenRecipe)
+		admin.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/add", app.CreateKitchenFolderRecipes)
+		admin.POST("/kitchen/:kitchen_id/follow", app.FollowKitchen)
 	}
 
 	return app

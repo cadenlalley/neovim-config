@@ -12,6 +12,9 @@ serve:
 fixtures:
 	go run cmd/fixtures/main.go
 
+sync:
+	go run cmd/sync/main.go
+
 # Log into Docker
 docker-login:
 	aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com

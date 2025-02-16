@@ -10,6 +10,14 @@ To work on the Kitchens API you'll need to follow the below steps.
 3. Execute `make fixtures` which will spin up a few dummy accounts and the test-service@kitchens-app.com which can be logged into.
 3. Execute `make serve` and the API should be available on `localhost:1313`.
 
+### Syncing
+
+To sync the production database to the local database:
+
+1. Update the `.env` file with the JWT value of your current logged in session.
+2. Execute `make fixtures` this will reset your environment to prevent any conflicts with the production data.
+3. Execute `make sync` which will pull production data into your local environment.
+
 ### Dependencies
 
 * [Golang](https://formulae.brew.sh/formula/go) - Allows you to run Golang.

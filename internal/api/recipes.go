@@ -28,9 +28,11 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 
 	// Create recipe ID
 	recipeID := recipes.CreateRecipeID()
+	if input.RecipeID != "" {
+		recipeID = input.RecipeID
+	}
 
 	var recipe recipes.Recipe
-
 	txErr := mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
 		recipe, err = recipes.CreateRecipe(ctx, tx, recipes.CreateRecipeInput{
 			RecipeID:  recipeID,

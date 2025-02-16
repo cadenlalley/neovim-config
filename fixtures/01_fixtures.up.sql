@@ -9,7 +9,6 @@
 INSERT INTO accounts (account_id, user_id, email, first_name, last_name)
 VALUES
   ('acc_2jEwcS7Rla6E5ik5ELa8uoULKOW', 'auth0|665e3646139d9f6300bad5e9', 'test-service@kitchens-app.com', 'Sam', 'Smith'),
-  ('acc_2sHWE95xCSD0igNnaEkg9jNvG9p', 'auth0|670c621fa584f0ad733a5bb8', 'kristigood92@gmail.com', 'Kristi', 'Bennardo'),
   ('acc_2jEx1hZPbnNEoZRmkWqP2BDBB87', 'auth0|000000000000000000000001', 'test-mack@kitchens-app.com', 'Mack', 'Campbell'),
   ('acc_2jEx1fZrWeWKxxAciNcc1ng3fq5', 'auth0|000000000000000000000002', 'test-bill@kitchens-app.com', 'Bill', 'Williams'),
   ('acc_2qwGARyD8go0GdknbRK83NOob50', 'auth0|000000000000000000000003', 'test-sarah@kitchens-app.com', 'Sarah', 'Marry');
@@ -19,7 +18,6 @@ VALUES
 INSERT INTO kitchens (kitchen_id, account_id, kitchen_name, bio, handle, avatar, cover)
 VALUES
   ('ktc_2jEx1e1esA5292rBisRGuJwXc14', 'acc_2jEwcS7Rla6E5ik5ELa8uoULKOW', "Sam's Kitchen", NULL, 'sammycooks', "uploads/kitchens/ktc_2jEx1e1esA5292rBisRGuJwXc14/2pR9Azi4FC8IkJO3J6ZvjUqgz5Z.png", NULL),
-  ('ktc_2sHWE9wqIY2KxWlJSvw8DvT14Xx', 'acc_2sHWE95xCSD0igNnaEkg9jNvG9p', "Kristi's Kitchen", '❤️”A person cooking is a person giving: Even the simplest food is a gift.” - Laurie Colwin', "kbenn92", NULL, NULL),
   ('ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 'acc_2jEx1hZPbnNEoZRmkWqP2BDBB87', 'The Campbell Kitchen', "The Campbell's ladle out delicious delights with soup-erb flavor", 'Campbell_Soup', NULL, NULL),
   ('ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 'acc_2jEx1fZrWeWKxxAciNcc1ng3fq5', 'Bill in the Kitchen', NULL, 'bbq_bill', "uploads/kitchens/ktc_2jEx1j3CVPIIAaOwGIORKqHfK89/2qwGAZKuTbHO96b6VXZohC6VBes.jpg", NULL),
   ('ktc_2qwGAW3mHabA1ICXhRms3SJU11E', 'acc_2qwGARyD8go0GdknbRK83NOob50', "Sarah's Sauce House", NULL, 'saucy_sarah', NULL, NULL);
