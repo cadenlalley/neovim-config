@@ -16,7 +16,8 @@ To sync the production database to the local database:
 
 1. Update the `.env` file with the JWT value of your current logged in session.
 2. Execute `make fixtures` this will reset your environment to prevent any conflicts with the production data.
-3. Execute `make sync` which will pull production data into your local environment.
+3. Start the local API server.
+4. Execute `make sync` which will pull production data into your local environment.
 
 ### Dependencies
 
