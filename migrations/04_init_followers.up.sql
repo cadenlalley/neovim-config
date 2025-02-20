@@ -1,5 +1,5 @@
 -- =================
--- Schema 1.2
+-- Schema 1.3
 -- Add kitchen follower management.
 -- =================
 

@@ -121,3 +121,9 @@ VALUES
   ('ktc_2jEx1e1esA5292rBisRGuJwXc14', 'ktc_2jEx1eCS13KMS8udlPoK12e5KPW'), -- sammycooks -> Campbell_Soup
   ('ktc_2jEx1e1esA5292rBisRGuJwXc14', 'ktc_2jEx1j3CVPIIAaOwGIORKqHfK89'), -- sammycooks -> bbqbill
   ('ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 'ktc_2jEx1e1esA5292rBisRGuJwXc14'); -- bbqbill -> sammycooks
+
+-- SAVED RECIPES
+-- =================
+INSERT INTO recipes_saved (kitchen_id, recipe_id)
+VALUES
+  ('ktc_2jEx1e1esA5292rBisRGuJwXc14', 'rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7'); -- sammycooks -> spaghetti bolognese;

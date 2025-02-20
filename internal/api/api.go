@@ -89,28 +89,40 @@ func Create(input CreateInput) *App {
 	v1.PATCH("/kitchen/:kitchen_id", app.UpdateKitchen, kitchenAuth.ValidateWriter)
 
 	// Kitchen Recipes
+	mwRecipeWriter := []echo.MiddlewareFunc{
+		kitchenAuth.ValidateWriter,
+		kitchenAuth.ValidateRecipeWriter,
+	}
 	v1.GET("/kitchen/:kitchen_id/recipes", app.GetKitchenRecipes)
 	v1.GET("/kitchen/:kitchen_id/recipes/:recipe_id", app.GetKitchenRecipe)
-	v1.DELETE("/kitchen/:kitchen_id/recipes/:recipe_id", app.DeleteKitchenRecipe, kitchenAuth.ValidateWriter)
+	v1.DELETE("/kitchen/:kitchen_id/recipes/:recipe_id", app.DeleteKitchenRecipe, mwRecipeWriter...)
 	v1.POST("/kitchen/:kitchen_id/recipes", app.CreateKitchenRecipe, kitchenAuth.ValidateWriter)
-	v1.PUT("/kitchen/:kitchen_id/recipes/:recipe_id", app.UpdateKitchenRecipe, kitchenAuth.ValidateWriter)
+	v1.PUT("/kitchen/:kitchen_id/recipes/:recipe_id", app.UpdateKitchenRecipe, mwRecipeWriter...)
 
 	// Kitchen Folders
+	mwFolderWriter := []echo.MiddlewareFunc{
+		kitchenAuth.ValidateWriter,
+		kitchenAuth.ValidateFolderWriter,
+	}
 	v1.GET("/kitchen/:kitchen_id/folders", app.GetKitchenFolders)
 	v1.GET("/kitchen/:kitchen_id/folders/:folder_id", app.GetKitchenFolder)
-	v1.DELETE("/kitchen/:kitchen_id/folders/:folder_id", app.DeleteKitchenFolder, kitchenAuth.ValidateWriter)
+	v1.DELETE("/kitchen/:kitchen_id/folders/:folder_id", app.DeleteKitchenFolder, mwFolderWriter...)
 	v1.POST("/kitchen/:kitchen_id/folders", app.CreateKitchenFolder, kitchenAuth.ValidateWriter)
-	v1.PUT("/kitchen/:kitchen_id/folders/:folder_id", app.UpdateKitchenFolder, kitchenAuth.ValidateWriter)
+	v1.PUT("/kitchen/:kitchen_id/folders/:folder_id", app.UpdateKitchenFolder, mwFolderWriter...)
 
 	// Kitchen Folder Recipes
-	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/add", app.CreateKitchenFolderRecipes, kitchenAuth.ValidateWriter)
-	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/delete", app.DeleteKitchenFolderRecipes, kitchenAuth.ValidateWriter)
+	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/add", app.CreateKitchenFolderRecipes, mwFolderWriter...)
+	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/delete", app.DeleteKitchenFolderRecipes, mwFolderWriter...)
 
 	// Kitchen Followers
 	v1.GET("/kitchen/:kitchen_id/followers", app.GetKitchenFollowers)
 	v1.GET("/kitchen/:kitchen_id/followed", app.GetKitchensFollowing)
 	v1.POST("/kitchen/:kitchen_id/follow", app.FollowKitchen, kitchenAuth.ValidateWriter)
 	v1.POST("/kitchen/:kitchen_id/unfollow", app.UnfollowKitchen, kitchenAuth.ValidateWriter)
+
+	// Kitchen Saved Recipes
+	v1.POST("/kitchen/:kitchen_id/save-recipe", app.SaveRecipe, kitchenAuth.ValidateWriter)
+	v1.POST("/kitchen/:kitchen_id/remove-recipe", app.RemoveSavedRecipe, kitchenAuth.ValidateWriter)
 
 	// Search
 	v1.GET("/kitchens/search", app.SearchKitchens)

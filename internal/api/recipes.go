@@ -312,3 +312,53 @@ func (a *App) DeleteKitchenRecipe(c echo.Context) error {
 
 	return c.NoContent(http.StatusOK)
 }
+
+type SaveRecipeRequest struct {
+	RecipeID string `json:"recipeId"`
+}
+
+func (a *App) SaveRecipe(c echo.Context) error {
+	var input SaveRecipeRequest
+	err := web.ValidateRequest(c, web.ContentTypeApplicationJSON, &input)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	ctx := c.Request().Context()
+	kitchenID := c.Param("kitchen_id")
+
+	err = recipes.SaveRecipe(ctx, a.db, recipes.SaveRecipeInput{
+		KitchenID: kitchenID,
+		RecipeID:  input.RecipeID,
+	})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not save recipe").SetInternal(err)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
+type RemoveSavedRecipeRequest struct {
+	RecipeID string `json:"recipeId"`
+}
+
+func (a *App) RemoveSavedRecipe(c echo.Context) error {
+	var input RemoveSavedRecipeRequest
+	err := web.ValidateRequest(c, web.ContentTypeApplicationJSON, &input)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	ctx := c.Request().Context()
+	kitchenID := c.Param("kitchen_id")
+
+	err = recipes.RemoveRecipe(ctx, a.db, recipes.RemoveRecipeInput{
+		KitchenID: kitchenID,
+		RecipeID:  input.RecipeID,
+	})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not unsave recipe").SetInternal(err)
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
