@@ -24,6 +24,10 @@ type Recipe struct {
 	UpdatedAt time.Time   `json:"updatedAt" db:"updated_at"`
 	DeletedAt null.Time   `json:"deletedAt" db:"deleted_at"`
 
+	// Reviews
+	ReviewCount  int     `json:"reviewCount" db:"review_count"`
+	ReviewRating float64 `json:"reviewRating" db:"review_rating"`
+
 	// Attached for full recipe
 	SourceDomain null.String        `json:"sourceDomain" db:"-"`
 	Ingredients  []RecipeIngredient `json:"ingredients" db:"-" validate:"required,dive"`
@@ -161,4 +165,37 @@ type RecipeIngredient struct {
 	Quantity     null.Float  `json:"quantity" db:"quantity"`
 	Unit         null.String `json:"unit" db:"unit"`
 	Group        null.String `json:"group" db:"group_name"`
+}
+
+type Review struct {
+	ReviewID          string      `json:"reviewId" db:"review_id"`
+	RecipeID          string      `json:"recipeId" db:"recipe_id"`
+	ReviewerKitchenID string      `json:"reviewerKitchenId" db:"reviewer_kitchen_id"`
+	ReviewerName      string      `json:"reviewerName" db:"reviewer_name"`
+	ReviewerAvatar    null.String `json:"reviewerAvatar" db:"reviewer_avatar"`
+	Description       null.String `json:"description" db:"review_description"`
+	Rating            float64     `json:"rating" db:"rating"`
+	Media             null.String `json:"media" db:"media_path"`
+	CreatedAt         time.Time   `json:"createdAt" db:"created_at"`
+
+	// Attached for full review
+	TotalLikes int  `json:"totalLikes" db:"total_likes"`
+	Liked      bool `json:"liked" db:"liked"`
+}
+
+func CreateReviewID() string {
+	return "rvw_" + ksuid.New().String()
+}
+
+type ReviewSummary struct {
+	Total         int         `json:"total" db:"total"`
+	Average       float64     `json:"average" db:"average"`
+	Rating_1      int         `json:"-" db:"rating_1"`
+	Rating_2      int         `json:"-" db:"rating_2"`
+	Rating_3      int         `json:"-" db:"rating_3"`
+	Rating_4      int         `json:"-" db:"rating_4"`
+	Rating_5      int         `json:"-" db:"rating_5"`
+	Ratings       map[int]int `json:"ratings"`
+	Reviews       []Review    `json:"reviews"`
+	KitchenReview Review      `json:"kitchenReview"`
 }

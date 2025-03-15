@@ -164,3 +164,19 @@ func SearchKitchens(ctx context.Context, store Store, query string) ([]Kitchen, 
 
 	return kitchens, nil
 }
+
+func CheckKitchenWriter(ctx context.Context, store Store, kitchenID string, userID string) (bool, error) {
+	var exists bool
+
+	err := store.QueryRowxContext(ctx, `
+		SELECT 1 FROM kitchens k
+			LEFT JOIN accounts a ON k.account_id = a.account_id
+		WHERE k.kitchen_id = ? AND a.user_id = ?;
+	`, kitchenID, userID).Scan(&exists)
+
+	if err != nil && err != sql.ErrNoRows {
+		return false, err
+	}
+
+	return exists, nil
+}

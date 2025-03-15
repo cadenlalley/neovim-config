@@ -107,10 +107,18 @@ func ListRecipesByKitchenID(ctx context.Context, store Store, kitchenID string) 
 	recipes := make([]Recipe, 0)
 
 	rows, err := store.QueryxContext(ctx, `
-		SELECT * FROM recipes
-		WHERE (kitchen_id = ? OR recipe_id IN (SELECT recipe_id FROM recipes_saved WHERE kitchen_id = ?))
-			AND deleted_at IS NULL
-		ORDER BY created_at;
+		SELECT
+			r.*,
+			CASE WHEN rr.review_count IS NOT NULL THEN rr.review_count ELSE 0 END as review_count,
+			CASE WHEN rr.review_rating IS NOT NULL THEN rr.review_rating ELSE 0 END as review_rating
+		FROM recipes r
+			LEFT JOIN (SELECT recipe_id, count(*) as review_count, avg(rating) as review_rating
+									FROM recipe_reviews
+									GROUP BY recipe_id
+								) AS rr ON r.recipe_id = rr.recipe_id
+		WHERE (r.kitchen_id = ? OR r.recipe_id IN (SELECT recipe_id FROM recipes_saved WHERE kitchen_id = ?))
+		  AND r.deleted_at IS NULL
+		ORDER BY r.created_at;
 	`, kitchenID, kitchenID)
 
 	if err != nil {

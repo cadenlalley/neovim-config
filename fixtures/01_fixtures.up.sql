@@ -127,3 +127,12 @@ VALUES
 INSERT INTO recipes_saved (kitchen_id, recipe_id)
 VALUES
   ('ktc_2jEx1e1esA5292rBisRGuJwXc14', 'rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7'); -- sammycooks -> spaghetti bolognese;
+
+-- RECIPE REVIEWS
+-- =================
+INSERT INTO recipe_reviews (review_id, recipe_id, reviewer_kitchen_id, rating, review_description)
+VALUES
+  ('rvw_2tvEpuxUBa47rgYIwxPoyMfPMl6', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 5, "Incredible spaghetti recipe! The sauce is perfectly balanced with rich herbs, and the pasta is cooked to al dente perfection. A true homemade taste that brings back memories of my grandmother's cooking. Absolutely delicious and will definitely make again!"),
+  ('rvw_2tvEpsFp6GXKthzifUVPDRObPLP', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 4, "Really good spaghetti that's quick and easy to make. My only minor critique is that I might add a bit more garlic next time for extra punch. Overall, a solid weeknight dinner that the whole family enjoyed."),
+  ('rvw_2tvEppPKbjnGgYZHdud9OIxFmGB', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 3, "It's a standard, no-frills approach that gets the job done. The sauce was okay, but could use some more depth. It's reliable but lacks that wow factor that would make me want to make it again and again."),
+  ('rvw_2tvEpsnHblNIdAXshLNyWHpy4MS', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2qwGAW3mHabA1ICXhRms3SJU11E', 2, "Disappointing spaghetti that missed the mark. The sauce was too watery, and the seasoning felt bland and uninspired. There are definitely better spaghetti recipes out there that I'd recommend over this one.");

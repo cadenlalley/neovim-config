@@ -110,6 +110,14 @@ func Create(input CreateInput) *App {
 	v1.POST("/kitchen/:kitchen_id/folders", app.CreateKitchenFolder, kitchenAuth.ValidateWriter)
 	v1.PUT("/kitchen/:kitchen_id/folders/:folder_id", app.UpdateKitchenFolder, mwFolderWriter...)
 
+	// Kitchen Recipe Reviews
+	v1.GET("/kitchen/:kitchen_id/recipes/:recipe_id/reviews", app.GetRecipeReviews)
+	v1.POST("/kitchen/:kitchen_id/recipes/:recipe_id/reviews", app.CreateRecipeReview)
+	v1.PUT("/kitchen/:kitchen_id/recipes/:recipe_id/reviews/:review_id", app.UpdateRecipeReview)
+	v1.DELETE("/kitchen/:kitchen_id/recipes/:recipe_id/reviews/:review_id", app.DeleteRecipeReview)
+	v1.POST("/kitchen/:kitchen_id/recipes/:recipe_id/reviews/:review_id/like", app.LikeRecipeReview)
+	v1.DELETE("/kitchen/:kitchen_id/recipes/:recipe_id/reviews/:review_id/like", app.UnlikeRecipeReview)
+
 	// Kitchen Folder Recipes
 	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/add", app.CreateKitchenFolderRecipes, mwFolderWriter...)
 	v1.POST("/kitchen/:kitchen_id/folders/:folder_id/recipes/delete", app.DeleteKitchenFolderRecipes, mwFolderWriter...)

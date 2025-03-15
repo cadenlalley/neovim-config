@@ -36,6 +36,7 @@ func (a *Authorizer) ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 
 		c.Set(auth.ClaimsContextKey, validClaims)
 		c.Set(auth.UserIDContextKey, claims.RegisteredClaims.Subject)
+		c.Set(auth.KitchenIDContextKey, c.Request().Header.Get("X-Kitchen-ID"))
 
 		return next(c)
 	}

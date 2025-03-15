@@ -283,6 +283,14 @@ func (a *App) GetKitchenRecipe(c echo.Context) error {
 
 	recipe.Ingredients = ingredients
 
+	reviewSummary, err := recipes.GetReviewSummaryByRecipeID(ctx, a.db, recipe.RecipeID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get rating details for recipe").SetInternal(err)
+	}
+
+	recipe.ReviewCount = reviewSummary.Total
+	recipe.ReviewRating = reviewSummary.Average
+
 	return c.JSON(http.StatusOK, recipe)
 }
 

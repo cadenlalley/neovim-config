@@ -13,6 +13,7 @@ import (
 
 const ClaimsContextKey = "auth0_claims"
 const UserIDContextKey = "auth0_sub"
+const KitchenIDContextKey = "auth0_kitchen_id"
 
 // CustomClaims contains custom data we want from the token.
 type CustomClaims struct {
