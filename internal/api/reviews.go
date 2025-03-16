@@ -25,8 +25,8 @@ func (a *App) CreateRecipeReview(c echo.Context) error {
 	}
 
 	// Validate the input
-	if len(input.Description) > 255 {
-		return echo.NewHTTPError(http.StatusBadRequest, "description must be less than 255 characters")
+	if len(input.Description) > 2000 {
+		return echo.NewHTTPError(http.StatusBadRequest, "description must be less than 2000 characters")
 	}
 
 	if input.Rating == nil || *input.Rating < 1 || *input.Rating > 5 {
@@ -80,8 +80,8 @@ func (a *App) UpdateRecipeReview(c echo.Context) error {
 	}
 
 	// Validate the input
-	if input.Description != nil && len(*input.Description) > 255 {
-		return echo.NewHTTPError(http.StatusBadRequest, "description must be less than 255 characters")
+	if input.Description != nil && len(*input.Description) > 2000 {
+		return echo.NewHTTPError(http.StatusBadRequest, "description must be less than 2000 characters")
 	}
 
 	if input.Rating == nil || *input.Rating < 1 || *input.Rating > 5 {

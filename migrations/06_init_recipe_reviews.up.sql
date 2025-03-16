@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS recipe_reviews (
   review_id CHAR(31) PRIMARY KEY,
   recipe_id CHAR(31) NOT NULL,
   reviewer_kitchen_id CHAR(31) NOT NULL,
-  review_description VARCHAR(255),
+  review_description VARCHAR(2000),
   rating TINYINT NOT NULL,
   media_path VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
