@@ -3,11 +3,14 @@ package api
 import (
 	"net/http"
 
+	"github.com/jmoiron/sqlx"
+	"github.com/kitchens-io/kitchens-api/internal/mysql"
 	"github.com/kitchens-io/kitchens-api/internal/web"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 	"github.com/kitchens-io/kitchens-api/pkg/kitchens"
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"gopkg.in/guregu/null.v4"
 )
 
@@ -189,12 +192,23 @@ func (a *App) DeleteRecipeReview(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden)
 	}
 
-	// Delete the review.
-	err = recipes.DeleteReview(ctx, a.db, review.ReviewID)
-	if err != nil {
-		if err == recipes.ErrReviewNotFound {
-			return echo.NewHTTPError(http.StatusBadRequest, err)
+	txErr := mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
+		err = recipes.DeleteLikesByReviewID(ctx, tx, review.ReviewID)
+		if err != nil {
+			return errors.Wrap(err, "could not delete recipe review likes")
 		}
+
+		err = recipes.DeleteReview(ctx, tx, review.ReviewID)
+		if err != nil {
+			if err == recipes.ErrReviewNotFound {
+				return nil
+			}
+			return errors.Wrap(err, "could not delete recipe review")
+		}
+
+		return nil
+	})
+	if txErr != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not delete recipe review").SetInternal(err)
 	}
 

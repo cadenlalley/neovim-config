@@ -209,3 +209,14 @@ func UnlikeReview(ctx context.Context, store Store, reviewID string, kitchenID s
 
 	return nil
 }
+
+func DeleteLikesByReviewID(ctx context.Context, store Store, reviewID string) error {
+	_, err := store.ExecContext(ctx, `
+		DELETE FROM recipe_review_likes WHERE review_id = ?;
+	`, reviewID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
