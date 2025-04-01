@@ -4,11 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/segmentio/ksuid"
 	"gopkg.in/guregu/null.v4"
 )
+
+// This regex matches any character that is NOT a-z, A-Z, 0-9, or dash (-)
+var recipeShareURL = regexp.MustCompile(`[^a-zA-Z0-9-]+`)
 
 type Recipe struct {
 	RecipeID  string      `json:"recipeId" db:"recipe_id"`
@@ -32,6 +37,7 @@ type Recipe struct {
 	SourceDomain null.String        `json:"sourceDomain" db:"-"`
 	Ingredients  []RecipeIngredient `json:"ingredients" db:"-" validate:"required,dive"`
 	Steps        []RecipeStep       `json:"steps" db:"-" validate:"required,dive"`
+	ShareURL     string             `json:"shareUrl" db:"-"`
 }
 
 // Model validation not handled by the validator
@@ -53,10 +59,6 @@ func (r *Recipe) Validate() error {
 	return nil
 }
 
-func CreateRecipeID() string {
-	return "rcp_" + ksuid.New().String()
-}
-
 // Handle computed values
 func (r *Recipe) ComputeValues() error {
 	// Source Domain
@@ -68,7 +70,22 @@ func (r *Recipe) ComputeValues() error {
 		host := parsedURL.Hostname()
 		r.SourceDomain = null.NewString(host, host != "")
 	}
+
+	// Share URL
+	r.ShareURL = r.FormatShareURL()
+
 	return nil
+}
+
+// Format Share URL
+func (r *Recipe) FormatShareURL() string {
+	recipeName := strings.ToLower(recipeShareURL.ReplaceAllString(r.Name, "-"))
+	recipeName = strings.TrimPrefix(recipeName, "-")
+	recipeName = strings.TrimSuffix(recipeName, "-")
+
+	recipeID := strings.Split(r.RecipeID, "rcp_")[1]
+
+	return fmt.Sprintf("/%s/%s", recipeID, url.PathEscape(recipeName))
 }
 
 // Create from Import
@@ -133,6 +150,10 @@ func (r *Recipe) Import(v json.RawMessage, includeGroup bool) error {
 	}
 
 	return nil
+}
+
+func CreateRecipeID() string {
+	return "rcp_" + ksuid.New().String()
 }
 
 type RecipeStep struct {

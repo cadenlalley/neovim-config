@@ -142,6 +142,10 @@ func Create(input CreateInput) *App {
 	// Uploads
 	v1.POST("/upload", app.Upload)
 
+	// Public
+	public := app.API.Group("/public")
+	public.GET("/v1/recipes/:recipe_id", app.GetKitchenRecipe)
+
 	// Admin Routes
 	admin := app.API.Group("/admin")
 	admin.Use(authorizer.ValidateToken)
