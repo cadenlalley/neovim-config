@@ -61,6 +61,7 @@ func Create(input CreateInput) *App {
 	app.API.HidePort = true
 
 	// Attach middelware and routes to the Echo instance.
+	app.API.Use(mw.CORS())
 	app.API.Use(mw.Logger())
 	app.API.Use(mw.RequestID())
 	app.API.Use(mw.BodyLimitWithConfig(mw.BodyLimitConfig{
