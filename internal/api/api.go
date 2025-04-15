@@ -52,7 +52,7 @@ func Create(input CreateInput) *App {
 		API:         echo.New(),
 	}
 
-	authorizer := middleware.NewAuthorizer(input.AuthValidator)
+	authorizer := middleware.NewAuthorizer(input.AuthValidator, input.Env)
 	kitchenAuth := middleware.NewKitchenAuthorizer(input.DB)
 	adminAuth := middleware.NewAdminAuthorizer(adminUserIDs)
 

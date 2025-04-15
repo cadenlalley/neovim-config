@@ -1,4 +1,8 @@
-.PHONY: vendor serve fixtures docker-login docker-build docker-tag docker-push
+.PHONY: vendor serve fixtures docker-login docker-build docker-tag docker-push test
+
+# Run tests.
+test:
+	go test ./...
 
 # Clean and update dependencies.
 vendor:
