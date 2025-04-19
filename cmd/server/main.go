@@ -14,8 +14,9 @@ import (
 	"github.com/kitchens-io/kitchens-api/internal/api"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/mysql"
-	"github.com/kitchens-io/kitchens-api/internal/openai"
+	ai "github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
+	"github.com/openai/openai-go"
 
 	"github.com/rs/zerolog/log"
 )
@@ -112,7 +113,10 @@ func main() {
 
 	// Handle OpenAI client
 	// ==========================
-	aiClient := openai.NewOpenAIClient(cfg.OpenAI.Host, cfg.OpenAI.Token, cfg.Debug)
+	aiClient := ai.NewOpenAIClient(cfg.OpenAI.Host, cfg.OpenAI.Token, cfg.Debug)
+
+	// TODO: migrate existing ai client to v2
+	aiClientV2 := openai.NewClient()
 
 	// Handle application server.
 	// ==========================
@@ -131,6 +135,7 @@ func main() {
 		Env:           cfg.Env,
 		CDNHost:       cfg.CDN.Host,
 		AIClient:      aiClient,
+		AIClientV2:    aiClientV2,
 	})
 
 	// Start server

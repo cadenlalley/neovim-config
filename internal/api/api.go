@@ -7,9 +7,10 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/middleware"
-	"github.com/kitchens-io/kitchens-api/internal/openai"
+	ai "github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/labstack/echo/v4"
 	mw "github.com/labstack/echo/v4/middleware"
+	"github.com/openai/openai-go"
 )
 
 const (
@@ -25,7 +26,8 @@ var adminUserIDs = []string{
 type App struct {
 	db          *sqlx.DB
 	fileManager *media.S3FileManager
-	aiClient    *openai.OpenAIClient
+	aiClient    *ai.OpenAIClient
+	aiClientV2  openai.Client
 	env         string
 	cdnHost     string
 	API         *echo.Echo
@@ -37,7 +39,8 @@ type CreateInput struct {
 	AuthValidator *validator.Validator
 	Env           string
 	CDNHost       string
-	AIClient      *openai.OpenAIClient
+	AIClient      *ai.OpenAIClient
+	AIClientV2    openai.Client
 }
 
 // Create will establish an instance of the app with all routes
@@ -135,6 +138,7 @@ func Create(input CreateInput) *App {
 
 	// Search
 	v1.GET("/kitchens/search", app.SearchKitchens)
+	v1.GET("/recipes/search/ext", app.ExternalSearch)
 
 	// Recipe import routes
 	v1.POST("/import/url", app.ImportURL)
