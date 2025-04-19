@@ -49,6 +49,31 @@ func Migrate(migrationsPath, dsn string, migrationsTable *string) error {
 	return nil
 }
 
+// ResetFixtures will reset the database by dropping the migrations table
+// and re-applying the migrations from the migrationsPath.
+func ResetFixtures(migrationsPath, dsn string, migrationsTable *string) error {
+	table := "fixtures_migrations"
+	if migrationsTable != nil {
+		table = *migrationsTable
+	}
+
+	input := fmt.Sprintf("%s&multiStatements=true&x-migrations-table=%s", dsn, table)
+	m, err := migrate.New(migrationsPath, input)
+	if err != nil {
+		return err
+	}
+
+	if err := m.Down(); err != nil && err != migrate.ErrNoChange {
+		return err
+	}
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return err
+	}
+
+	return nil
+}
+
 func Transaction(ctx context.Context, conn *sqlx.DB, f func(tx *sqlx.Tx) error) error {
 	tx, err := conn.BeginTxx(ctx, nil)
 	if err != nil {
@@ -66,43 +91,3 @@ func Transaction(ctx context.Context, conn *sqlx.DB, f func(tx *sqlx.Tx) error) 
 
 	return nil
 }
-
-// ApplyFixtures will receive a DB and table to reset for tests.
-// This function can only be used locally or in tests.
-// TODO: Figure out pathing issue for tests.
-// func ApplyFixtures(db *sqlx.DB, path, table string) error {
-// 	if env := os.Getenv("APP_ENV"); env != "dev" && env != "test" {
-// 		return fmt.Errorf("Unable to apply fixtures in environment: %s", env)
-// 	}
-
-// 	var fileName string
-// 	switch table {
-// 	case "users":
-// 		fileName = "01_create_users.up.sql"
-// 	default:
-// 		return fmt.Errorf("Invalid table name supplied '%s'", table)
-// 	}
-
-// 	dsql := fmt.Sprintf(`DELETE FROM %s WHERE 1=1;`, table)
-// 	_, err := db.Exec(dsql)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	pwd, err := os.Getwd()
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	fixture := filepath.Join(pwd, path, "fixtures", fileName)
-// 	sql, err := ioutil.ReadFile(fixture)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	if _, err := db.Exec(string(sql)); err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
