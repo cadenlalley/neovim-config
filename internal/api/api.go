@@ -5,12 +5,11 @@ import (
 
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/jmoiron/sqlx"
+	"github.com/kitchens-io/kitchens-api/internal/ai"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/middleware"
-	ai "github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/labstack/echo/v4"
 	mw "github.com/labstack/echo/v4/middleware"
-	"github.com/openai/openai-go"
 )
 
 const (
@@ -26,8 +25,7 @@ var adminUserIDs = []string{
 type App struct {
 	db          *sqlx.DB
 	fileManager *media.S3FileManager
-	aiClient    *ai.OpenAIClient
-	aiClientV2  openai.Client
+	aiClient    *ai.AIClient
 	env         string
 	cdnHost     string
 	API         *echo.Echo
@@ -39,8 +37,7 @@ type CreateInput struct {
 	AuthValidator *validator.Validator
 	Env           string
 	CDNHost       string
-	AIClient      *ai.OpenAIClient
-	AIClientV2    openai.Client
+	AIClient      *ai.AIClient
 }
 
 // Create will establish an instance of the app with all routes
@@ -49,9 +46,9 @@ func Create(input CreateInput) *App {
 	app := &App{
 		db:          input.DB,
 		fileManager: input.FileManager,
-		aiClient:    input.AIClient,
 		env:         input.Env,
 		cdnHost:     input.CDNHost,
+		aiClient:    input.AIClient,
 		API:         echo.New(),
 	}
 

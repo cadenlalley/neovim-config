@@ -3,12 +3,11 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"html"
 	"net/http"
+	"strings"
 
 	"github.com/kitchens-io/kitchens-api/internal/extractor"
 	"github.com/kitchens-io/kitchens-api/internal/media"
-	"github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/kitchens-io/kitchens-api/internal/web"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
@@ -35,6 +34,8 @@ func (a *App) ImportURL(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
+	ctx := c.Request().Context()
+
 	// Load the requested source
 	str, err := extractor.GetTextFromURL(input.Source)
 	if err != nil {
@@ -44,67 +45,24 @@ func (a *App) ImportURL(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
 
-	// Ask OpenAI to convert the string to a structured recipe.
-	res, err := a.getRecipeFromText(str, input)
+	res, err := a.aiClient.ExtractRecipeFromText(ctx, str)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
 
-	res.Source = null.NewString(input.Source, true)
-
-	return c.JSON(http.StatusOK, res)
-}
-
-func (a *App) getRecipeFromText(text string, req ImportURLRequest) (recipes.Recipe, error) {
-	prompt := "Retrieve the complete recipe from the following text, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text:"
-	if req.Debug.Prompt != "" {
-		prompt = req.Debug.Prompt
-	}
-
-	res, err := a.aiClient.PostChatCompletion(openai.ChatCompletionRequest{
-		Model:     "gpt-4o-mini",
-		MaxTokens: 1600,
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role: "system",
-				Content: []openai.ChatCompletionContent{
-					{
-						Type: "text",
-						Text: "You are a helpful assistant.",
-					},
-				},
-			},
-			{
-				Role: "user",
-				Content: []openai.ChatCompletionContent{
-					{
-						Type: "text",
-						Text: prompt + " " + text,
-					},
-				},
-			},
-		},
-		ResponseFormat: recipes.JsonSchema,
-	})
+	data, err := json.Marshal(res)
 	if err != nil {
-		return recipes.Recipe{}, err
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
 
-	// Handle the escaped HTML that comes back from Open AI.
-	if len(res.Choices) == 0 {
-		return recipes.Recipe{}, fmt.Errorf("unexpected response payload from Open AI: %v", res)
-	}
-
-	recipeText := html.UnescapeString(res.Choices[0].Message.Content)
-
-	// Marshal the response into a recipe struct.
-	var recipe recipes.Recipe
-	err = recipe.Import(json.RawMessage(recipeText), req.Features.Groups)
+	var r recipes.Recipe
+	err = r.Import(data, input.Features.Groups)
 	if err != nil {
-		return recipes.Recipe{}, err
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
+	r.Source = null.NewString(input.Source, true)
 
-	return recipe, nil
+	return c.JSON(http.StatusOK, r)
 }
 
 type ImportImageRequest struct {
@@ -112,9 +70,7 @@ type ImportImageRequest struct {
 	Features struct {
 		Groups bool `form:"featureGroups"`
 	}
-	Debug struct {
-		Prompt string `form:"prompt"`
-	}
+	URLs string `form:"urls"`
 
 	// The following are manually checked in the handler based on the provided count.
 	// file_1, file_2, file_n...
@@ -162,83 +118,37 @@ func (a *App) ImportImage(c echo.Context) error {
 	}
 
 	// Image Uploads don't work in development, however we can return an empty recipe for debugging.
+	// If URLs are provided in the form submission, use those instead.
 	if a.env == ENV_DEV {
-		var sample recipes.Recipe
-		err := json.Unmarshal(recipes.Sample, &sample)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "could not parse sample recipe for development").SetInternal(err)
+		if len(input.URLs) > 0 {
+			parts := strings.Split(input.URLs, ",")
+			urls = make([]string, 0)
+			urls = append(urls, parts...)
+		} else {
+			var sample recipes.Recipe
+			err := json.Unmarshal(recipes.Sample, &sample)
+			if err != nil {
+				return echo.NewHTTPError(http.StatusInternalServerError, "could not parse sample recipe for development").SetInternal(err)
+			}
+			return c.JSON(http.StatusOK, sample)
 		}
-		return c.JSON(http.StatusOK, sample)
 	}
 
-	res, err := a.getRecipeFromImages(urls, input)
+	res, err := a.aiClient.ExtractRecipeFromImageURLs(ctx, urls)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from image").SetInternal(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
+	}
+
+	data, err := json.Marshal(res)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
+	}
+
+	var r recipes.Recipe
+	err = r.Import(data, input.Features.Groups)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
 
 	return c.JSON(http.StatusOK, res)
-}
-
-func (a *App) getRecipeFromImages(urls []string, req ImportImageRequest) (recipes.Recipe, error) {
-	prompt := "Retrieve the complete recipe from the following images, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text."
-	if req.Debug.Prompt != "" {
-		prompt = req.Debug.Prompt
-	}
-
-	chatCompletion := []openai.ChatCompletionContent{
-		{
-			Type: "text",
-			Text: prompt,
-		},
-	}
-
-	// Append each URL that has been provided to completion.
-	for _, url := range urls {
-		chatCompletion = append(chatCompletion, openai.ChatCompletionContent{
-			Type: "image_url",
-			ImageURL: &openai.ChatCompletionContentImageURL{
-				URL: url,
-			},
-		})
-	}
-
-	res, err := a.aiClient.PostChatCompletion(openai.ChatCompletionRequest{
-		Model:     "gpt-4o-mini",
-		MaxTokens: 1600,
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role: "system",
-				Content: []openai.ChatCompletionContent{
-					{
-						Type: "text",
-						Text: "You are a helpful assistant.",
-					},
-				},
-			},
-			{
-				Role:    "user",
-				Content: chatCompletion,
-			},
-		},
-		ResponseFormat: recipes.JsonSchema,
-	})
-	if err != nil {
-		return recipes.Recipe{}, err
-	}
-
-	// Handle the escaped HTML that comes back from Open AI.
-	if len(res.Choices) == 0 {
-		return recipes.Recipe{}, fmt.Errorf("unexpected response payload from Open AI: %v", res)
-	}
-
-	recipeText := html.UnescapeString(res.Choices[0].Message.Content)
-
-	// Marshal the response into a recipe struct.
-	var recipe recipes.Recipe
-	err = recipe.Import(json.RawMessage(recipeText), req.Features.Groups)
-	if err != nil {
-		return recipes.Recipe{}, err
-	}
-
-	return recipe, nil
 }

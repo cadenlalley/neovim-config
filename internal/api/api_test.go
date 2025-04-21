@@ -15,9 +15,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/kitchens-io/kitchens-api/internal/ai"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/mysql"
-	"github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/rs/zerolog/log"
 )
 
@@ -100,7 +100,9 @@ func TestMain(m *testing.M) {
 
 	fileManager := media.NewS3FileManager(s3Client, cfg.S3.MediaBucket)
 
-	aiClient := openai.NewOpenAIClient(cfg.OpenAI.Host, cfg.OpenAI.Token, cfg.Debug)
+	// Handle AI Client
+	// ==========================
+	aiClient := ai.NewClient(cfg.OpenAI.Token, cfg.OpenAI.Host)
 
 	// Handle application server.
 	// ==========================

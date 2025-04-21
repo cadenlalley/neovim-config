@@ -11,12 +11,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/kitchens-io/kitchens-api/internal/ai"
 	"github.com/kitchens-io/kitchens-api/internal/api"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/mysql"
-	ai "github.com/kitchens-io/kitchens-api/internal/openai"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
-	"github.com/openai/openai-go"
 
 	"github.com/rs/zerolog/log"
 )
@@ -111,12 +110,9 @@ func main() {
 
 	fileManager := media.NewS3FileManager(s3Client, cfg.S3.MediaBucket)
 
-	// Handle OpenAI client
+	// Handle AI client
 	// ==========================
-	aiClient := ai.NewOpenAIClient(cfg.OpenAI.Host, cfg.OpenAI.Token, cfg.Debug)
-
-	// TODO: migrate existing ai client to v2
-	aiClientV2 := openai.NewClient()
+	aiClient := ai.NewClient(cfg.OpenAI.Token, cfg.OpenAI.Host)
 
 	// Handle application server.
 	// ==========================
@@ -135,7 +131,6 @@ func main() {
 		Env:           cfg.Env,
 		CDNHost:       cfg.CDN.Host,
 		AIClient:      aiClient,
-		AIClientV2:    aiClientV2,
 	})
 
 	// Start server
