@@ -15,6 +15,7 @@ import (
 	"github.com/kitchens-io/kitchens-api/internal/api"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/mysql"
+	"github.com/kitchens-io/kitchens-api/internal/search"
 	"github.com/kitchens-io/kitchens-api/pkg/auth"
 
 	"github.com/rs/zerolog/log"
@@ -61,6 +62,12 @@ type AppConfig struct {
 	OpenAI struct {
 		Host  string `required:"true" envconfig:"OPENAI_HOST"`
 		Token string `required:"true" envconfig:"OPENAI_TOKEN"`
+	}
+
+	// Brave
+	Brave struct {
+		Host  string `required:"true" envconfig:"BRAVE_HOST"`
+		Token string `required:"true" envconfig:"BRAVE_TOKEN"`
 	}
 }
 
@@ -114,6 +121,10 @@ func main() {
 	// ==========================
 	aiClient := ai.NewClient(cfg.OpenAI.Token, cfg.OpenAI.Host)
 
+	// Handle Search client
+	// ==========================
+	searchClient := search.NewClient(cfg.Brave.Token, cfg.Brave.Host)
+
 	// Handle application server.
 	// ==========================
 
@@ -131,6 +142,7 @@ func main() {
 		Env:           cfg.Env,
 		CDNHost:       cfg.CDN.Host,
 		AIClient:      aiClient,
+		SearchClient:  searchClient,
 	})
 
 	// Start server

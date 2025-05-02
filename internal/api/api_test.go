@@ -60,6 +60,12 @@ type AppConfig struct {
 		Host  string `required:"true" envconfig:"OPENAI_HOST"`
 		Token string `required:"true" envconfig:"OPENAI_TOKEN"`
 	}
+
+	// Brave Search
+	Brave struct {
+		Host  string `required:"true" envconfig:"BRAVE_HOST"`
+		Token string `required:"true" envconfig:"BRAVE_TOKEN"`
+	}
 }
 
 func TestMain(m *testing.M) {

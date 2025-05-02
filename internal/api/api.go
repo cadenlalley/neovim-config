@@ -8,6 +8,7 @@ import (
 	"github.com/kitchens-io/kitchens-api/internal/ai"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/middleware"
+	"github.com/kitchens-io/kitchens-api/internal/search"
 	"github.com/labstack/echo/v4"
 	mw "github.com/labstack/echo/v4/middleware"
 )
@@ -23,12 +24,13 @@ var adminUserIDs = []string{
 }
 
 type App struct {
-	db          *sqlx.DB
-	fileManager *media.S3FileManager
-	aiClient    *ai.AIClient
-	env         string
-	cdnHost     string
-	API         *echo.Echo
+	db           *sqlx.DB
+	fileManager  *media.S3FileManager
+	env          string
+	cdnHost      string
+	aiClient     *ai.AIClient
+	searchClient *search.SearchClient
+	API          *echo.Echo
 }
 
 type CreateInput struct {
@@ -38,18 +40,20 @@ type CreateInput struct {
 	Env           string
 	CDNHost       string
 	AIClient      *ai.AIClient
+	SearchClient  *search.SearchClient
 }
 
 // Create will establish an instance of the app with all routes
 // and middleware attached.
 func Create(input CreateInput) *App {
 	app := &App{
-		db:          input.DB,
-		fileManager: input.FileManager,
-		env:         input.Env,
-		cdnHost:     input.CDNHost,
-		aiClient:    input.AIClient,
-		API:         echo.New(),
+		db:           input.DB,
+		fileManager:  input.FileManager,
+		env:          input.Env,
+		cdnHost:      input.CDNHost,
+		aiClient:     input.AIClient,
+		searchClient: input.SearchClient,
+		API:          echo.New(),
 	}
 
 	authorizer := middleware.NewAuthorizer(input.AuthValidator, input.Env)
@@ -135,7 +139,7 @@ func Create(input CreateInput) *App {
 
 	// Search
 	v1.GET("/kitchens/search", app.SearchKitchens)
-	v1.GET("/recipes/search/ext", app.ExternalSearch)
+	v1.GET("/recipes/search/web", app.WebSearch)
 
 	// Recipe import routes
 	v1.POST("/import/url", app.ImportURL)

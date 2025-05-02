@@ -101,6 +101,12 @@ func TestUpdateKitchen(t *testing.T) {
 		},
 	}
 
+	// Reset Database before testing.
+	err := resetFixtures()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			status, body, err := patchFormRequest("/v1/kitchen/"+tc.kitchenID, tc.formData)
@@ -163,6 +169,12 @@ func TestSearchKitchens(t *testing.T) {
 				testKitchen,
 			},
 		},
+	}
+
+	// Reset Database before testing.
+	err := resetFixtures()
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	for _, tc := range testCases {
