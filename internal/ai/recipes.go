@@ -25,15 +25,15 @@ type RecipeResponseIngredientsSchema struct {
 	IngredientID int     `json:"ingredientId"`
 	Name         string  `json:"name"`
 	Quantity     float64 `json:"quantity" jsonschema_description:"the amount of the ingredient, if an amount doesn't make sense for the ingredient set it to 0"`
-	Unit         string  `json:"unit" jsonschema:"enum=bag,enum=bottle,enum=box,enum=can,enum=clove,enum=cup,enum=dash,enum=drop,enum=gallon,enum=gram,enum=jar,enum=kilogram,enum=liter,enum=milliliter,enum=ounce,enum=packet,enum=piece,enum=pint,enum=pinch,enum=pound,enum=quart,enum=slice,enum=stick,enum=tbsp,enum=tsp,enum=n/a" jsonschema_description:"optional unit of measurement, if a unit doesn't make sense for the ingredient set it to n/a"`
-	Group        string  `json:"group" jsonschema_description:"the group within the recipe the ingredient belongs to"`
+	Unit         string  `json:"unit" jsonschema:"enum=bag,enum=bottle,enum=box,enum=can,enum=clove,enum=cup,enum=dash,enum=drop,enum=gallon,enum=gram,enum=jar,enum=kilogram,enum=liter,enum=milliliter,enum=ounce,enum=packet,enum=piece,enum=pint,enum=pinch,enum=pound,enum=quart,enum=slice,enum=stick,enum=tbsp,enum=tsp,enum=n/a" jsonschema_description:"optional unit of measurement, if a unit doesn't make sense for the ingredient (like whole vegetables) set it to n/a"`
+	Group        string  `json:"group" jsonschema_description:"ingredient group or 'n/a' if the content does not subdivide ingredients"`
 }
 
 type RecipeResponseStepsSchema struct {
 	StepID      int    `json:"stepId"`
 	Instruction string `json:"instruction"`
-	Note        string `json:"note"`
-	Group       string `json:"group" jsonschema_description:"the group within the recipe the step belongs to"`
+	Note        string `json:"note" jsonschema_description:"optional note for the instruction step"`
+	Group       string `json:"group" jsonschema_description:"step group or 'n/a' if the content does not subdivide steps"`
 }
 
 func (a *AIClient) ExtractRecipeFromText(ctx context.Context, text string) (RecipeResponseSchema, error) {
@@ -48,7 +48,34 @@ func (a *AIClient) ExtractRecipeFromText(ctx context.Context, text string) (Reci
 		Model:     openai.ChatModelGPT4oMini,
 		MaxTokens: openai.Int(1600),
 		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.UserMessage("Retrieve the complete recipe from the following text, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text: " + text),
+			openai.UserMessage(`
+Your task is to accurately extract the recipe from the provided Recipe Markdown Text based on the following rules:
+
+**Rules**
+1. Verbatim & Order
+  * Copy every ingredient line and instruction step exactly—preserve punctuation, formatting, and numbering from the markdown.
+  * Do not sort, merge, or renumber; use markdown list numbers for stepId, or 1-based position if none exist.
+
+2. Groups
+  * Only create an ingredient or step group when the markdown has an actual heading (e.g. ## Filling).
+  * Do not invent, rename, or repurpose any groups.
+	* Groups must be specific, do not include "Ingredients" or "Directions" in group names.
+
+3. Steps
+  * If a step starts with a variation of "note", it is not a step and must be ignored as an instruction.
+
+4. Notes
+  * If a step has its own sub-heading, boldened, or italicized note directly underneath, attach it as a step note.
+  * Do not use notes to indicate grouping.
+
+5. Formatting
+	* Remove any text formatting meant for display purposes (e.g. bold, italic, etc.)
+
+---
+
+**Recipe Markdown Text:**
+
+` + text),
 		},
 		ResponseFormat: openai.ChatCompletionNewParamsResponseFormatUnion{
 			OfJSONSchema: &openai.ResponseFormatJSONSchemaParam{

@@ -1,9 +1,13 @@
 module github.com/kitchens-io/kitchens-api
 
-go 1.22
+go 1.23.0
+
+toolchain go1.23.8
 
 require (
+	github.com/JohannesKaufmann/html-to-markdown/v2 v2.3.2
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/adrg/strutil v0.3.1
 	github.com/auth0/go-jwt-middleware/v2 v2.2.1
 	github.com/aws/aws-sdk-go-v2/config v1.27.18
@@ -21,12 +25,14 @@ require (
 	github.com/rs/zerolog v1.32.0
 	github.com/segmentio/ksuid v1.0.4
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/net v0.34.0
+	golang.org/x/net v0.39.0
 	gopkg.in/guregu/null.v4 v4.0.0
 )
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/JohannesKaufmann/dom v0.2.0 // indirect
+	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.27.2 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.2 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.18 // indirect
@@ -69,10 +75,10 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/crypto v0.32.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	gopkg.in/go-jose/go-jose.v2 v2.6.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

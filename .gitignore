@@ -29,3 +29,6 @@ go.work.sum
 
 # Workspace ideas
 scratch/
+
+# Evaluator
+cmd/evaluator

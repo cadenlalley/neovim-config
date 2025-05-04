@@ -4,8 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
+	"net/url"
 
+	"github.com/JohannesKaufmann/html-to-markdown/v2/converter"
+	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/base"
+	"github.com/JohannesKaufmann/html-to-markdown/v2/plugin/commonmark"
+	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html"
 )
 
@@ -13,17 +17,49 @@ var (
 	ErrRequestBlocked = errors.New("request blocked")
 )
 
-type EntityTags struct {
-	Tags map[string]bool
-}
-
-func (e *EntityTags) Contains(tag string) bool {
-	return e.Tags[tag]
+var excludedTags = []string{
+	"script",
+	"style",
+	"head",
+	"nav",
+	"footer",
+	"img",
+	"iframe",
+	"svg",
+	"form",
+	"button",
+	"input",
+	"select",
+	"textarea",
+	"link",
+	"picture",
+	"video",
+	"audio",
+	"source",
+	"canvas",
+	"noscript",
+	"figure",
 }
 
 // Fetch webpage content
-func fetchURL(url string) (*html.Node, error) {
-	resp, err := http.Get(url)
+func fetchURL(inputURL string) (*html.Node, error) {
+	// Get domain of URL
+	parsedURL, err := url.Parse(inputURL)
+	if err != nil {
+		return nil, err
+	}
+	host := parsedURL.Hostname()
+
+	req, err := http.NewRequest("GET", inputURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
+	req.Header.Set("Host", host)
+	req.Header.Set("Accept", "text/html")
+	req.Header.Set("Accept-Language", "en-US")
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -45,27 +81,6 @@ func fetchURL(url string) (*html.Node, error) {
 	return doc, nil
 }
 
-// Recursive function to extract text content from HTML nodes
-func extractText(n *html.Node, sb *strings.Builder, excludedTags *EntityTags) {
-	// Skip the node if it's an element that should be excluded
-	if n.Type == html.ElementNode && excludedTags.Contains(n.Data) {
-		return
-	}
-
-	// If it's a text node, clean and append the text content
-	if n.Type == html.TextNode {
-		text := strings.TrimSpace(n.Data)
-		if len(text) > 0 && !strings.HasPrefix(text, "<iframe") && !strings.HasPrefix(text, "<img") {
-			sb.WriteString(text + " ")
-		}
-	}
-
-	// Traverse the child nodes
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		extractText(c, sb, excludedTags)
-	}
-}
-
 func GetTextFromURL(url string) (string, error) {
 	// Fetch the HTML document
 	doc, err := fetchURL(url)
@@ -73,22 +88,28 @@ func GetTextFromURL(url string) (string, error) {
 		return "", err
 	}
 
-	excludedTags := &EntityTags{
-		Tags: map[string]bool{
-			"script": true,
-			"style":  true,
-			"head":   true,
-			"nav":    true,
-			"footer": true,
-			"img":    true,
-			"iframe": true,
-		},
+	gqDoc := goquery.NewDocumentFromNode(doc)
+	gqDoc.Find("a[href]").Each(func(i int, s *goquery.Selection) {
+		s.SetAttr("href", "")
+	})
+
+	conv := converter.NewConverter(
+		converter.WithPlugins(
+			base.NewBasePlugin(),
+			commonmark.NewCommonmarkPlugin(
+				commonmark.WithStrongDelimiter("__"),
+			),
+		),
+	)
+
+	for _, tag := range excludedTags {
+		conv.Register.TagType(tag, converter.TagTypeRemove, 0)
 	}
 
-	// Extract the text content
-	var sb strings.Builder
-	extractText(doc, &sb, excludedTags)
+	md, err := conv.ConvertNode(gqDoc.Get(0))
+	if err != nil {
+		return "", err
+	}
 
-	// Return the cleaned-up text
-	return sb.String(), nil
+	return string(md), nil
 }

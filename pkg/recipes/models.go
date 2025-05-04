@@ -108,9 +108,6 @@ func (r *Recipe) Import(v json.RawMessage, includeGroup bool) error {
 	for i, ingredient := range input.Ingredients {
 		// NOTE: Temporary fix for import URL failing to handle groups well.
 		group := ParseNullString(ingredient.Group)
-		if !includeGroup {
-			group = null.NewString("", false)
-		}
 
 		// NOTE: Frontend expects 1/3 as 0.333
 		quantity := ParseNullFloat(ingredient.Quantity)

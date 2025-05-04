@@ -18,7 +18,7 @@ import (
 // Application Configuration
 type AppConfig struct {
 	Source string `default:"https://dbm2jjspeb.us-east-1.awsapprunner.com"`
-	Target string `default:"http://localhost:1313" envconfig:"TARGET_DATABASE_URL"`
+	Target string `default:"http://localhost:1313"`
 	JWT    string `required:"true" envconfig:"JWT"`
 
 	// Database configurations
