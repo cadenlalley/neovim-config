@@ -3,7 +3,9 @@ package ai
 import (
 	"context"
 	"encoding/json"
+	"time"
 
+	"github.com/kitchens-io/kitchens-api/internal/metrics"
 	"github.com/openai/openai-go"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
@@ -26,7 +28,8 @@ type RecipeResponseIngredientsSchema struct {
 	Name         string  `json:"name"`
 	Quantity     float64 `json:"quantity" jsonschema_description:"the amount of the ingredient, if an amount doesn't make sense for the ingredient set it to 0"`
 	Unit         string  `json:"unit" jsonschema:"enum=bag,enum=bottle,enum=box,enum=can,enum=clove,enum=cup,enum=dash,enum=drop,enum=gallon,enum=gram,enum=jar,enum=kilogram,enum=liter,enum=milliliter,enum=ounce,enum=packet,enum=piece,enum=pint,enum=pinch,enum=pound,enum=quart,enum=slice,enum=stick,enum=tbsp,enum=tsp,enum=n/a" jsonschema_description:"optional unit of measurement, if a unit doesn't make sense for the ingredient (like whole vegetables) set it to n/a"`
-	Group        string  `json:"group" jsonschema_description:"ingredient group or 'n/a' if the content does not subdivide ingredients"`
+	// Prepration   string  `json:"prepration" jsonschema_description:"optional preparation method, ex: peeled, chopped, minced, etc."`
+	Group string `json:"group" jsonschema_description:"ingredient group or 'n/a' if the content does not subdivide ingredients"`
 }
 
 type RecipeResponseStepsSchema struct {
@@ -44,6 +47,7 @@ func (a *AIClient) ExtractRecipeFromText(ctx context.Context, text string) (Reci
 		Strict:      openai.Bool(true),
 	}
 
+	start := time.Now()
 	chat, err := a.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
 		Model:     openai.ChatModelGPT4oMini,
 		MaxTokens: openai.Int(1600),
@@ -95,6 +99,7 @@ Your task is to accurately extract the recipe from the provided Recipe Markdown 
 			CompletionTokens: chat.Usage.CompletionTokens,
 			TotalTokens:      chat.Usage.TotalTokens,
 		}).
+		Int64("latency", metrics.Elapsed(start)).
 		Msg("openai metadata")
 
 	if chat.Choices == nil || len(chat.Choices) == 0 {
@@ -126,6 +131,7 @@ func (a *AIClient) ExtractRecipeFromImageURLs(ctx context.Context, urls []string
 		}))
 	}
 
+	start := time.Now()
 	chat, err := a.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
 		Model:     openai.ChatModelGPT4oMini,
 		MaxTokens: openai.Int(1600),
@@ -151,6 +157,7 @@ func (a *AIClient) ExtractRecipeFromImageURLs(ctx context.Context, urls []string
 			CompletionTokens: chat.Usage.CompletionTokens,
 			TotalTokens:      chat.Usage.TotalTokens,
 		}).
+		Int64("latency", metrics.Elapsed(start)).
 		Msg("openai metadata")
 
 	if len(chat.Choices) == 0 {
