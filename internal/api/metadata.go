@@ -38,6 +38,35 @@ func (a *App) extractRecipeMeta(ctx context.Context, recipeID string) ([]tags.Ta
 		return nil, err
 	}
 
+	steps, err := recipes.GetRecipeStepsByRecipeID(ctx, a.db, recipeID)
+	if err != nil {
+		return nil, err
+	}
+
+	notes, err := recipes.GetRecipeNotesByRecipeID(ctx, a.db, recipe.RecipeID)
+	if err != nil {
+		return nil, err
+	}
+
+	for i, step := range steps {
+		for _, note := range notes {
+			if step.StepID == note.StepID {
+				step.Note = note.Note
+			}
+		}
+
+		steps[i] = step
+	}
+
+	recipe.Steps = steps
+
+	ingredients, err := recipes.GetRecipeIngredientsByRecipeID(ctx, a.db, recipe.RecipeID)
+	if err != nil {
+		return nil, err
+	}
+
+	recipe.Ingredients = ingredients
+
 	recipeJSON, err := json.Marshal(recipe)
 	if err != nil {
 		return nil, err
