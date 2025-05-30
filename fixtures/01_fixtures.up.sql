@@ -136,3 +136,58 @@ VALUES
   ('rvw_2tvEpsFp6GXKthzifUVPDRObPLP', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 4, "Really good spaghetti that's quick and easy to make. My only minor critique is that I might add a bit more garlic next time for extra punch. Overall, a solid weeknight dinner that the whole family enjoyed."),
   ('rvw_2tvEppPKbjnGgYZHdud9OIxFmGB', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 3, "It's a standard, no-frills approach that gets the job done. The sauce was okay, but could use some more depth. It's reliable but lacks that wow factor that would make me want to make it again and again."),
   ('rvw_2tvEpsnHblNIdAXshLNyWHpy4MS', 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2qwGAW3mHabA1ICXhRms3SJU11E', 2, "Disappointing spaghetti that missed the mark. The sauce was too watery, and the seasoning felt bland and uninspired. There are definitely better spaghetti recipes out there that I'd recommend over this one.");
+
+-- RECIPE TAGS
+-- =================
+INSERT INTO tags (tag_id, tag_type, tag_value)
+VALUES
+  -- Generated from Pumpkin Pie
+  (1, 'class', 'dessert'),
+  (2, 'course', 'dessert'),
+  (3, 'cuisine', 'american'),
+  (4, 'diet', 'vegetarian'),
+  (5, 'difficulty', '3'),
+  (6, 'ingredient', 'brown-sugar'),
+  (7, 'ingredient', 'heavy-cream'),
+  (8, 'ingredient', 'pumpkin-puree'),
+  (9, 'keyword', 'baked-pie'),
+  (10, 'keyword', 'creamy-filling'),
+  (11, 'keyword', 'fall-dessert'),
+  (12, 'keyword', 'homemade-pie'),
+  (13, 'keyword', 'spice-flavors'),
+  (14, 'keyword', 'thanksgiving-dessert'),
+  -- Generated from Spaghetti
+  (15, 'class', 'main'),
+  (16, 'course', 'dinner'),
+  (17, 'cuisine', 'italian'),
+  (18, 'ingredient', 'ground-beef'),
+  (19, 'ingredient', 'spaghetti'),
+  (20, 'ingredient', 'tomato-sauce'),
+  (21, 'keyword', 'classic-pasta-dish'),
+  (22, 'keyword', 'comfort-food'),
+  (23, 'keyword', 'homemade-bolognese'),
+  (24, 'keyword', 'quick-recipe'),
+  (25, 'keyword', 'savory-meat-sauce'),
+  -- Generated from Chocolate Chip Cookies
+  (26, 'class', 'snack'),
+  (27, 'difficulty', '1'),
+  (28, 'ingredient', 'all-purpose-flour'),
+  (29, 'ingredient', 'butter'),
+  (30, 'ingredient', 'chocolate-chips'),
+  (31, 'keyword', 'baking-from-scratch'),
+  (32, 'keyword', 'classic-cookie'),
+  (33, 'keyword', 'easy-recipe'),
+  (34, 'keyword', 'kid-friendly'),
+  (35, 'keyword', 'soft-and-chewy');
+
+INSERT INTO recipe_tags (recipe_id, tag_id)
+  SELECT 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', tag_id
+    FROM tags WHERE (tag_id > 0 AND tag_id <= 14) OR tag_id = 5;
+
+INSERT INTO recipe_tags (recipe_id, tag_id)
+SELECT 'rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', tag_id
+    FROM tags WHERE tag_id > 14 AND tag_id <= 24;
+
+INSERT INTO recipe_tags (recipe_id, tag_id)
+SELECT 'rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', tag_id
+    FROM tags WHERE (tag_id > 24 AND tag_id <= 35) OR tag_id IN (2, 3);

@@ -157,7 +157,7 @@ func Create(input CreateInput) *App {
 	admin.Use(authorizer.ValidateToken)
 	admin.Use(adminAuth.ValidateAdmin)
 	admin.GET("/accounts", app.AdminListAccounts)
-	admin.POST("/recipes/metadata", app.GenerateRecipeMetadata)
+	admin.POST("/recipes/metadata", app.AdminCreateRecipeMetadata)
 
 	// Used only for syncing in development.
 	if app.env == ENV_DEV {
