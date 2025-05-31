@@ -3,8 +3,8 @@ package api
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"mime/multipart"
-	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -134,9 +134,17 @@ func resetFixtures() error {
 	return mysql.ResetFixtures("file://../../fixtures", testDSN, nil)
 }
 
-func getRequest(path string) (status int, body *bytes.Buffer) {
+func request(method, path string, payload interface{}) (status int, body *bytes.Buffer, err error) {
+	var data []byte
+	if payload != nil {
+		data, err = json.Marshal(payload)
+		if err != nil {
+			return 0, nil, err
+		}
+	}
+
 	// Create a request
-	req := httptest.NewRequest(http.MethodGet, path, nil)
+	req := httptest.NewRequest(method, path, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", testBearerToken)
 
@@ -147,10 +155,10 @@ func getRequest(path string) (status int, body *bytes.Buffer) {
 	testApp.API.ServeHTTP(w, req)
 
 	// Return the response details
-	return w.Code, w.Body
+	return w.Code, w.Body, err
 }
 
-func patchFormRequest(path string, payload map[string]string) (status int, body *bytes.Buffer, err error) {
+func formRequest(method, path string, payload map[string]string) (status int, body *bytes.Buffer, err error) {
 	data := &bytes.Buffer{}
 	writer := multipart.NewWriter(data)
 
@@ -164,7 +172,7 @@ func patchFormRequest(path string, payload map[string]string) (status int, body 
 	}
 
 	// Create a request
-	req := httptest.NewRequest(http.MethodPatch, path, data)
+	req := httptest.NewRequest(method, path, data)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	req.Header.Set("Authorization", testBearerToken)
 

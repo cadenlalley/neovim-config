@@ -84,23 +84,23 @@ VALUES
   ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 13, 'salt', .75, 'tsp', 'Pie filling'),
 
   -- Spaghetti
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 1, 'Ground beef', 0.5, 'pound', 'Meat'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 2, 'Spaghetti', 1, 'box', 'Pasta'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 3, 'Tomato sauce', 24, 'ounce', 'Sauce'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 4, 'Garlic', 3, 'clove', 'Seasoning'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 5, 'Onion', 1, 'piece', 'Vegetable'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 1, 'ground beef', 0.5, 'pound', 'Meat'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 2, 'spaghetti', 1, 'box', 'Pasta'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 3, 'tomato sauce', 24, 'ounce', 'Sauce'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 4, 'garlic', 3, 'clove', 'Seasoning'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 5, 'onion', 1, 'piece', 'Vegetable'),
 
   -- Chocolate Chip Cookies
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 1, 'Butter', 1, 'cup', 'Dairy'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 2, 'White sugar', 1, 'cup', 'Sweetener'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 3, 'Brown sugar', 1, 'cup', 'Sweetener'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 4, 'Eggs', 2, 'piece', 'Eggs'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 5, 'Vanilla extract', 2, 'tsp', 'Flavoring'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 6, 'Baking soda', 1, 'tsp', 'Leavening'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 7, 'Hot water', 2, 'tsp', 'Liquid'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 8, 'Salt', 0.5, 'tsp', 'Seasoning'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 9, 'All-purpose flour', 3, 'cup', 'Dry Ingredient'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 10, 'Chocolate chips', 2, 'cup', 'Add-in');
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 1, 'butter', 1, 'cup', 'Dairy'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 2, 'white sugar', 1, 'cup', 'Sweetener'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 3, 'brown sugar', 1, 'cup', 'Sweetener'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 4, 'eggs', 2, 'piece', 'Eggs'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 5, 'vanilla extract', 2, 'tsp', 'Flavoring'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 6, 'baking soda', 1, 'tsp', 'Leavening'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 7, 'hot water', 2, 'tsp', 'Liquid'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 8, 'salt', 0.5, 'tsp', 'Seasoning'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 9, 'all-purpose flour', 3, 'cup', 'Dry Ingredient'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 10, 'chocolate chips', 2, 'cup', 'Add-in');
 
 -- FOLDERS
 -- =================

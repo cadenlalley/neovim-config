@@ -40,14 +40,13 @@ func TestGetIAM(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			status, body := getRequest("/v1/iam")
-
-			// Assert response
-			assert.Equal(t, http.StatusOK, status)
+			status, body, err := request(http.MethodGet, "/v1/iam", nil)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedCode, status)
 
 			// Actual
 			var actual GetIAMResponse
-			err := json.Unmarshal(body.Bytes(), &actual)
+			err = json.Unmarshal(body.Bytes(), &actual)
 			assert.NoError(t, err)
 
 			// Fix time causing failed tests.

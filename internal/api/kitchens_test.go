@@ -45,20 +45,19 @@ func TestGetKitchen(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			status, res := getRequest("/v1/kitchen/" + tc.kitchenID)
-
-			// Assert response
+			status, body, err := request(http.MethodGet, "/v1/kitchen/"+tc.kitchenID, nil)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedCode, status)
 
 			// Check errors
 			if tc.expectedErrorResponse != "" {
-				assert.JSONEq(t, tc.expectedErrorResponse, res.String())
+				assert.JSONEq(t, tc.expectedErrorResponse, body.String())
 				return
 			}
 
 			// Actual
 			var actual kitchens.Kitchen
-			err := json.Unmarshal(res.Bytes(), &actual)
+			err = json.Unmarshal(body.Bytes(), &actual)
 			assert.NoError(t, err)
 
 			// Hande time
@@ -109,10 +108,8 @@ func TestUpdateKitchen(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			status, body, err := patchFormRequest("/v1/kitchen/"+tc.kitchenID, tc.formData)
+			status, body, err := formRequest(http.MethodPatch, "/v1/kitchen/"+tc.kitchenID, tc.formData)
 			assert.NoError(t, err)
-
-			// Assert response
 			assert.Equal(t, tc.expectedCode, status)
 
 			// Check errors
@@ -179,9 +176,8 @@ func TestSearchKitchens(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			status, body := getRequest("/v1/kitchens/search?q=" + url.QueryEscape(tc.query))
-
-			// Assert response
+			status, body, err := request(http.MethodGet, "/v1/kitchens/search?q="+url.QueryEscape(tc.query), nil)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedCode, status)
 
 			// Check errors
@@ -192,7 +188,7 @@ func TestSearchKitchens(t *testing.T) {
 
 			// Actual
 			var actual []kitchens.Kitchen
-			err := json.Unmarshal(body.Bytes(), &actual)
+			err = json.Unmarshal(body.Bytes(), &actual)
 			assert.NoError(t, err)
 
 			// Hande time
