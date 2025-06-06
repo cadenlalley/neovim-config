@@ -67,7 +67,7 @@ func ParseNullString(input null.String) null.String {
 	invalids := []string{"null", "-", "", "n/a"}
 	for _, v := range invalids {
 		if strings.ToLower(input.String) == v {
-			return null.NewString("", false)
+			return null.String{}
 		}
 	}
 
@@ -80,7 +80,7 @@ func ParseNullFloat(input null.Float) null.Float {
 	}
 
 	if input.Float64 == 0 {
-		return null.NewFloat(0, false)
+		return null.Float{}
 	}
 
 	return input

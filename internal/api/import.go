@@ -22,9 +22,6 @@ type ImportURLRequest struct {
 	Features struct {
 		Groups bool `json:"groups"`
 	} `json:"features"`
-	Debug struct {
-		Prompt string `json:"prompt"`
-	} `json:"debug"`
 }
 
 func (a *App) ImportURL(c echo.Context) error {
@@ -119,7 +116,7 @@ func (a *App) ImportImage(c echo.Context) error {
 
 	// Image Uploads don't work in development, however we can return an empty recipe for debugging.
 	// If URLs are provided in the form submission, use those instead.
-	if a.env == ENV_DEV {
+	if a.env == ENV_DEV || a.env == ENV_TEST {
 		if len(input.URLs) > 0 {
 			parts := strings.Split(input.URLs, ",")
 			urls = make([]string, 0)
@@ -150,5 +147,5 @@ func (a *App) ImportImage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
 
-	return c.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusOK, r)
 }

@@ -16,6 +16,7 @@ import (
 const (
 	ENV_DEV  = "development"
 	ENV_PROD = "production"
+	ENV_TEST = "test"
 )
 
 var adminUserIDs = []string{
