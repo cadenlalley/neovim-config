@@ -11,6 +11,7 @@ import (
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/kitchens-io/kitchens-api/pkg/tags"
 	"github.com/rs/zerolog/log"
+	"gopkg.in/guregu/null.v4"
 )
 
 // extractRecipeMetaBackground wrapper for extractRecipeMeta that should be run as a goroutine.
@@ -75,6 +76,24 @@ func (a *App) extractRecipeMeta(ctx context.Context, recipeID string) ([]tags.Ta
 	result, err := a.aiClient.ExtractRecipeMetaFromText(ctx, string(recipeJSON))
 	if err != nil {
 		return nil, err
+	}
+
+	// TODO: Temporary Backfill recipe metadata, only update if no data has been filled out.
+	// This should indicate that the frontend hasn't implemented difficulty, course, or class.
+	if recipe.Difficulty == 0 && !recipe.Course.Valid && !recipe.Class.Valid && !recipe.Cuisine.Valid {
+		// uppercase first letter
+		result.Cuisine = strings.Title(result.Cuisine)
+
+		err = recipes.BackfillRecipeTags(ctx, a.db, recipes.BackfillRecipeTagsInput{
+			RecipeID:   recipeID,
+			Difficulty: result.Difficulty,
+			Course:     null.StringFrom(result.Course),
+			Class:      null.StringFrom(result.Class),
+			Cuisine:    null.StringFrom(result.Cuisine),
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Convert to tags

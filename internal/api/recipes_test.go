@@ -48,11 +48,15 @@ func TestKitchenRecipesAuthorization(t *testing.T) {
 
 func TestCreateKitchenRecipe(t *testing.T) {
 	testPayload := recipes.Recipe{
-		Name:     "Tacos",
-		Summary:  null.NewString("Protein, tortilla, and toppings.", true),
-		PrepTime: ptr.Int(10),
-		CookTime: ptr.Int(15),
-		Servings: ptr.Int(4),
+		Name:       "Tacos",
+		Summary:    null.StringFrom("Protein, tortilla, and toppings."),
+		PrepTime:   ptr.Int(10),
+		CookTime:   ptr.Int(15),
+		Servings:   ptr.Int(4),
+		Difficulty: 1,
+		Course:     null.StringFrom("dinner"),
+		Class:      null.StringFrom("main"),
+		Cuisine:    null.StringFrom("Mexican"),
 		Steps: []recipes.RecipeStep{
 			{
 				StepID:      1,
@@ -63,8 +67,8 @@ func TestCreateKitchenRecipe(t *testing.T) {
 			{
 				IngredientID: 1,
 				Name:         "Taco",
-				Quantity:     null.NewFloat(1, true),
-				Unit:         null.NewString("piece", true),
+				Quantity:     null.FloatFrom(1),
+				Unit:         null.StringFrom("piece"),
 			},
 		},
 	}
@@ -134,6 +138,7 @@ func TestUpdateRecipe(t *testing.T) {
 	testRecipe := fixtures.GetTestRecipe()
 	testRecipe.Name = "Store bought pumpkin pie"
 	testRecipe.ShareURL = "/2jbgfAMKOCnKrWQroRBkXPIRI6T/store-bought-pumpkin-pie"
+	testRecipe.Difficulty = 1
 
 	// These wont be set on the response.
 	testRecipe.ReviewCount = 0

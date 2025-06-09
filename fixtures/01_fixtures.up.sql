@@ -24,11 +24,11 @@ VALUES
 
 -- RECIPES
 -- =================
-INSERT INTO recipes (recipe_id, kitchen_id, recipe_name, summary, prep_time, cook_time, servings, cover)
+INSERT INTO recipes (recipe_id, kitchen_id, recipe_name, summary, prep_time, cook_time, servings, difficulty, course, class, cuisine, cover)
 VALUES
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Homemade pumpkin pie', "With a combination of heavy cream and whole milk, this pumpkin pie has the creamiest filling, with warm spices and lovely flavor. It's baked in a flaky, buttery single crust.", 40, 60, 12, "uploads/recipes/rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T/2pR9B2cIFxj82GDTDB44lpMzYHu.png"),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 'ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 'Spaghetti Bolognese', 'A classic Italian pasta dish made with a rich and savory meat sauce.', 20, 60, 4, NULL),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 'ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 'Chocolate Chip Cookies', 'Classic chocolate chip cookies with a soft and chewy texture.', 15, 12, 24, NULL);
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 'ktc_2jEx1e1esA5292rBisRGuJwXc14', 'Homemade pumpkin pie', "With a combination of heavy cream and whole milk, this pumpkin pie has the creamiest filling, with warm spices and lovely flavor. It's baked in a flaky, buttery single crust.", 40, 60, 12, 2, 'dessert', 'dessert', 'American', "uploads/recipes/rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T/2pR9B2cIFxj82GDTDB44lpMzYHu.png"),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 'ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 'Spaghetti Bolognese', 'A classic Italian pasta dish made with a rich and savory meat sauce.', 20, 60, 4, 2, 'dinner', 'main', 'Italian', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 'ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', 'Chocolate Chip Cookies', 'Classic chocolate chip cookies with a soft and chewy texture.', 15, 12, 24, 1, 'dessert', 'dessert', 'American', NULL);
 
 INSERT INTO recipe_steps(recipe_id, step_id, instruction, group_name)
 VALUES

@@ -14,8 +14,12 @@ import (
 var RecipeMetaResponseJSONSchema = GenerateSchema[RecipeMetaResponseSchema]()
 
 type RecipeMetaResponseSchema struct {
-	Tags []struct {
-		Type  string `json:"type" jsonschema_description:"enum=difficulty,enum=cuisine,enum=course,enum=class,enum=diet,enum=keyword,enum=ingredient"`
+	Difficulty int    `json:"difficulty" jsonschema:"enum=1,enum=2,enum=3,enum=4,enum=5"`
+	Course     string `json:"course" jsonschema:"enum=breakfast,enum=brunch,enum=lunch,enum=dinner,enum=dessert,enum=supper"`
+	Class      string `json:"class" jsonschema:"enum=main,enum=side,enum=snack,enum=beverage,enum=dessert,enum=dip,enum=soup,enum=appetizer"`
+	Cuisine    string `json:"cuisine" jsonschema_description:"the cuisine of the recipe"`
+	Tags       []struct {
+		Type  string `json:"type" jsonschema_description:"enum=diet,enum=keyword,enum=ingredient"`
 		Value string `json:"value" jsonschema_description:"the value of the tag"`
 	} `json:"tags" jsonschema_description:"an array of tags"`
 }
@@ -38,7 +42,7 @@ Your task is to parse the provided JSON recipe into search‑friendly tags.
 
 **TAGGING RULES**
 1. **difficulty**: one tag only, value "1"…"5" (stringified int; 1 = easiest).
-2. **cuisine**: one tag per cuisine (e.g. italian, mexican, korean, mediterranean, tex-mex).
+2. **cuisine**: one tag only, the cuisine that best represents the recipe (e.g. italian, mexican, korean, mediterranean, tex-mex).
 3. **course**: exactly one of: breakfast, brunch, lunch, dinner, dessert, supper.
 4. **class**: exactly one of: main, side, snack, beverage, dessert, dip, soup, appetizer.
 5. **diet**: one tag per diet/allergen (e.g. vegan, vegetarian, keto, paleo, high-protein, low-carb).

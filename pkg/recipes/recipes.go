@@ -15,15 +15,19 @@ type Store interface {
 }
 
 type CreateRecipeInput struct {
-	RecipeID  string
-	KitchenID string
-	Name      string
-	Summary   null.String
-	PrepTime  int
-	CookTime  int
-	Servings  int
-	Cover     null.String
-	Source    null.String
+	RecipeID   string
+	KitchenID  string
+	Name       string
+	Summary    null.String
+	PrepTime   int
+	CookTime   int
+	Servings   int
+	Difficulty int
+	Course     null.String
+	Class      null.String
+	Cuisine    null.String
+	Cover      null.String
+	Source     null.String
 }
 
 func CreateRecipe(ctx context.Context, store Store, input CreateRecipeInput) (Recipe, error) {
@@ -36,11 +40,15 @@ func CreateRecipe(ctx context.Context, store Store, input CreateRecipeInput) (Re
 			prep_time,
 			cook_time,
 			servings,
+			difficulty,
+			course,
+			class,
+			cuisine,
 			cover,
 			source,
 			created_at
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
-	`, input.RecipeID, input.KitchenID, input.Name, input.Summary, input.PrepTime, input.CookTime, input.Servings, input.Cover, input.Source)
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP);
+	`, input.RecipeID, input.KitchenID, input.Name, input.Summary, input.PrepTime, input.CookTime, input.Servings, input.Difficulty, input.Course, input.Class, input.Cuisine, input.Cover, input.Source)
 
 	if err != nil {
 		return Recipe{}, err
@@ -50,14 +58,18 @@ func CreateRecipe(ctx context.Context, store Store, input CreateRecipeInput) (Re
 }
 
 type UpdateRecipeInput struct {
-	RecipeID string
-	Name     string
-	Summary  null.String
-	PrepTime int
-	CookTime int
-	Servings int
-	Cover    null.String
-	Source   null.String
+	RecipeID   string
+	Name       string
+	Summary    null.String
+	PrepTime   int
+	CookTime   int
+	Servings   int
+	Difficulty int
+	Course     null.String
+	Class      null.String
+	Cuisine    null.String
+	Cover      null.String
+	Source     null.String
 }
 
 func UpdateRecipe(ctx context.Context, store Store, input UpdateRecipeInput) (Recipe, error) {
@@ -69,11 +81,15 @@ func UpdateRecipe(ctx context.Context, store Store, input UpdateRecipeInput) (Re
 			prep_time = ?,
 			cook_time = ?,
 			servings = ?,
+			difficulty = ?,
+			course = ?,
+			class = ?,
+			cuisine = ?,
 			cover = ?,
 			source = ?
 		WHERE
 			recipe_id = ?;
-	`, input.Name, input.Summary, input.PrepTime, input.CookTime, input.Servings, input.Cover, input.Source, input.RecipeID)
+	`, input.Name, input.Summary, input.PrepTime, input.CookTime, input.Servings, input.Difficulty, input.Course, input.Class, input.Cuisine, input.Cover, input.Source, input.RecipeID)
 	if err != nil {
 		return Recipe{}, err
 	}
@@ -160,3 +176,79 @@ func DeleteRecipesByKitchenID(ctx context.Context, store Store, kitchenID string
 	}
 	return nil
 }
+
+// TODO: Temporary for backfilling recipes with missing difficulty, course, class until frontend sends consistently.
+type BackfillRecipeTagsInput struct {
+	RecipeID   string
+	Difficulty int
+	Course     null.String
+	Class      null.String
+	Cuisine    null.String
+}
+
+func BackfillRecipeTags(ctx context.Context, store Store, input BackfillRecipeTagsInput) error {
+	_, err := store.ExecContext(ctx, `
+		UPDATE recipes
+			SET difficulty = ?,
+			course = ?,
+			class = ?,
+			cuisine = ?
+		WHERE recipe_id = ?;
+	`, input.Difficulty, input.Course, input.Class, input.Cuisine, input.RecipeID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// func SearchRecipeText(ctx context.Context, store Store, query string) ([]SearchResult, error) {
+// 	recipes := make([]SearchResult, 0)
+
+// 	q := prepareSearchQuery(query)
+
+// 	rows, err := store.QueryxContext(ctx, `
+// 		SELECT
+// 			r.recipe_id,
+// 			r.kitchen_id,
+// 			r.recipe_name,
+// 			r.cover,
+// 			r.source,
+// 			COALESCE(rr.review_count, 0) as review_count,
+// 			COALESCE(rr.review_rating, 0) as review_rating,
+// 			MATCH(r.recipe_name, r.summary) AGAINST(? IN BOOLEAN MODE) as relevance_score
+// 		FROM recipes r
+// 			LEFT JOIN (SELECT recipe_id, count(*) as review_count, avg(rating) as review_rating
+// 											FROM recipe_reviews
+// 											GROUP BY recipe_id
+// 										) AS rr ON r.recipe_id = rr.recipe_id
+// 		WHERE MATCH(r.recipe_name, r.summary) AGAINST(? IN BOOLEAN MODE)
+// 		  AND r.deleted_at IS NULL
+// 		ORDER BY relevance_score DESC;
+// 	`, q, q)
+
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	for rows.Next() {
+// 		var recipe SearchResult
+// 		if err := rows.StructScan(&recipe); err != nil {
+// 			return nil, err
+// 		}
+// 		recipes = append(recipes, recipe)
+// 	}
+
+// 	if err := rows.Err(); err != nil {
+// 		return nil, err
+// 	}
+
+// 	return recipes, nil
+// }
+
+// func prepareSearchQuery(query string) string {
+// 	query = strings.TrimSpace(query)
+// 	if !strings.HasSuffix(query, "*") {
+// 		query += "*"
+// 	}
+// 	return query
+// }

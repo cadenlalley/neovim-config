@@ -19,6 +19,10 @@ type RecipeResponseSchema struct {
 	PrepTime    int                               `json:"prepTime" jsonschema_description:"the prep time in minutes"`
 	CookTime    int                               `json:"cookTime" jsonschema_description:"the cook time in minutes"`
 	Servings    int                               `json:"servings" jsonschema_description:"the number of servings"`
+	Difficulty  int                               `json:"difficulty" jsonschema:"enum=1,enum=2,enum=3,enum=4,enum=5" jsonschema_description:"the difficulty of the recipe, 1 is the easiest and 5 is the hardest"`
+	Course      string                            `json:"course" jsonschema:"enum=breakfast,enum=brunch,enum=lunch,enum=dinner,enum=dessert,enum=supper"`
+	Class       string                            `json:"class" jsonschema:"enum=main,enum=side,enum=snack,enum=beverage,enum=dessert,enum=dip,enum=soup,enum=appetizer"`
+	Cuisine     string                            `json:"cuisine" jsonschema_description:"the cuisine of the recipe"`
 	Ingredients []RecipeResponseIngredientsSchema `json:"ingredients"`
 	Steps       []RecipeResponseStepsSchema       `json:"steps"`
 }
@@ -59,20 +63,19 @@ Your task is to accurately extract the recipe from the provided Recipe Markdown 
 1. Verbatim & Order
   * Copy every ingredient line and instruction step exactly—preserve punctuation, formatting, and numbering from the markdown.
   * Do not sort, merge, or renumber; use markdown list numbers for stepId, or 1-based position if none exist.
-
-2. Groups
+2. Cuisine
+	* If the recipe has a cuisine tag, use it as the cuisine.
+	* If the recipe does not have a cuisine tag, use the cuisine that best represents the recipe (e.g. italian, mexican, korean, mediterranean, tex-mex).
+3. Groups
   * Only create an ingredient or step group when the markdown has an actual heading (e.g. ## Filling).
   * Do not invent, rename, or repurpose any groups.
 	* Groups must be specific, do not include "Ingredients" or "Directions" in group names.
-
-3. Steps
+4. Steps
   * If a step starts with a variation of "note", it is not a step and must be ignored as an instruction.
-
-4. Notes
+5. Notes
   * If a step has its own sub-heading, boldened, or italicized note directly underneath, attach it as a step note.
   * Do not use notes to indicate grouping.
-
-5. Formatting
+6. Formatting
 	* Remove any text formatting meant for display purposes (e.g. bold, italic, etc.)
 
 ---

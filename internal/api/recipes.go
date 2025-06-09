@@ -36,15 +36,19 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 	var recipe recipes.Recipe
 	txErr := mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
 		recipe, err = recipes.CreateRecipe(ctx, tx, recipes.CreateRecipeInput{
-			RecipeID:  recipeID,
-			KitchenID: kitchenID,
-			Name:      input.Name,
-			Summary:   input.Summary,
-			PrepTime:  *input.PrepTime,
-			CookTime:  *input.CookTime,
-			Servings:  *input.Servings,
-			Cover:     input.Cover,
-			Source:    input.Source,
+			RecipeID:   recipeID,
+			KitchenID:  kitchenID,
+			Name:       input.Name,
+			Summary:    input.Summary,
+			PrepTime:   *input.PrepTime,
+			CookTime:   *input.CookTime,
+			Servings:   *input.Servings,
+			Difficulty: input.Difficulty,
+			Course:     input.Course,
+			Class:      input.Class,
+			Cuisine:    input.Cuisine,
+			Cover:      input.Cover,
+			Source:     input.Source,
 		})
 		if err != nil {
 			return err
@@ -123,6 +127,12 @@ func (a *App) UpdateKitchenRecipe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
+	// Additional validation that ingredients and steps were required.
+	err = input.Validate()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
 	ctx := c.Request().Context()
 	recipeID := c.Param("recipe_id")
 
@@ -136,14 +146,18 @@ func (a *App) UpdateKitchenRecipe(c echo.Context) error {
 
 	txErr := mysql.Transaction(ctx, a.db, func(tx *sqlx.Tx) error {
 		recipe, err = recipes.UpdateRecipe(ctx, tx, recipes.UpdateRecipeInput{
-			RecipeID: recipeID,
-			Name:     input.Name,
-			Summary:  input.Summary,
-			PrepTime: *input.PrepTime,
-			CookTime: *input.CookTime,
-			Servings: *input.Servings,
-			Cover:    input.Cover,
-			Source:   input.Source,
+			RecipeID:   recipeID,
+			Name:       input.Name,
+			Summary:    input.Summary,
+			PrepTime:   *input.PrepTime,
+			CookTime:   *input.CookTime,
+			Servings:   *input.Servings,
+			Difficulty: input.Difficulty,
+			Course:     input.Course,
+			Class:      input.Class,
+			Cuisine:    input.Cuisine,
+			Cover:      input.Cover,
+			Source:     input.Source,
 		})
 		if err != nil {
 			return err

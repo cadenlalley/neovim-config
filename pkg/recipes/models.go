@@ -16,18 +16,22 @@ import (
 var recipeShareURL = regexp.MustCompile(`[^a-zA-Z0-9-]+`)
 
 type Recipe struct {
-	RecipeID  string      `json:"recipeId" db:"recipe_id"`
-	KitchenID string      `json:"kitchenId" db:"kitchen_id"`
-	Name      string      `json:"name" db:"recipe_name" validate:"required"`
-	Summary   null.String `json:"summary" db:"summary"`
-	PrepTime  *int        `json:"prepTime" db:"prep_time" validate:"required"`
-	CookTime  *int        `json:"cookTime" db:"cook_time" validate:"required"`
-	Servings  *int        `json:"servings" db:"servings" validate:"required"`
-	Cover     null.String `json:"cover" db:"cover"`
-	Source    null.String `json:"source" db:"source"`
-	CreatedAt time.Time   `json:"createdAt" db:"created_at"`
-	UpdatedAt time.Time   `json:"updatedAt" db:"updated_at"`
-	DeletedAt null.Time   `json:"deletedAt" db:"deleted_at"`
+	RecipeID   string      `json:"recipeId" db:"recipe_id"`
+	KitchenID  string      `json:"kitchenId" db:"kitchen_id"`
+	Name       string      `json:"name" db:"recipe_name" validate:"required"`
+	Summary    null.String `json:"summary" db:"summary"`
+	PrepTime   *int        `json:"prepTime" db:"prep_time" validate:"required"`
+	CookTime   *int        `json:"cookTime" db:"cook_time" validate:"required"`
+	Servings   *int        `json:"servings" db:"servings" validate:"required"`
+	Difficulty int         `json:"difficulty" db:"difficulty"`
+	Course     null.String `json:"course" db:"course"`
+	Class      null.String `json:"class" db:"class"`
+	Cuisine    null.String `json:"cuisine" db:"cuisine"`
+	Cover      null.String `json:"cover" db:"cover"`
+	Source     null.String `json:"source" db:"source"`
+	CreatedAt  time.Time   `json:"createdAt" db:"created_at"`
+	UpdatedAt  time.Time   `json:"updatedAt" db:"updated_at"`
+	DeletedAt  null.Time   `json:"deletedAt" db:"deleted_at"`
 
 	// Reviews
 	ReviewCount  int     `json:"reviewCount" db:"review_count"`
@@ -42,6 +46,11 @@ type Recipe struct {
 
 // Model validation not handled by the validator
 func (r *Recipe) Validate() error {
+	// TODO: Add validation for lower bound once UI implements.
+	if r.Difficulty > 5 {
+		return fmt.Errorf("field 'difficulty' must be between 1 and 5")
+	}
+
 	if len(r.Ingredients) == 0 {
 		return fmt.Errorf("missing items for field 'ingredients'")
 	}
@@ -101,20 +110,24 @@ func (r *Recipe) Import(v json.RawMessage, includeGroup bool) error {
 	r.PrepTime = input.PrepTime
 	r.CookTime = input.CookTime
 	r.Servings = input.Servings
+	r.Difficulty = input.Difficulty
+	r.Course = input.Course
+	r.Class = input.Class
+	r.Cuisine = input.Cuisine
 	r.Source = input.Source
 	r.Ingredients = make([]RecipeIngredient, len(input.Ingredients))
 	r.Steps = make([]RecipeStep, len(input.Steps))
 
 	for i, ingredient := range input.Ingredients {
-		// NOTE: Temporary fix for import URL failing to handle groups well.
+		// FIXME: Temporary fix for import URL failing to handle groups well.
 		group := ParseNullString(ingredient.Group)
 		if !includeGroup {
 			group = null.NewString("", false)
 		}
 
-		// NOTE: Frontend expects 1/3 as 0.333
 		quantity := ParseNullFloat(ingredient.Quantity)
 
+		// TODO: Combine these into a function that handles 1/3 and 2/3
 		// Handle 1/3 quantity
 		if quantity.Float64 >= 0.33 && quantity.Float64 < 0.34 {
 			quantity = null.NewFloat(0.333, true)
@@ -135,7 +148,7 @@ func (r *Recipe) Import(v json.RawMessage, includeGroup bool) error {
 	}
 
 	for i, step := range input.Steps {
-		// NOTE: Temporary fix for import URL failing to handle groups well.
+		// FIXME: Temporary fix for import URL failing to handle groups well.
 		group := ParseNullString(step.Group)
 		if !includeGroup {
 			group = null.NewString("", false)
@@ -220,3 +233,15 @@ type ReviewSummary struct {
 	Reviews       []Review    `json:"reviews"`
 	KitchenReview Review      `json:"kitchenReview"`
 }
+
+// type SearchResult struct {
+// 	RecipeID     string      `json:"recipeId" db:"recipe_id"`
+// 	KitchenID    string      `json:"kitchenId" db:"kitchen_id"`
+// 	Name         string      `json:"name" db:"recipe_name"`
+// 	Cover        null.String `json:"cover" db:"cover"`
+// 	Source       null.String `json:"source" db:"source"`
+// 	ReviewCount  int         `json:"reviewCount" db:"review_count"`
+// 	ReviewRating float64     `json:"reviewRating" db:"review_rating"`
+
+// 	RelevanceScore float64 `json:"-" db:"relevance_score"`
+// }
