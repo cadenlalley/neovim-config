@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 	"gopkg.in/guregu/null.v4"
 )
@@ -201,54 +202,68 @@ func BackfillRecipeTags(ctx context.Context, store Store, input BackfillRecipeTa
 	return nil
 }
 
-// func SearchRecipeText(ctx context.Context, store Store, query string) ([]SearchResult, error) {
-// 	recipes := make([]SearchResult, 0)
+type SearchRecipeInput struct {
+	Query     string
+	KitchenID string
+}
 
-// 	q := prepareSearchQuery(query)
+func SearchRecipe(ctx context.Context, store Store, input SearchRecipeInput) ([]SearchResult, error) {
+	recipes := make([]SearchResult, 0)
 
-// 	rows, err := store.QueryxContext(ctx, `
-// 		SELECT
-// 			r.recipe_id,
-// 			r.kitchen_id,
-// 			r.recipe_name,
-// 			r.cover,
-// 			r.source,
-// 			COALESCE(rr.review_count, 0) as review_count,
-// 			COALESCE(rr.review_rating, 0) as review_rating,
-// 			MATCH(r.recipe_name, r.summary) AGAINST(? IN BOOLEAN MODE) as relevance_score
-// 		FROM recipes r
-// 			LEFT JOIN (SELECT recipe_id, count(*) as review_count, avg(rating) as review_rating
-// 											FROM recipe_reviews
-// 											GROUP BY recipe_id
-// 										) AS rr ON r.recipe_id = rr.recipe_id
-// 		WHERE MATCH(r.recipe_name, r.summary) AGAINST(? IN BOOLEAN MODE)
-// 		  AND r.deleted_at IS NULL
-// 		ORDER BY relevance_score DESC;
-// 	`, q, q)
+	query, args, err := prepareSearchRecipeQuery(input)
+	if err != nil {
+		return nil, err
+	}
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	rows, err := store.QueryxContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
 
-// 	for rows.Next() {
-// 		var recipe SearchResult
-// 		if err := rows.StructScan(&recipe); err != nil {
-// 			return nil, err
-// 		}
-// 		recipes = append(recipes, recipe)
-// 	}
+	for rows.Next() {
+		var recipe SearchResult
+		if err := rows.StructScan(&recipe); err != nil {
+			return nil, err
+		}
+		recipes = append(recipes, recipe)
+	}
 
-// 	if err := rows.Err(); err != nil {
-// 		return nil, err
-// 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 
-// 	return recipes, nil
-// }
+	return recipes, nil
+}
 
-// func prepareSearchQuery(query string) string {
-// 	query = strings.TrimSpace(query)
-// 	if !strings.HasSuffix(query, "*") {
-// 		query += "*"
-// 	}
-// 	return query
-// }
+// Prepare the search query for recipes.
+func prepareSearchRecipeQuery(input SearchRecipeInput) (string, []interface{}, error) {
+	base := sq.Select(
+		"r.recipe_id",
+		"r.recipe_name",
+		"r.kitchen_id",
+		"r.source",
+		"r.cover",
+		"COALESCE(rr.review_count, 0) as review_count",
+		"COALESCE(rr.review_rating, 0) as review_rating",
+	).
+		Column("MATCH(r.recipe_name) AGAINST (? IN NATURAL LANGUAGE MODE) * 2.0 AS name_score", input.Query).
+		Column("MATCH(r.summary) AGAINST (? IN NATURAL LANGUAGE MODE) * 1.0 AS summary_score", input.Query).
+		From("recipes r").
+		LeftJoin("(SELECT recipe_id, COUNT(*) as review_count, AVG(rating) as review_rating FROM recipe_reviews GROUP BY recipe_id) rr ON r.recipe_id = rr.recipe_id").
+		Where(sq.Expr("MATCH(r.recipe_name, r.summary) AGAINST (? IN NATURAL LANGUAGE MODE)", input.Query)).
+		Where(sq.Eq{"r.deleted_at": nil})
+
+	// Apply optional filters
+	if input.KitchenID != "" {
+		base = base.Where(sq.Eq{"r.kitchen_id": input.KitchenID})
+	}
+
+	// Order by name score and summary score
+	query := base.OrderBy("name_score DESC, summary_score DESC").Limit(20)
+	output, args, err := query.ToSql()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return output, args, nil
+}

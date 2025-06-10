@@ -234,14 +234,15 @@ type ReviewSummary struct {
 	KitchenReview Review      `json:"kitchenReview"`
 }
 
-// type SearchResult struct {
-// 	RecipeID     string      `json:"recipeId" db:"recipe_id"`
-// 	KitchenID    string      `json:"kitchenId" db:"kitchen_id"`
-// 	Name         string      `json:"name" db:"recipe_name"`
-// 	Cover        null.String `json:"cover" db:"cover"`
-// 	Source       null.String `json:"source" db:"source"`
-// 	ReviewCount  int         `json:"reviewCount" db:"review_count"`
-// 	ReviewRating float64     `json:"reviewRating" db:"review_rating"`
+type SearchResult struct {
+	RecipeID     string      `json:"recipeId" db:"recipe_id"`
+	KitchenID    string      `json:"kitchenId" db:"kitchen_id"`
+	Name         string      `json:"name" db:"recipe_name"`
+	Cover        null.String `json:"cover" db:"cover"`
+	Source       null.String `json:"source" db:"source"`
+	ReviewCount  int         `json:"reviewCount" db:"review_count"`
+	ReviewRating float64     `json:"reviewRating" db:"review_rating"`
 
-// 	RelevanceScore float64 `json:"-" db:"relevance_score"`
-// }
+	NameScore    float64 `json:"-" db:"name_score"`
+	SummaryScore float64 `json:"-" db:"summary_score"`
+}

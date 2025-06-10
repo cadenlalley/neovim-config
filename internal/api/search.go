@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog/log"
 )
@@ -65,4 +66,26 @@ func (a *App) WebSearch(c echo.Context) error {
 	})
 
 	return c.JSON(http.StatusOK, results)
+}
+
+func (a *App) RecipeSearch(c echo.Context) error {
+	ctx := c.Request().Context()
+	query := c.QueryParam("q")
+	kitchenID := c.QueryParam("kitchenId")
+
+	// Remove leading and trailing whitespace from the query,
+	query = strings.Trim(query, " ")
+	if query == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "missing query parameter 'q'")
+	}
+
+	recipes, err := recipes.SearchRecipe(ctx, a.db, recipes.SearchRecipeInput{
+		Query:     query,
+		KitchenID: kitchenID,
+	})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not search for recipes").SetInternal(err)
+	}
+
+	return c.JSON(http.StatusOK, recipes)
 }
