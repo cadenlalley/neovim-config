@@ -6,9 +6,12 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/kitchens-io/kitchens-api/internal/web"
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"gopkg.in/guregu/null.v4"
 )
 
 type WebSearchResult struct {
@@ -70,22 +73,70 @@ func (a *App) WebSearch(c echo.Context) error {
 
 func (a *App) RecipeSearch(c echo.Context) error {
 	ctx := c.Request().Context()
-	query := c.QueryParam("q")
-	kitchenID := c.QueryParam("kitchenId")
 
-	// Remove leading and trailing whitespace from the query,
-	query = strings.Trim(query, " ")
-	if query == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "missing query parameter 'q'")
+	input, err := prepareSearchRecipeInput(c)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 
-	recipes, err := recipes.SearchRecipe(ctx, a.db, recipes.SearchRecipeInput{
-		Query:     query,
-		KitchenID: kitchenID,
-	})
+	recipes, err := recipes.SearchRecipe(ctx, a.db, input)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not search for recipes").SetInternal(err)
 	}
 
 	return c.JSON(http.StatusOK, recipes)
+}
+
+func prepareSearchRecipeInput(c echo.Context) (recipes.SearchRecipeInput, error) {
+	input := recipes.SearchRecipeInput{}
+
+	// Required: Query parameter 'q'
+	input.Query = strings.Trim(c.QueryParam("q"), " ")
+	if input.Query == "" {
+		return input, errors.New("missing query parameter 'q'")
+	}
+
+	// Optional: String query parameters
+	input.KitchenID = null.NewString(c.QueryParam("kitchenId"), c.QueryParam("kitchenId") != "")
+	input.Course = null.NewString(c.QueryParam("course"), c.QueryParam("course") != "")
+	input.Class = null.NewString(c.QueryParam("class"), c.QueryParam("class") != "")
+	input.Cuisine = null.NewString(c.QueryParam("cuisine"), c.QueryParam("cuisine") != "")
+	input.OrderBy = null.NewString(c.QueryParam("sort"), c.QueryParam("sort") != "")
+
+	// Optional: Query parameter 'difficulty', is int
+	difficulty, err := web.ParseIntQueryParam(c, "difficulty", 0)
+	if err != nil {
+		return input, errors.New("invalid value for query parameter 'difficulty'")
+	}
+	input.MaxDifficulty = difficulty
+
+	// Optional: Query parameter 'rating', is int
+	rating, err := web.ParseIntQueryParam(c, "rating", 0)
+	if err != nil {
+		return input, errors.New("invalid value for query parameter 'rating'")
+	}
+	input.MinRating = rating
+
+	// Optional: Query parameter 'time', is int
+	time, err := web.ParseIntQueryParam(c, "time", 0)
+	if err != nil {
+		return input, errors.New("invalid value for query parameter 'time'")
+	}
+	input.MaxTime = time
+
+	// Optional: Query parameter 'limit', is uint64, default to 20
+	limit, err := web.ParseUintQueryParam(c, "limit", 20)
+	if err != nil {
+		return input, err
+	}
+	input.Limit = limit
+
+	// Optional: Query parameter 'offset', is uint64, default to 0
+	offset, err := web.ParseUintQueryParam(c, "offset", 0)
+	if err != nil {
+		return input, err
+	}
+	input.Offset = offset
+
+	return input, nil
 }

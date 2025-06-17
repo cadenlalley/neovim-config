@@ -203,8 +203,17 @@ func BackfillRecipeTags(ctx context.Context, store Store, input BackfillRecipeTa
 }
 
 type SearchRecipeInput struct {
-	Query     string
-	KitchenID string
+	Query         string
+	KitchenID     null.String
+	Course        null.String
+	Class         null.String
+	Cuisine       null.String
+	MaxDifficulty int
+	MinRating     int
+	MaxTime       int
+	OrderBy       null.String
+	Limit         uint64
+	Offset        uint64
 }
 
 func SearchRecipe(ctx context.Context, store Store, input SearchRecipeInput) ([]SearchResult, error) {
@@ -254,16 +263,51 @@ func prepareSearchRecipeQuery(input SearchRecipeInput) (string, []interface{}, e
 		Where(sq.Eq{"r.deleted_at": nil})
 
 	// Apply optional filters
-	if input.KitchenID != "" {
-		base = base.Where(sq.Eq{"r.kitchen_id": input.KitchenID})
+	if input.KitchenID.Valid {
+		base = base.Where(sq.Eq{"r.kitchen_id": input.KitchenID.String})
 	}
 
-	// Order by name score and summary score
-	query := base.OrderBy("name_score DESC, summary_score DESC").Limit(20)
-	output, args, err := query.ToSql()
+	if input.Course.Valid {
+		base = base.Where(sq.Eq{"r.course": input.Course.String})
+	}
+
+	if input.Class.Valid {
+		base = base.Where(sq.Eq{"r.class": input.Class.String})
+	}
+
+	if input.Cuisine.Valid {
+		base = base.Where(sq.Eq{"r.cuisine": input.Cuisine.String})
+	}
+
+	if input.MaxDifficulty > 0 {
+		base = base.Where(sq.LtOrEq{"r.difficulty": input.MaxDifficulty})
+	}
+
+	if input.MinRating > 0 {
+		base = base.Where(sq.GtOrEq{"rr.review_rating": input.MinRating})
+	}
+
+	if input.MaxTime > 0 {
+		base = base.Where(sq.LtOrEq{"r.prep_time + r.cook_time": input.MaxTime})
+	}
+
+	// Ordering options
+	switch input.OrderBy.String {
+	case "top":
+		base = base.OrderBy("review_rating DESC, review_count DESC")
+	case "new":
+		base = base.OrderBy("r.created_at DESC")
+	default:
+		base = base.OrderBy("name_score DESC, summary_score DESC, review_rating DESC, review_count DESC")
+	}
+
+	// Apply limit and offset
+	base = base.Limit(input.Limit).Offset(input.Offset)
+
+	query, args, err := base.ToSql()
 	if err != nil {
 		return "", nil, err
 	}
 
-	return output, args, nil
+	return query, args, nil
 }

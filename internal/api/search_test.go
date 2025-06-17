@@ -6,33 +6,128 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/kitchens-io/kitchens-api/internal/fixtures"
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/guregu/null.v4"
 )
 
 func TestSearchRecipes(t *testing.T) {
 	testCases := []struct {
 		name                  string
-		query                 string
+		parameters            map[string]string
 		expectedCode          int
 		expectedResponse      []recipes.SearchResult
 		expectedErrorResponse string
 	}{
 		{
-			name:         "successfully search recipes",
-			query:        "pumpkin pie",
-			expectedCode: http.StatusOK,
-			expectedResponse: []recipes.SearchResult{
-				{
-					RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
-					KitchenID:    "ktc_2jEx1e1esA5292rBisRGuJwXc14",
-					Name:         "Homemade pumpkin pie",
-					Cover:        null.StringFrom("uploads/recipes/rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T/2pR9B2cIFxj82GDTDB44lpMzYHu.png"),
-					ReviewCount:  4,
-					ReviewRating: 3.5,
-				},
-			},
+			name:             "successfully search recipes",
+			parameters:       map[string]string{"q": "pumpkin pie"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"pie"}),
+		},
+		{
+			name:             "successfully search recipes with no results",
+			parameters:       map[string]string{"q": "invalid"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: []recipes.SearchResult{},
+		},
+		// Filters
+		// =================
+		{
+			name:             "successfully filter recipes by kitchen id",
+			parameters:       map[string]string{"q": "classic", "kitchenId": "ktc_2jEx1eCS13KMS8udlPoK12e5KPW"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"bolognese"}),
+		},
+		{
+			name:             "successfully filter recipes by course",
+			parameters:       map[string]string{"q": "classic", "course": "dessert"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"cookie"}),
+		},
+		{
+			name:             "successfully filter recipes by class",
+			parameters:       map[string]string{"q": "classic", "class": "dessert"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"cookie"}),
+		},
+		{
+			name:             "successfully filter recipes by cuisine",
+			parameters:       map[string]string{"q": "homemade", "cuisine": "American"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"pie", "cookie"}),
+		},
+		{
+			name:             "successfully filter recipes by difficulty",
+			parameters:       map[string]string{"q": "classic", "difficulty": "1"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"cookie"}),
+		},
+		{
+			name:             "successfully filter recipes by rating",
+			parameters:       map[string]string{"q": "homemade", "rating": "3"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"pie"}),
+		},
+		{
+			name:             "successfully filter recipes by time",
+			parameters:       map[string]string{"q": "homemade", "course": "dessert", "time": "30"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"cookie"}),
+		},
+		// Pagination
+		// =================
+		{
+			name:             "successfully paginate recipes with limit",
+			parameters:       map[string]string{"q": "homemade", "limit": "1"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"pie"}),
+		},
+		{
+			name:             "successfully paginate recipes with limit and offset",
+			parameters:       map[string]string{"q": "homemade", "limit": "1", "offset": "1"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"cookie"}),
+		},
+		// Sorting
+		// =================
+		{
+			name:             "successfully sort recipes by rating",
+			parameters:       map[string]string{"q": "love", "sort": "top"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"pie", "bolognese", "cookie"}),
+		},
+		{
+			name:             "successfully sort recipes by newest",
+			parameters:       map[string]string{"q": "love", "sort": "new"},
+			expectedCode:     http.StatusOK,
+			expectedResponse: fixtures.GetSearchRecipes([]string{"cookie", "bolognese", "pie"}),
+		},
+		// Bad requests
+		// =================
+		{
+			name:                  "responds bad request with missing query parameter 'q'",
+			parameters:            map[string]string{},
+			expectedCode:          http.StatusBadRequest,
+			expectedErrorResponse: `{"message":"missing query parameter 'q'"}`,
+		},
+		{
+			name:                  "responds bad request with invalid value for query parameter 'difficulty'",
+			parameters:            map[string]string{"q": "classic", "difficulty": "invalid"},
+			expectedCode:          http.StatusBadRequest,
+			expectedErrorResponse: `{"message":"invalid value for query parameter 'difficulty'"}`,
+		},
+		{
+			name:                  "responds bad request with invalid value for query parameter 'limit'",
+			parameters:            map[string]string{"q": "classic", "limit": "invalid"},
+			expectedCode:          http.StatusBadRequest,
+			expectedErrorResponse: `{"message":"invalid value for query parameter 'limit'"}`,
+		},
+		{
+			name:                  "responds bad request with invalid value for query parameter 'offset'",
+			parameters:            map[string]string{"q": "classic", "offset": "invalid"},
+			expectedCode:          http.StatusBadRequest,
+			expectedErrorResponse: `{"message":"invalid value for query parameter 'offset'"}`,
 		},
 	}
 
@@ -44,9 +139,12 @@ func TestSearchRecipes(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			query := url.QueryEscape(tc.query)
+			params := make(url.Values)
+			for k, v := range tc.parameters {
+				params.Set(k, url.QueryEscape(v))
+			}
 
-			status, body, err := request(http.MethodGet, "/v1/recipes/search?q="+query, nil)
+			status, body, err := request(http.MethodGet, "/v1/recipes/search?"+params.Encode(), nil)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedCode, status)
 

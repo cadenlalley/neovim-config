@@ -44,7 +44,7 @@ func GetTestRecipe() recipes.Recipe {
 		RecipeID:   "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 		KitchenID:  "ktc_2jEx1e1esA5292rBisRGuJwXc14",
 		Name:       "Homemade pumpkin pie",
-		Summary:    null.StringFrom("With a combination of heavy cream and whole milk, this pumpkin pie has the creamiest filling, with warm spices and lovely flavor. It's baked in a flaky, buttery single crust."),
+		Summary:    null.StringFrom("With a combination of heavy cream and whole milk, this pumpkin pie has the creamiest filling, with warm spices and a flavor to love. It's baked in a flaky, buttery single crust."),
 		PrepTime:   ptr.Int(40),
 		CookTime:   ptr.Int(60),
 		Servings:   ptr.Int(12),
@@ -196,4 +196,48 @@ func GetTestRecipe() recipes.Recipe {
 		},
 		ShareURL: "/2jbgfAMKOCnKrWQroRBkXPIRI6T/homemade-pumpkin-pie",
 	}
+}
+
+func GetSearchRecipes(ids []string) []recipes.SearchResult {
+	pieRecipe := recipes.SearchResult{
+		RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
+		KitchenID:    "ktc_2jEx1e1esA5292rBisRGuJwXc14",
+		Name:         "Homemade pumpkin pie",
+		Cover:        null.StringFrom("uploads/recipes/rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T/2pR9B2cIFxj82GDTDB44lpMzYHu.png"),
+		ReviewCount:  4,
+		ReviewRating: 3.5,
+	}
+	cookieRecipe := recipes.SearchResult{
+		RecipeID:     "rcp_2oSUH6fs0iCWGNP1AF2XemKYClo",
+		KitchenID:    "ktc_2jEx1j3CVPIIAaOwGIORKqHfK89",
+		Name:         "Love's Chocolate Chip Cookies",
+		Cover:        null.String{},
+		ReviewCount:  0,
+		ReviewRating: 0,
+	}
+	bologneseRecipe := recipes.SearchResult{
+		RecipeID:     "rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7",
+		KitchenID:    "ktc_2jEx1eCS13KMS8udlPoK12e5KPW",
+		Name:         "Spaghetti Bolognese",
+		Cover:        null.String{},
+		ReviewCount:  0,
+		ReviewRating: 0,
+	}
+
+	var results []recipes.SearchResult
+
+	for _, id := range ids {
+		switch id {
+		case "pie":
+			results = append(results, pieRecipe)
+		case "cookie":
+			results = append(results, cookieRecipe)
+		case "bolognese":
+			results = append(results, bologneseRecipe)
+		default:
+			return []recipes.SearchResult{}
+		}
+	}
+
+	return results
 }
