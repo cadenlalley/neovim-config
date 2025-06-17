@@ -140,3 +140,31 @@ func prepareSearchRecipeInput(c echo.Context) (recipes.SearchRecipeInput, error)
 
 	return input, nil
 }
+
+type RecipeSearchFiltersResponse struct {
+	Courses    []string `json:"courses"`
+	Classes    []string `json:"classes"`
+	Difficulty []int    `json:"difficulty"`
+	Rating     []int    `json:"rating"`
+	Sort       []string `json:"sort"`
+}
+
+func (a *App) RecipeSearchFilters(c echo.Context) error {
+	filters := RecipeSearchFiltersResponse{
+		Courses:    stringMapKeys(recipes.ValidCourses),
+		Classes:    stringMapKeys(recipes.ValidClasses),
+		Difficulty: []int{1, 2, 3, 4, 5},
+		Rating:     []int{1, 2, 3, 4, 5},
+		Sort:       stringMapKeys(recipes.ValidSort),
+	}
+
+	return c.JSON(http.StatusOK, filters)
+}
+
+func stringMapKeys(m map[string]interface{}) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}

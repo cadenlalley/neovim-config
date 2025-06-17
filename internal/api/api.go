@@ -142,6 +142,7 @@ func Create(input CreateInput) *App {
 	v1.GET("/kitchens/search", app.SearchKitchens)
 	v1.GET("/recipes/search/web", app.WebSearch)
 	v1.GET("/recipes/search", app.RecipeSearch)
+	v1.GET("/recipes/search/filters", app.RecipeSearchFilters)
 
 	// Recipe import routes
 	v1.POST("/import/url", app.ImportURL)

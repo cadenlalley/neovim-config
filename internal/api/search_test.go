@@ -163,3 +163,43 @@ func TestSearchRecipes(t *testing.T) {
 		})
 	}
 }
+
+func TestRecipeSearchFilters(t *testing.T) {
+	testCases := []struct {
+		name                  string
+		expectedCode          int
+		expectedResponse      RecipeSearchFiltersResponse
+		expectedErrorResponse string
+	}{
+		{
+			name:         "successfully get recipe search filters",
+			expectedCode: http.StatusOK,
+			expectedResponse: RecipeSearchFiltersResponse{
+				Courses:    stringMapKeys(recipes.ValidCourses),
+				Classes:    stringMapKeys(recipes.ValidClasses),
+				Difficulty: []int{1, 2, 3, 4, 5},
+				Rating:     []int{1, 2, 3, 4, 5},
+				Sort:       stringMapKeys(recipes.ValidSort),
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			status, body, err := request(http.MethodGet, "/v1/recipes/search/filters", nil)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedCode, status)
+
+			// Actual
+			var actual RecipeSearchFiltersResponse
+			err = json.Unmarshal(body.Bytes(), &actual)
+			assert.NoError(t, err)
+
+			assert.ElementsMatch(t, tc.expectedResponse.Courses, actual.Courses)
+			assert.ElementsMatch(t, tc.expectedResponse.Classes, actual.Classes)
+			assert.ElementsMatch(t, tc.expectedResponse.Difficulty, actual.Difficulty)
+			assert.ElementsMatch(t, tc.expectedResponse.Rating, actual.Rating)
+			assert.ElementsMatch(t, tc.expectedResponse.Sort, actual.Sort)
+		})
+	}
+}
