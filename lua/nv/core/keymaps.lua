@@ -63,11 +63,13 @@ keymap.set("n", "<leader>sll", lazygit.log, { desc = "git open lazygit log" })
 -- lsp
 ----------------------
 
-keymap.set("n", "<leader>lf", vim.diagnostic.open_float, { desc = "lsp open diagnostic" })
 keymap.set("n", "<leader>gd", picker.lsp_definitions, { desc = "lsp go to definitions" })
 keymap.set("n", "<leader>gD", picker.lsp_declarations, { desc = "lsp to go declarations" })
 keymap.set("n", "<leader>gI", picker.lsp_implementations, { desc = "lsp go to implementations" })
 keymap.set("n", "<leader>gr", picker.lsp_references, { desc = "lsp go to references" })
+keymap.set("n", "<leader>lf", vim.diagnostic.open_float, { desc = "lsp open diagnostic" })
+keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { desc = "lsp code actions" })
+keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = "lsp rename" })
 
 ----------------------
 -- flash
