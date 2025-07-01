@@ -12,7 +12,27 @@ return {
 			gopls = {
 				on_attach = function(client, bufnr)
 					client.server_capabilities.documentHighlightProvider = false
-				end
+				end,
+				usePlaceholders = true,
+				completeUnimported = true,
+				staticcheck = true,
+				semanticTokens = true,
+				analyses = {
+					unusedparams = true,
+					nilness = true,
+					shadow = true,
+				},
+				codelenses = {
+					test = true,
+					tidy = true,
+					regenerate_cgo = true,
+				},
+				hints = {
+					parameterNames = true,
+				},
+				buildFlags = { "-tags=integration" },
+				experimentalPostfixCompletions = true,
+				hoverKind = "FullDocumentation",
 			}
 		}
 	},
