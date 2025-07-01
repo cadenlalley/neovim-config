@@ -17,7 +17,7 @@ return {
 		statuscolumn = { enabled = true },
 		words = { enabled = true },
 		terminal = { enabled = true },
-		image = { enabled = true },
+		mage = { enabled = true },
 		gitbrowse = { enabled = true },
 		git = { enabled = true },
 		lazygit = { enabled = true },
