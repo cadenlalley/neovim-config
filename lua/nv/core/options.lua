@@ -33,4 +33,8 @@ opt.clipboard:append("unnamedplus")
 opt.splitright = true
 opt.splitbelow = true
 
+-- diable folds by default
+opt.foldlevelstart = 99
 
+-- ghost text diagnostics
+vim.diagnostic.config { virtual_text = true }

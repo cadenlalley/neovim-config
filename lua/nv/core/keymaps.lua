@@ -75,7 +75,7 @@ keymap.set('n', '<leader>rn', vim.lsp.buf.rename, { desc = "lsp rename" })
 -- flash
 ----------------------
 
-keymap.set({ "n", "x", "o" }, "<leader>b", flash.jump, { desc = "flash Jump" })
+keymap.set({ "n", "x", "o" }, "<leader>b", flash.jump, { desc = "flash jump" })
 keymap.set({ "n", "x", "o" }, "<leader>S", flash.treesitter, { desc = "flash treesitter" })
 keymap.set({ "n", "x", "o" }, "<leader>r", flash.remote, { desc = "flash remote" })
 keymap.set({ "n", "x", "o" }, "<leader>R", flash.treesitter_search, { desc = "flash treesitter search" })
