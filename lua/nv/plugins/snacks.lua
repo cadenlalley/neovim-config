@@ -7,8 +7,27 @@ return {
 		bigfile = { enabled = true },
 		dashboard = {
 			enabled = true,
+			preset = {
+				header = [[
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣈⣻⣿⣿⣿⣶⣶⣦⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠛⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠿⣿⣿⣿⣦⡀⠀⠀⠀
+⠀⠀⠀⠀⠀⣀⣀⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⣡⣶⣿⣷⣶⣍⠻⣿⣿⣄⠀⠀
+⠀⠀⠀⠀⠀⠀⠤⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢰⣿⣿⣿⣿⣿⣿⣷⡙⣿⣿⡆⠀
+⠀⠀⠀⠤⠤⠤⣤⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢸⣿⣿⡟⢻⣿⣿⣿⣇⢹⣿⣿⡄
+⠀⢰⡄⠀⢀⣤⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⢻⣿⣿⣿⣿⣿⣿⡟⣸⣿⣿⣇
+⣷⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣙⠿⣿⣿⣿⠟⣱⣿⣿⣿⣿
+⣭⣻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣿⣿⡿⢟⣫⣷
+⠈⢻⡿⣶⣾⣭⣽⣛⣛⣿⣿⣿⠿⠿⠿⠿⣿⣿⣿⣛⣛⣻⣭⣽⣷⣶⣿⣿⣿⡏
+⠀⠈⠁⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁
+⠀⠀⠈⠉⠉⠉⠉⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀
+⠀⠀⠀⠀⠈⢉⣉⣩⣭⣭⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠋⠀⠀
+⠀⠀⠀⠀⠀⠈⠉⠛⠛⣛⣛⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣭⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣿⣿⣿⠿⠿⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀]],
+			},
 			sections = {
-				{ section = "header" },
+				{ section = "header", header = [[Test]] },
 				{ section = "keys", gap = 1, padding = 1 },
 				{ pane = 2, icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
 				{ pane = 2, icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
@@ -29,10 +48,10 @@ return {
 				{ section = "startup" },
 			},
 		},
-		explorer = { enabled = true },
+		explorer = { enabled = true, sources = { files = { hidden = true, } } },
 		indent = { enabled = true },
 		input = { enabled = true },
-		picker = { enabled = true },
+		picker = { enabled = true, sources = { files = { hidden = true, } } },
 		notifier = { enabled = true },
 		quickfile = { enabled = true },
 		scope = { enabled = true },
