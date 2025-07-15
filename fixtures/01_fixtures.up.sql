@@ -30,31 +30,31 @@ VALUES
   ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 'ktc_2jEx1eCS13KMS8udlPoK12e5KPW', 'Spaghetti Bolognese', "A classic Italian pasta dish made with a rich and savory meat sauce that you'll love.", 20, 60, 4, 2, 'dinner', 'main', 'Italian', NULL, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 DAY)),
   ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 'ktc_2jEx1j3CVPIIAaOwGIORKqHfK89', "Love's Chocolate Chip Cookies", 'Classic homemade chocolate chip cookies with a soft and chewy texture.', 15, 12, 24, 1, 'dessert', 'dessert', 'American', NULL, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 2 DAY));
 
-INSERT INTO recipe_steps(recipe_id, step_id, instruction, group_name)
+INSERT INTO recipe_steps(recipe_id, step_id, instruction, group_name, ingredient_ids)
 VALUES
   -- Pumpkin Pie
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 1, 'Cut the butter into slices (8-10 slices per stick). Put the butter in a bowl and place in the freezer. Fill a medium-sized measuring cup up with water, and add plenty of ice. Let both the butter and the ice sit for 5-10 minutes.', 'Pie crust'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 2, 'In the bowl of a standing mixer fitted with a paddle attachment, combine the flour, sugar, and salt. Add half of the chilled butter and mix on low, until the butter is just starting to break down, about a minute. Add the rest of the butter and continue mixing, until the butter is broken down and in various sizes. Slowly add the water, a few tablespoons at a time, and mix until the dough starts to come together but still is quite shaggy.', 'Pie crust'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 3, 'Dump the dough out on your work surface and flatten it slightly into a square. Gently fold the dough over onto itself and flatten again. Repeat this process 3 or 4 more times, until all the loose pieces are worked into the dough. Flatten the dough one last time into a circle, and wrap in plastic wrap. Refrigerate for 30 minutes (and up to 2 days) before using.', 'Pie crust'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 4, 'Adjust oven rack to lowest position, place rimmed baking sheet on rack, and heat oven to 400°F. Remove dough from refrigerator and roll out on generously floured (up to 1/4 cup) work surface to 12-inch circle about 1/8 inch thick. Roll dough loosely around rolling pin and unroll into pie plate, leaving at least 1-inch overhang on each side. Ease dough into plate by gently lifting edge of dough with one hand while pressing into plate bottom with the other.', 'Pie crust'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 5, 'Preheat oven to 400F. While the pie shell is baking, whisk cream, milk, eggs, yolks, and vanilla together in medium bowl. Combine pumpkin puree, sugars, maple syrup, cinnamon, ginger, nutmeg, and salt in large heavy-bottomed saucepan; bring to sputtering simmer over medium heat, 5 to 7 minutes. Continue to simmer pumpkin mixture, stirring constantly until thick and shiny, 10 to 15 minutes.', 'Pie filling'),
-  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 6, 'Remove pan from heat and stir in the black strap rum if using. Whisk in cream mixture until fully incorporated. Strain the mixture through fine-mesh strainer set over a medium bowl, using a spatula to press the solids through the strainer. Re-whisk the mixture and transfer to warm pre-baked pie shell. Return the pie plate with baking sheet to the oven and bake pie for 10 minutes. Reduce the heat to 300°F and continue baking until the edges of the pie are set and slightly puffed, and the center jiggles only slightly, 27 to 35 minutes longer. Transfer the pie to wire rack and cool to room temperature, 2 to 3 hours. Cut into wedges and serve with whipped cream.', 'Pie filling'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 1, 'Cut the butter into slices (8-10 slices per stick). Put the butter in a bowl and place in the freezer. Fill a medium-sized measuring cup up with water, and add plenty of ice. Let both the butter and the ice sit for 5-10 minutes.', 'Pie crust', '[1]'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 2, 'In the bowl of a standing mixer fitted with a paddle attachment, combine the flour, sugar, and salt. Add half of the chilled butter and mix on low, until the butter is just starting to break down, about a minute. Add the rest of the butter and continue mixing, until the butter is broken down and in various sizes. Slowly add the water, a few tablespoons at a time, and mix until the dough starts to come together but still is quite shaggy.', 'Pie crust', '[1,2]'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 3, 'Dump the dough out on your work surface and flatten it slightly into a square. Gently fold the dough over onto itself and flatten again. Repeat this process 3 or 4 more times, until all the loose pieces are worked into the dough. Flatten the dough one last time into a circle, and wrap in plastic wrap. Refrigerate for 30 minutes (and up to 2 days) before using.', 'Pie crust', '[]'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 4, 'Adjust oven rack to lowest position, place rimmed baking sheet on rack, and heat oven to 400°F. Remove dough from refrigerator and roll out on generously floured (up to 1/4 cup) work surface to 12-inch circle about 1/8 inch thick. Roll dough loosely around rolling pin and unroll into pie plate, leaving at least 1-inch overhang on each side. Ease dough into plate by gently lifting edge of dough with one hand while pressing into plate bottom with the other.', 'Pie crust', '[]'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 5, 'Preheat oven to 400F. While the pie shell is baking, whisk cream, milk, eggs, yolks, and vanilla together in medium bowl. Combine pumpkin puree, sugars, maple syrup, cinnamon, ginger, nutmeg, and salt in large heavy-bottomed saucepan; bring to sputtering simmer over medium heat, 5 to 7 minutes. Continue to simmer pumpkin mixture, stirring constantly until thick and shiny, 10 to 15 minutes.', 'Pie filling', '[3,4,5,6,7,8,9,10,11,12,13]'),
+  ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 6, 'Remove pan from heat and stir in the black strap rum if using. Whisk in cream mixture until fully incorporated. Strain the mixture through fine-mesh strainer set over a medium bowl, using a spatula to press the solids through the strainer. Re-whisk the mixture and transfer to warm pre-baked pie shell. Return the pie plate with baking sheet to the oven and bake pie for 10 minutes. Reduce the heat to 300°F and continue baking until the edges of the pie are set and slightly puffed, and the center jiggles only slightly, 27 to 35 minutes longer. Transfer the pie to wire rack and cool to room temperature, 2 to 3 hours. Cut into wedges and serve with whipped cream.', 'Pie filling', '[]'),
 
   -- Spaghetti
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 1, 'Heat a large skillet over medium-high heat and add ground beef.', 'Cooking'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 2, 'Add chopped onion and minced garlic to the skillet and sauté until fragrant.', 'Cooking'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 3, 'Pour in the tomato sauce and let it simmer for 30 minutes.', 'Sauce'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 4, 'Cook the spaghetti according to the package instructions.', 'Pasta'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 5, 'Serve the Bolognese sauce over the cooked spaghetti.', 'Serving'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 1, 'Heat a large skillet over medium-high heat and add ground beef.', 'Cooking', '[]'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 2, 'Add chopped onion and minced garlic to the skillet and sauté until fragrant.', 'Cooking', '[]'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 3, 'Pour in the tomato sauce and let it simmer for 30 minutes.', 'Sauce', '[]'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 4, 'Cook the spaghetti according to the package instructions.', 'Pasta', '[]'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 5, 'Serve the Bolognese sauce over the cooked spaghetti.', 'Serving', '[]'),
 
   -- Chocolate Chip Cookies
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 1, 'Preheat the oven to 350°F (175°C).', 'Preparation'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 2, 'In a large bowl, cream together the butter, white sugar, and brown sugar until smooth.', 'Mixing'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 3, 'Beat in the eggs one at a time, then stir in the vanilla.', 'Mixing'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 4, 'Dissolve baking soda in hot water and add to the batter with salt.', 'Mixing'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 5, 'Stir in flour and chocolate chips.', 'Mixing'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 6, 'Drop large spoonfuls of dough onto ungreased pans.', 'Preparation'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 7, 'Bake for about 10 minutes, or until edges are nicely browned.', 'Baking');
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 1, 'Preheat the oven to 350°F (175°C).', 'Preparation', '[]'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 2, 'In a large bowl, cream together the butter, white sugar, and brown sugar until smooth.', 'Mixing', '[1,2,3]'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 3, 'Beat in the eggs one at a time, then stir in the vanilla.', 'Mixing', '[4,5]'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 4, 'Dissolve baking soda in hot water and add to the batter with salt.', 'Mixing', '[6,7,8]'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 5, 'Stir in flour and chocolate chips.', 'Mixing', '[9,10]'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 6, 'Drop large spoonfuls of dough onto ungreased pans.', 'Preparation', '[]'),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 7, 'Bake for about 10 minutes, or until edges are nicely browned.', 'Baking', '[]');
 
 INSERT INTO recipe_images(recipe_id, step_id, image_url)
 VALUES
@@ -84,23 +84,23 @@ VALUES
   ('rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', 13, 'salt', .75, 'tsp', 'Pie filling'),
 
   -- Spaghetti
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 1, 'ground beef', 0.5, 'pound', 'Meat'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 2, 'spaghetti', 1, 'box', 'Pasta'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 3, 'tomato sauce', 24, 'ounce', 'Sauce'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 4, 'garlic', 3, 'clove', 'Seasoning'),
-  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 5, 'onion', 1, 'piece', 'Vegetable'),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 1, 'ground beef', 0.5, 'pound', NULL),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 2, 'spaghetti', 1, 'box', NULL),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 3, 'tomato sauce', 24, 'ounce', NULL),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 4, 'garlic', 3, 'clove', NULL),
+  ('rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', 5, 'onion', 1, 'piece', NULL),
 
   -- Chocolate Chip Cookies
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 1, 'butter', 1, 'cup', 'Dairy'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 2, 'white sugar', 1, 'cup', 'Sweetener'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 3, 'brown sugar', 1, 'cup', 'Sweetener'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 4, 'eggs', 2, 'piece', 'Eggs'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 5, 'vanilla extract', 2, 'tsp', 'Flavoring'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 6, 'baking soda', 1, 'tsp', 'Leavening'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 7, 'hot water', 2, 'tsp', 'Liquid'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 8, 'salt', 0.5, 'tsp', 'Seasoning'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 9, 'all-purpose flour', 3, 'cup', 'Dry Ingredient'),
-  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 10, 'chocolate chips', 2, 'cup', 'Add-in');
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 1, 'butter', 1, 'cup', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 2, 'white sugar', 1, 'cup', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 3, 'brown sugar', 1, 'cup', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 4, 'eggs', 2, 'piece', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 5, 'vanilla extract', 2, 'tsp', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 6, 'baking soda', 1, 'tsp', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 7, 'hot water', 2, 'tsp', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 8, 'salt', 0.5, 'tsp', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 9, 'all-purpose flour', 3, 'cup', NULL),
+  ('rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', 10, 'chocolate chips', 2, 'cup', NULL);
 
 -- FOLDERS
 -- =================
@@ -142,52 +142,43 @@ VALUES
 INSERT INTO tags (tag_id, tag_type, tag_value)
 VALUES
   -- Generated from Pumpkin Pie
-  (1, 'class', 'dessert'),
-  (2, 'course', 'dessert'),
-  (3, 'cuisine', 'american'),
-  (4, 'diet', 'vegetarian'),
-  (5, 'difficulty', '3'),
-  (6, 'ingredient', 'brown-sugar'),
-  (7, 'ingredient', 'heavy-cream'),
-  (8, 'ingredient', 'pumpkin-puree'),
-  (9, 'keyword', 'baked-pie'),
-  (10, 'keyword', 'creamy-filling'),
-  (11, 'keyword', 'fall-dessert'),
-  (12, 'keyword', 'homemade-pie'),
-  (13, 'keyword', 'spice-flavors'),
-  (14, 'keyword', 'thanksgiving-dessert'),
+  (1, 'diet', 'vegetarian'),
+  (2, 'ingredient', 'brown-sugar'),
+  (3, 'ingredient', 'heavy-cream'),
+  (4, 'ingredient', 'pumpkin-puree'),
+  (5, 'keyword', 'baked-pie'),
+  (6, 'keyword', 'creamy-filling'),
+  (7, 'keyword', 'fall-dessert'),
+  (8, 'keyword', 'homemade-pie'),
+  (9, 'keyword', 'spice-flavors'),
+  (10, 'keyword', 'thanksgiving-dessert'),
   -- Generated from Spaghetti
-  (15, 'class', 'main'),
-  (16, 'course', 'dinner'),
-  (17, 'cuisine', 'italian'),
-  (18, 'ingredient', 'ground-beef'),
-  (19, 'ingredient', 'spaghetti'),
-  (20, 'ingredient', 'tomato-sauce'),
-  (21, 'keyword', 'classic-pasta-dish'),
-  (22, 'keyword', 'comfort-food'),
-  (23, 'keyword', 'homemade-bolognese'),
-  (24, 'keyword', 'quick-recipe'),
-  (25, 'keyword', 'savory-meat-sauce'),
+  (11, 'ingredient', 'ground-beef'),
+  (12, 'ingredient', 'spaghetti'),
+  (13, 'ingredient', 'tomato-sauce'),
+  (14, 'keyword', 'classic-pasta-dish'),
+  (15, 'keyword', 'comfort-food'),
+  (16, 'keyword', 'homemade-bolognese'),
+  (17, 'keyword', 'quick-recipe'),
+  (18, 'keyword', 'savory-meat-sauce'),
   -- Generated from Chocolate Chip Cookies
-  (26, 'class', 'snack'),
-  (27, 'difficulty', '1'),
-  (28, 'ingredient', 'all-purpose-flour'),
-  (29, 'ingredient', 'butter'),
-  (30, 'ingredient', 'chocolate-chips'),
-  (31, 'keyword', 'baking-from-scratch'),
-  (32, 'keyword', 'classic-cookie'),
-  (33, 'keyword', 'easy-recipe'),
-  (34, 'keyword', 'kid-friendly'),
-  (35, 'keyword', 'soft-and-chewy');
+  (19, 'ingredient', 'all-purpose-flour'),
+  (20, 'ingredient', 'butter'),
+  (21, 'ingredient', 'chocolate-chips'),
+  (22, 'keyword', 'baking-from-scratch'),
+  (23, 'keyword', 'classic-cookie'),
+  (24, 'keyword', 'easy-recipe'),
+  (25, 'keyword', 'kid-friendly'),
+  (26, 'keyword', 'soft-and-chewy');
 
 INSERT INTO recipe_tags (recipe_id, tag_id)
   SELECT 'rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T', tag_id
-    FROM tags WHERE (tag_id > 0 AND tag_id <= 14) OR tag_id = 5;
+    FROM tags WHERE (tag_id > 0 AND tag_id <= 10);
 
 INSERT INTO recipe_tags (recipe_id, tag_id)
 SELECT 'rcp_2oSUH8pCU0gfKbQPxg1JLD8DzJ7', tag_id
-    FROM tags WHERE tag_id > 14 AND tag_id <= 24;
+    FROM tags WHERE tag_id > 10 AND tag_id <= 18;
 
 INSERT INTO recipe_tags (recipe_id, tag_id)
 SELECT 'rcp_2oSUH6fs0iCWGNP1AF2XemKYClo', tag_id
-    FROM tags WHERE (tag_id > 24 AND tag_id <= 35) OR tag_id IN (2, 3);
+    FROM tags WHERE tag_id > 18 AND tag_id <= 26;

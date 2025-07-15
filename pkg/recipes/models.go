@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kitchens-io/kitchens-api/pkg/types"
 	"github.com/segmentio/ksuid"
 	"gopkg.in/guregu/null.v4"
 )
@@ -155,10 +156,11 @@ func (r *Recipe) Import(v json.RawMessage, includeGroup bool) error {
 		}
 
 		r.Steps[i] = RecipeStep{
-			StepID:      step.StepID,
-			Instruction: step.Instruction,
-			Group:       group,
-			Note:        step.Note,
+			StepID:        step.StepID,
+			Instruction:   step.Instruction,
+			Group:         group,
+			IngredientIDs: step.IngredientIDs,
+			Note:          step.Note,
 		}
 	}
 
@@ -170,10 +172,11 @@ func CreateRecipeID() string {
 }
 
 type RecipeStep struct {
-	RecipeID    string      `json:"-" db:"recipe_id"`
-	StepID      int         `json:"stepId" db:"step_id" validate:"required"`
-	Instruction string      `json:"instruction" db:"instruction" validate:"required"`
-	Group       null.String `json:"group" db:"group_name"`
+	RecipeID      string         `json:"-" db:"recipe_id"`
+	StepID        int            `json:"stepId" db:"step_id" validate:"required"`
+	Instruction   string         `json:"instruction" db:"instruction" validate:"required"`
+	Group         null.String    `json:"group" db:"group_name"`
+	IngredientIDs types.IntSlice `json:"ingredientIds" db:"ingredient_ids"`
 
 	// Attached for full step
 	Images []string `json:"images" db:"-"`

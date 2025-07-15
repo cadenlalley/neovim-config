@@ -4,14 +4,16 @@ import (
 	"context"
 	"strings"
 
+	"github.com/kitchens-io/kitchens-api/pkg/types"
 	"gopkg.in/guregu/null.v4"
 )
 
 type CreateRecipeStepInput struct {
-	RecipeID    string
-	StepID      int
-	Instruction string
-	Group       null.String
+	RecipeID      string
+	StepID        int
+	Instruction   string
+	Group         null.String
+	IngredientIDs types.IntSlice
 }
 
 func CreateRecipeSteps(ctx context.Context, store Store, input CreateRecipeStepInput) error {
@@ -25,9 +27,10 @@ func CreateRecipeSteps(ctx context.Context, store Store, input CreateRecipeStepI
 			recipe_id,
 			step_id,
 			instruction,
-			group_name
-		) VALUES (?, ?, ?, ?)
-	`, input.RecipeID, input.StepID, input.Instruction, input.Group)
+			group_name,
+			ingredient_ids
+		) VALUES (?, ?, ?, ?, ?)
+	`, input.RecipeID, input.StepID, input.Instruction, input.Group, input.IngredientIDs)
 
 	if err != nil {
 		return err
@@ -81,4 +84,22 @@ func GetRecipeStepsByRecipeID(ctx context.Context, store Store, recipeID string)
 	}
 
 	return steps, nil
+}
+
+type BackfillRecipeStepIngredientsInput struct {
+	RecipeID      string
+	StepID        int
+	IngredientIDs types.IntSlice
+}
+
+func BackfillRecipeStepIngredients(ctx context.Context, store Store, input BackfillRecipeStepIngredientsInput) error {
+	_, err := store.ExecContext(ctx, `
+		UPDATE recipe_steps
+		SET ingredient_ids = ?
+		WHERE recipe_id = ? AND step_id = ?;
+	`, input.IngredientIDs, input.RecipeID, input.StepID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

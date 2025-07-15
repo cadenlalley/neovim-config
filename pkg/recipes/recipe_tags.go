@@ -35,3 +35,14 @@ func CreateRecipeTags(ctx context.Context, store Store, recipeID string, tagIDs 
 
 	return nil
 }
+
+func RecipeHasTags(ctx context.Context, store Store, recipeID string) (bool, error) {
+	var count int
+	err := store.QueryRowxContext(ctx, `
+		SELECT COUNT(*) FROM recipe_tags WHERE recipe_id = ?;
+	`, recipeID).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}

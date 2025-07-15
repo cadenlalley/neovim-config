@@ -37,10 +37,11 @@ type RecipeResponseIngredientsSchema struct {
 }
 
 type RecipeResponseStepsSchema struct {
-	StepID      int    `json:"stepId"`
-	Instruction string `json:"instruction"`
-	Note        string `json:"note" jsonschema_description:"optional note for the instruction step"`
-	Group       string `json:"group" jsonschema_description:"step group or 'n/a' if the content does not subdivide steps"`
+	StepID        int    `json:"stepId"`
+	Instruction   string `json:"instruction"`
+	Note          string `json:"note" jsonschema_description:"optional note for the instruction step"`
+	Group         string `json:"group" jsonschema_description:"step group or 'n/a' if the content does not subdivide steps"`
+	IngredientIDs []int  `json:"ingredientIds" jsonschema_description:"optional list of ingredient IDs that are used in this step"`
 }
 
 func (a *AIClient) ExtractRecipeFromText(ctx context.Context, text string) (RecipeResponseSchema, error) {
@@ -57,26 +58,52 @@ func (a *AIClient) ExtractRecipeFromText(ctx context.Context, text string) (Reci
 		MaxTokens: openai.Int(1600),
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(`
-Your task is to accurately extract the recipe from the provided Recipe Markdown Text based on the following rules:
+Your task is to extract the recipe from the provided markdown text with perfect accuracy. Follow these rules carefully:
 
-**Rules**
-1. Verbatim & Order
-  * Copy every ingredient line and instruction step exactly—preserve punctuation, formatting, and numbering from the markdown.
-  * Do not sort, merge, or renumber; use markdown list numbers for stepId, or 1-based position if none exist.
-2. Cuisine
-	* If the recipe has a cuisine tag, use it as the cuisine.
-	* If the recipe does not have a cuisine tag, use the cuisine that best represents the recipe (e.g. italian, mexican, korean, mediterranean, tex-mex).
-3. Groups
-  * Only create an ingredient or step group when the markdown has an actual heading (e.g. ## Filling).
-  * Do not invent, rename, or repurpose any groups.
-	* Groups must be specific, do not include "Ingredients" or "Directions" in group names.
-4. Steps
-  * If a step starts with a variation of "note", it is not a step and must be ignored as an instruction.
-5. Notes
-  * If a step has its own sub-heading, boldened, or italicized note directly underneath, attach it as a step note.
-  * Do not use notes to indicate grouping.
-6. Formatting
-	* Remove any text formatting meant for display purposes (e.g. bold, italic, etc.)
+1. INGREDIENT HANDLING
+   • Preserve all ingredient names, quantities, and units exactly as written
+   • Maintain original ingredient grouping (e.g., "For the sauce", "For the crust")
+   • Use empty string "" (not null) for ungrouped ingredients
+   • Keep ingredients in their original order
+
+2. STEP INSTRUCTIONS
+   • Preserve the exact wording and numbering of steps
+   • Keep steps in their original sequence
+   • Remove decorative formatting (bold, italics) unless it's part of the instruction
+
+3. INGREDIENT ASSOCIATION
+   Include an ingredient in a step's ingredientIds ONLY when:
+   • It's being actively used or transformed in that step
+   • It's being combined with other ingredients for the first time
+   • It's being added to the dish in its raw/prepared form
+
+   Do NOT include an ingredient when:
+   • It's part of a pre-mixed component from a previous step
+   • It's only mentioned in reference to equipment (e.g., "greased pan")
+   • It's part of a cooking instruction without being actively used (e.g., "bake for 30 minutes")
+
+4. NOTES & TIPS
+   • Move alternative methods, variations, and non-essential tips to the 'note' field
+   • Keep the main instruction focused on the core action
+   • Preserve cooking times and temperatures in the main instruction
+
+5. SPECIAL CASES
+   • For "combine all dry ingredients" type instructions, include all relevant ingredients
+   • When an ingredient is prepped in one step (e.g., "chopped onions"), reference the base ingredient
+   • For multi-component recipes, maintain clear separation between components
+
+Example of good ingredient association:
+Step: "Chop chocolate into small pieces"
+ingredientIds: [1]  // chocolate
+
+Step: "Whisk together flour, sugar, and salt"
+ingredientIds: [2,3,4]  // flour, sugar, salt
+
+Step: "Add milk and eggs, mix until combined"
+ingredientIds: [5,6]    // milk, eggs
+
+Step: "Bake for 30 minutes"
+ingredientIds: []       // No ingredients actively used
 
 ---
 

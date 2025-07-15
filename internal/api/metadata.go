@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/kitchens-io/kitchens-api/internal/ai"
 	"github.com/kitchens-io/kitchens-api/internal/mysql"
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/kitchens-io/kitchens-api/pkg/tags"
@@ -30,7 +31,7 @@ func (a *App) extractRecipeMetaBackground(recipeID string) {
 }
 
 // extractRecipeMeta extracts metadata for a recipe.
-func (a *App) extractRecipeMeta(ctx context.Context, recipeID string) ([]tags.Tag, error) {
+func (a *App) extractRecipeMeta(ctx context.Context, recipeID string) (*ai.RecipeMetaResponseSchema, error) {
 	recipe, err := recipes.GetRecipeByID(ctx, a.db, recipeID)
 	if err != nil {
 		if err == recipes.ErrRecipeNotFound {
@@ -80,20 +81,28 @@ func (a *App) extractRecipeMeta(ctx context.Context, recipeID string) ([]tags.Ta
 
 	// TODO: Temporary Backfill recipe metadata, only update if no data has been filled out.
 	// This should indicate that the frontend hasn't implemented difficulty, course, or class.
-	if recipe.Difficulty == 0 && !recipe.Course.Valid && !recipe.Class.Valid && !recipe.Cuisine.Valid {
-		// uppercase first letter
-		result.Cuisine = strings.Title(result.Cuisine)
+	err = a.backfillRecipeTags(ctx, &recipe, &result)
+	if err != nil {
+		return &result, err
+	}
 
-		err = recipes.BackfillRecipeTags(ctx, a.db, recipes.BackfillRecipeTagsInput{
-			RecipeID:   recipeID,
-			Difficulty: result.Difficulty,
-			Course:     null.StringFrom(result.Course),
-			Class:      null.StringFrom(result.Class),
-			Cuisine:    null.StringFrom(result.Cuisine),
-		})
-		if err != nil {
-			return nil, err
-		}
+	// TODO: Temporary Backfill recipe step ingredient associations, only update if no data has been filled out.
+	// This should indicate that the frontend hasn't implemented step ingredient associations.
+	err = a.backfillRecipeStepIngredients(ctx, &recipe, &result)
+	if err != nil {
+		return &result, err
+	}
+
+	// TODO: Temporary backfill for existing recipes, only if no tags exist.
+	recipeHasTags, err := recipes.RecipeHasTags(ctx, a.db, recipeID)
+	if err != nil {
+		return &result, err
+	}
+
+	// If recipe has tags already, do not backfill.
+	if recipeHasTags {
+		log.Info().Str("recipe_id", recipeID).Msg("recipe already has tags, skipping backfill")
+		return &result, nil
 	}
 
 	// Convert to tags
@@ -125,8 +134,62 @@ func (a *App) extractRecipeMeta(ctx context.Context, recipeID string) ([]tags.Ta
 		return nil
 	})
 	if txErr != nil {
-		return nil, txErr
+		return &result, txErr
 	}
 
-	return createdTags, nil
+	return &result, nil
+}
+
+// TODO: Temporary backfill functionality
+func (a *App) backfillRecipeTags(ctx context.Context, r *recipes.Recipe, result *ai.RecipeMetaResponseSchema) error {
+	if r.Difficulty == 0 && !r.Course.Valid && !r.Class.Valid && !r.Cuisine.Valid {
+		// uppercase first letter
+		result.Cuisine = strings.Title(result.Cuisine)
+
+		err := recipes.BackfillRecipeTags(ctx, a.db, recipes.BackfillRecipeTagsInput{
+			RecipeID:   r.RecipeID,
+			Difficulty: result.Difficulty,
+			Course:     null.StringFrom(result.Course),
+			Class:      null.StringFrom(result.Class),
+			Cuisine:    null.StringFrom(result.Cuisine),
+		})
+		if err != nil {
+			return err
+		}
+	} else {
+		log.Info().Str("recipe_id", r.RecipeID).Msg("recipe already has metadata, skipping backfill")
+	}
+	return nil
+}
+
+// TODO: Temporary backfill functionality
+func (a *App) backfillRecipeStepIngredients(ctx context.Context, r *recipes.Recipe, result *ai.RecipeMetaResponseSchema) error {
+	var recipeStepsFound bool
+	for _, step := range r.Steps {
+		if len(step.IngredientIDs) > 0 {
+			recipeStepsFound = true
+			break
+		}
+	}
+
+	if !recipeStepsFound {
+		for _, step := range result.StepIngredients {
+			if len(step.IngredientIDs) == 0 {
+				continue
+			}
+
+			err := recipes.BackfillRecipeStepIngredients(ctx, a.db, recipes.BackfillRecipeStepIngredientsInput{
+				RecipeID:      r.RecipeID,
+				StepID:        step.StepID,
+				IngredientIDs: step.IngredientIDs,
+			})
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		log.Info().Str("recipe_id", r.RecipeID).Msg("recipe already has step ingredients, skipping backfill")
+	}
+
+	return nil
 }

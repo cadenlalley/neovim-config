@@ -18,10 +18,18 @@ type RecipeMetaResponseSchema struct {
 	Course     string `json:"course" jsonschema:"enum=breakfast,enum=brunch,enum=lunch,enum=dinner,enum=dessert,enum=supper"`
 	Class      string `json:"class" jsonschema:"enum=main,enum=side,enum=snack,enum=beverage,enum=dessert,enum=dip,enum=soup,enum=appetizer"`
 	Cuisine    string `json:"cuisine" jsonschema_description:"the cuisine of the recipe"`
-	Tags       []struct {
+
+	Tags []struct {
 		Type  string `json:"type" jsonschema_description:"enum=diet,enum=keyword,enum=ingredient"`
 		Value string `json:"value" jsonschema_description:"the value of the tag"`
 	} `json:"tags" jsonschema_description:"an array of tags"`
+
+	StepIngredients []RecipeMetaStepIngredientsSchema `json:"stepIngredients" jsonschema_description:"a map of step IDs to ingredient IDs"`
+}
+
+type RecipeMetaStepIngredientsSchema struct {
+	StepID        int   `json:"stepId"`
+	IngredientIDs []int `json:"ingredientIds"`
 }
 
 func (a *AIClient) ExtractRecipeMetaFromText(ctx context.Context, text string) (RecipeMetaResponseSchema, error) {
@@ -38,7 +46,7 @@ func (a *AIClient) ExtractRecipeMetaFromText(ctx context.Context, text string) (
 		MaxTokens: openai.Int(1600),
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(`
-Your task is to parse the provided JSON recipe into search‑friendly tags.
+Your task is to parse the provided JSON recipe and extract metadata for it.
 
 **TAGGING RULES**
 1. **difficulty**: one tag only, value "1"…"5" (stringified int; 1 = easiest).
@@ -54,13 +62,34 @@ Your task is to parse the provided JSON recipe into search‑friendly tags.
 		- time/effort (under‑15‑min, 30-minute-meal, overnight)
 		- occasion (meal‑prep)
 		- audience (kid‑friendly, budget, beginner)
+8. **format and style**:
+   - Each tag object must include both "type" and "value".
+   - If a tag is not applicable, do not include it.
+   - Follow these rules strictly to produce clean, indexable tag metadata for the recipe.
 
-**FORMAT & STYLE**
-* All strings must be lowercase; multi‑word values must use kebab‑case (sheet‑pan).
-* Each tag object must include both "type" and "value".
-* If a tag is not applicable, do not include it.
+**INGREDIENT ASSOCIATION**
+   Include an ingredient in a step's ingredientIds ONLY when:
+   • It's being actively used or transformed in that step
+   • It's being combined with other ingredients for the first time
+   • It's being added to the dish in its raw/prepared form
 
-Follow these rules strictly to produce clean, indexable metadata for every recipe.
+   Do NOT include an ingredient when:
+   • It's part of a pre-mixed component from a previous step
+   • It's only mentioned in reference to equipment (e.g., "greased pan")
+   • It's part of a cooking instruction without being actively used (e.g., "bake for 30 minutes")
+
+Example of good ingredient association:
+Step: "Chop chocolate into small pieces"
+ingredientIds: [1]  // chocolate
+
+Step: "Whisk together flour, sugar, and salt"
+ingredientIds: [2,3,4]  // flour, sugar, salt
+
+Step: "Add milk and eggs, mix until combined"
+ingredientIds: [5,6]    // milk, eggs
+
+Step: "Bake for 30 minutes"
+ingredientIds: []       // No ingredients actively used
 
 ---
 

@@ -57,10 +57,11 @@ func (a *App) CreateKitchenRecipe(c echo.Context) error {
 		// Handle step processing (images, notes)
 		for _, step := range input.Steps {
 			err = recipes.CreateRecipeSteps(ctx, tx, recipes.CreateRecipeStepInput{
-				RecipeID:    recipeID,
-				StepID:      step.StepID,
-				Instruction: step.Instruction,
-				Group:       step.Group,
+				RecipeID:      recipeID,
+				StepID:        step.StepID,
+				Instruction:   step.Instruction,
+				Group:         step.Group,
+				IngredientIDs: step.IngredientIDs,
 			})
 			if err != nil {
 				return err
@@ -187,10 +188,11 @@ func (a *App) UpdateKitchenRecipe(c echo.Context) error {
 		// Handle step processing (images, notes)
 		for _, step := range input.Steps {
 			err = recipes.CreateRecipeSteps(ctx, tx, recipes.CreateRecipeStepInput{
-				RecipeID:    recipeID,
-				StepID:      step.StepID,
-				Instruction: step.Instruction,
-				Group:       step.Group,
+				RecipeID:      recipeID,
+				StepID:        step.StepID,
+				Instruction:   step.Instruction,
+				Group:         step.Group,
+				IngredientIDs: step.IngredientIDs,
 			})
 			if err != nil {
 				return err
