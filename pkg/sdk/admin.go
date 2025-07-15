@@ -1,9 +1,9 @@
 package sdk
 
 import (
+	"github.com/kitchens-io/kitchens-api/internal/ai"
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
-	"github.com/kitchens-io/kitchens-api/pkg/tags"
 )
 
 // Admin List Accounts
@@ -57,12 +57,12 @@ func (c *client) AdminFollowKitchen(kitchenID, followedKitchenID string) error {
 }
 
 // Admin Create Recipe Metadata
-func (c *client) AdminCreateRecipeMetadata(recipeID string) ([]tags.Tag, error) {
+func (c *client) AdminCreateRecipeMetadata(recipeID string) (*ai.RecipeMetaResponseSchema, error) {
 	type request struct {
 		RecipeID string `json:"recipeId"`
 	}
 
-	var res []tags.Tag
+	var res *ai.RecipeMetaResponseSchema
 	err := c.post("/admin/recipes/metadata", request{
 		RecipeID: recipeID,
 	}, &res)
