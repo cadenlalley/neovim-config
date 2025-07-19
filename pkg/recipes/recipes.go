@@ -177,6 +177,35 @@ func DeleteRecipesByKitchenID(ctx context.Context, store Store, kitchenID string
 	return nil
 }
 
+func GetRandomRecipes(ctx context.Context, store Store, count int) ([]Recipe, error) {
+
+	rows, err := store.QueryxContext(ctx, `
+		SELECT * FROM recipes
+		WHERE deleted_at IS null
+		ORDER BY RAND()
+		LIMIT ?;
+	`, count)
+	if err != nil {
+		return []Recipe{}, err
+	}
+
+	var recipes []Recipe
+
+	for rows.Next() {
+		var recipe Recipe
+		if err := rows.StructScan(&recipe); err != nil {
+			return recipes, err
+		}
+		recipes = append(recipes, recipe)
+	}
+
+	if err := rows.Err(); err != nil {
+		return recipes, err
+	}
+
+	return recipes, nil
+}
+
 // TODO: Temporary for backfilling recipes with missing difficulty, course, class until frontend sends consistently.
 type BackfillRecipeTagsInput struct {
 	RecipeID   string

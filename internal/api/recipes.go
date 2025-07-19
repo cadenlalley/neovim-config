@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -314,6 +315,31 @@ func (a *App) GetKitchenRecipe(c echo.Context) error {
 	recipe.ReviewRating = reviewSummary.Average
 
 	return c.JSON(http.StatusOK, recipe)
+}
+
+func (a *App) GetRandomRecipes(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	queryCount := c.QueryParam("count")
+	if queryCount == "" {
+		queryCount = "5"
+	}
+
+	count, err := strconv.Atoi(queryCount)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid count parameter, ensure it is an integer").SetInternal(err)
+	}
+
+	if count < 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "count parameter must be greater than 0").SetInternal(err)
+	}
+
+	recipes, err := recipes.GetRandomRecipes(ctx, a.db, count)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get random recipe(s)").SetInternal(err)
+	}
+
+	return c.JSON(http.StatusOK, recipes)
 }
 
 func (a *App) GetKitchenRecipes(c echo.Context) error {

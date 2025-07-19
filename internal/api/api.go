@@ -99,6 +99,7 @@ func Create(input CreateInput) *App {
 		kitchenAuth.ValidateWriter,
 		kitchenAuth.ValidateRecipeWriter,
 	}
+	v1.GET("/recipes/random", app.GetRandomRecipes)
 	v1.GET("/kitchen/:kitchen_id/recipes", app.GetKitchenRecipes)
 	v1.GET("/kitchen/:kitchen_id/recipes/:recipe_id", app.GetKitchenRecipe)
 	v1.DELETE("/kitchen/:kitchen_id/recipes/:recipe_id", app.DeleteKitchenRecipe, mwRecipeWriter...)
@@ -150,6 +151,14 @@ func Create(input CreateInput) *App {
 
 	// Uploads
 	v1.POST("/upload", app.Upload)
+
+	// Meal Planning
+	v1.POST("/account/:account_id/plan", app.CreatePlan)
+	v1.GET("/account/:account_id/plan/:id", app.GetPlanByID)
+	v1.GET("/account/:account_id/plan/:start_date/:end_date", app.GetPlanByAccountIDAndDateRange)
+	v1.GET("/account/:account_id/plan", app.GetPlansByUserID)
+	v1.POST("/account/:account_id/plan/recipes/:id", app.AddRecipesToPlan)
+	v1.GET("/account/:account_id/plan/:id/recipes", app.GetFullRecipesByPlanID)
 
 	// Public
 	public := app.API.Group("/public")
