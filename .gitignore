@@ -32,3 +32,6 @@ scratch/
 
 # Evaluator
 cmd/local_*
+
+# VS Code Workspace
+.vscode
