@@ -11,6 +11,7 @@ local gitbrowse = require("snacks.gitbrowse")
 local lazygit = require("snacks.lazygit")
 local flash = require("flash")
 local aerial = require("aerial")
+local harpoon = require("harpoon")
 
 ----------------------
 -- misc
@@ -102,3 +103,12 @@ keymap.set({ "n", "x", "o" }, "<leader>b", flash.jump, { desc = "flash jump" })
 keymap.set({ "n", "x", "o" }, "<leader>S", flash.treesitter, { desc = "flash treesitter" })
 keymap.set({ "n", "x", "o" }, "<leader>r", flash.remote, { desc = "flash remote" })
 keymap.set({ "n", "x", "o" }, "<leader>R", flash.treesitter_search, { desc = "flash treesitter search" })
+
+----------------------
+-- harpoon
+----------------------
+
+keymap.set("n", "<leader>ha", function() harpoon:list():add() end, { desc = "harpoon add mark" })
+keymap.set("n", "<leader>hl", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "harpoon show list" })
+keymap.set("n", "<leader>h[", function() harpoon:list():prev() end, { desc = "harpoon previous mark" })
+keymap.set("n", "<leader>h]", function() harpoon:list():next() end, { desc = "harpoon next mark" })

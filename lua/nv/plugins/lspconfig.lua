@@ -29,6 +29,12 @@ return {
 				},
 				hints = {
 					parameterNames = true,
+					assignVariableTypes = true,
+					compositeLiteralFields = true,
+					compositeLiteralTypes = true,
+					constantValues = true,
+					functionTypeParameters = true,
+					rangeVariableTypes = true,
 				},
 				buildFlags = { "-tags=integration" },
 				experimentalPostfixCompletions = true,
