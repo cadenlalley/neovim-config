@@ -36,9 +36,15 @@ func ListFolderRecipesByFolderID(ctx context.Context, store Store, folderID stri
 			r.recipe_id as recipe_id,
 			r.recipe_name as recipe_name,
 			r.cover as cover,
+			r.difficulty as difficulty,
+			COALESCE(rr.review_rating, 0) as review_rating,
 			fr.created_at as created_at
 		FROM folder_recipes fr
 			LEFT JOIN recipes r ON fr.recipe_id = r.recipe_id
+			LEFT JOIN (SELECT recipe_id, avg(rating) as review_rating
+							FROM recipe_reviews
+							GROUP BY recipe_id
+					) AS rr ON r.recipe_id = rr.recipe_id
 		WHERE fr.folder_id = ?
 		  AND r.deleted_at IS NULL
 		ORDER BY fr.created_at DESC

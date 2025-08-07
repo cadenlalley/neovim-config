@@ -125,8 +125,8 @@ func ListRecipesByKitchenID(ctx context.Context, store Store, kitchenID string) 
 	rows, err := store.QueryxContext(ctx, `
 		SELECT
 			r.*,
-			CASE WHEN rr.review_count IS NOT NULL THEN rr.review_count ELSE 0 END as review_count,
-			CASE WHEN rr.review_rating IS NOT NULL THEN rr.review_rating ELSE 0 END as review_rating
+			COALESCE(rr.review_count, 0) as review_count,
+			COALESCE(rr.review_rating, 0) as review_rating
 		FROM recipes r
 			LEFT JOIN (SELECT recipe_id, count(*) as review_count, avg(rating) as review_rating
 									FROM recipe_reviews

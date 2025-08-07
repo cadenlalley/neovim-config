@@ -19,10 +19,14 @@ type Folder struct {
 }
 
 type FolderRecipe struct {
-	RecipeID  string      `json:"recipeId" db:"recipe_id" validate:"required"`
-	Name      string      `json:"name" db:"recipe_name"`
-	Cover     null.String `json:"cover" db:"cover"`
-	CreatedAt time.Time   `json:"createdAt" db:"created_at"`
+	RecipeID   string      `json:"recipeId" db:"recipe_id" validate:"required"`
+	Name       string      `json:"name" db:"recipe_name"`
+	Cover      null.String `json:"cover" db:"cover"`
+	Difficulty int         `json:"difficulty" db:"difficulty"`
+	CreatedAt  time.Time   `json:"createdAt" db:"created_at"`
+
+	// Reviews
+	ReviewRating float64 `json:"reviewRating" db:"review_rating"`
 }
 
 func CreateFolderID() string {

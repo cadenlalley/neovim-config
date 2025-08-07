@@ -216,9 +216,11 @@ func GetTestFolder() folders.Folder {
 		Cover:     null.StringFrom("/uploads/folders/fld_2pPgQjn08dQzr5vjSk8WYSBTATo/2pR6BliLuDCHYJKq7Eqkb9l55bS.png"),
 		Recipes: []folders.FolderRecipe{
 			{
-				RecipeID: testRecipe.RecipeID,
-				Name:     testRecipe.Name,
-				Cover:    testRecipe.Cover,
+				RecipeID:     testRecipe.RecipeID,
+				Name:         testRecipe.Name,
+				Cover:        testRecipe.Cover,
+				Difficulty:   testRecipe.Difficulty,
+				ReviewRating: testRecipe.ReviewRating,
 			},
 		},
 	}
