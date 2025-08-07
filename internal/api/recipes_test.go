@@ -98,6 +98,12 @@ func TestCreateKitchenRecipe(t *testing.T) {
 		},
 	}
 
+	// Reset Database before testing.
+	err := resetFixtures()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			status, body, err := request(http.MethodPost, "/v1/kitchen/"+tc.kitchenID+"/recipes", tc.payload)

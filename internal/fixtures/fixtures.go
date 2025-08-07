@@ -2,6 +2,7 @@ package fixtures
 
 import (
 	"github.com/kitchens-io/kitchens-api/pkg/accounts"
+	"github.com/kitchens-io/kitchens-api/pkg/folders"
 	"github.com/kitchens-io/kitchens-api/pkg/kitchens"
 	"github.com/kitchens-io/kitchens-api/pkg/ptr"
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
@@ -204,6 +205,50 @@ func GetTestRecipe() recipes.Recipe {
 	}
 }
 
+// Return the base level test folder default.
+func GetTestFolder() folders.Folder {
+	testRecipe := GetTestRecipe()
+
+	return folders.Folder{
+		FolderID:  "fld_2pPgQjn08dQzr5vjSk8WYSBTATo",
+		KitchenID: "ktc_2jEx1e1esA5292rBisRGuJwXc14",
+		Name:      "Breakfast",
+		Cover:     null.StringFrom("/uploads/folders/fld_2pPgQjn08dQzr5vjSk8WYSBTATo/2pR6BliLuDCHYJKq7Eqkb9l55bS.png"),
+		Recipes: []folders.FolderRecipe{
+			{
+				RecipeID: testRecipe.RecipeID,
+				Name:     testRecipe.Name,
+				Cover:    testRecipe.Cover,
+			},
+		},
+	}
+}
+
+// Return the base level test folders default.
+func GetTestFolders() []folders.Folder {
+	return []folders.Folder{
+		{
+			FolderID:  "fld_2jEx1eCS13KMS8udlPoK12e5KPW",
+			KitchenID: "ktc_2jEx1e1esA5292rBisRGuJwXc14",
+			Name:      "Healthy Lunch",
+			Cover:     null.StringFrom("uploads/folders/fld_2pPgQjn08dQzr5vjSk8WYSBTATo/2pR6Bouca6LsCl1fXHDK9p264bi.png"),
+		},
+		{
+			FolderID:  "fld_2jEx1j3CVPIIAaOwGIORKqHfK89",
+			KitchenID: "ktc_2jEx1e1esA5292rBisRGuJwXc14",
+			Name:      "Mediteranean",
+			Cover:     null.StringFrom("uploads/folders/fld_2pPgQjn08dQzr5vjSk8WYSBTATo/2pR6BrWvEtBW5uBwoNc213qALBc.png"),
+		},
+		{
+			FolderID:  "fld_2pPgQjn08dQzr5vjSk8WYSBTATo",
+			KitchenID: "ktc_2jEx1e1esA5292rBisRGuJwXc14",
+			Name:      "Breakfast",
+			Cover:     null.StringFrom("/uploads/folders/fld_2pPgQjn08dQzr5vjSk8WYSBTATo/2pR6BliLuDCHYJKq7Eqkb9l55bS.png"),
+		},
+	}
+}
+
+// Return the base level test search recipes default.
 func GetSearchRecipes(ids []string) []recipes.SearchResult {
 	pieRecipe := recipes.SearchResult{
 		RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",

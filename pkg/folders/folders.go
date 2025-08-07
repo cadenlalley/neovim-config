@@ -55,6 +55,9 @@ func UpdateFolder(ctx context.Context, store Store, input UpdateFolderInput) (Fo
 	`, input.Name, input.Cover, input.FolderID)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return Folder{}, ErrFolderNotFound
+		}
 		return Folder{}, err
 	}
 
@@ -108,6 +111,9 @@ func DeleteFolderByID(ctx context.Context, store Store, folderID string) error {
 		DELETE FROM folders WHERE folder_id = ?
 	`, folderID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return ErrFolderNotFound
+		}
 		return err
 	}
 	return nil

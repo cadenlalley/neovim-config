@@ -22,7 +22,7 @@ type FolderRecipe struct {
 	RecipeID  string      `json:"recipeId" db:"recipe_id" validate:"required"`
 	Name      string      `json:"name" db:"recipe_name"`
 	Cover     null.String `json:"cover" db:"cover"`
-	CreatedAt string      `json:"createdAt" db:"created_at"`
+	CreatedAt time.Time   `json:"createdAt" db:"created_at"`
 }
 
 func CreateFolderID() string {
