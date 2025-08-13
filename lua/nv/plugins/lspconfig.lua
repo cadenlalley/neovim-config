@@ -5,12 +5,12 @@ return {
 	opts = {
 		servers = {
 			lua_ls = {
-				on_attach = function(client, bufnr)
+				on_attach = function(client, _)
 					client.server_capabilities.documentHighlightProvider = false
 				end
 			},
 			gopls = {
-				on_attach = function(client, bufnr)
+				on_attach = function(client, _)
 					client.server_capabilities.documentHighlightProvider = false
 				end,
 				usePlaceholders = true,
@@ -41,7 +41,11 @@ return {
 				hoverKind = "FullDocumentation",
 			},
 			terraformls = {
-				on_attach = function(client, bufnr)
+				filetypes = { "terraform", "tf" },
+				flags = {
+					debounce_text_changes = 300,
+				},
+				on_attach = function(client, _)
 					client.server_capabilities.documentHighlightProvider = false
 				end
 			}
