@@ -41,10 +41,9 @@ return {
 				hoverKind = "FullDocumentation",
 			},
 			terraformls = {
-				filetypes = { "terraform", "tf" },
-				flags = {
-					debounce_text_changes = 300,
-				},
+				cmd = { "terraform-ls", "serve" },
+				filetypes = { "terraform", "terraform-vars", "tfvars" },
+				flags = { debounce_text_changes = 100 },
 				on_attach = function(client, _)
 					client.server_capabilities.documentHighlightProvider = false
 				end

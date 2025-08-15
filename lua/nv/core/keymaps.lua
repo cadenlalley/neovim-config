@@ -49,10 +49,11 @@ keymap.set("n", "<leader>er", explorer.reveal, { desc = "explorer reveal" })
 ----------------------
 
 keymap.set("n", "<leader>ff", picker.files, { desc = "find files" })
-keymap.set("n", "<leader>fw", picker.grep, { desc = "find word" })
+keymap.set("n", "<leader>fW", picker.grep, { desc = "find word globally" })
+keymap.set("n", "<leader>fw", picker.lines, { desc = "find word" })
 keymap.set("n", "<leader>fb", picker.buffers, { desc = "find buffer" })
 keymap.set("n", "<leader>fs", picker.lsp_symbols, { desc = "find symbols" })
-keymap.set("n", "<leader>fS", aerial.snacks_picker, { desc = "find symbols" })
+keymap.set("n", "<leader>fS", function() picker.lsp_workspace_symbols({ live = true }) end, { desc = "find symbols" })
 keymap.set("n", "<leader>fgd", picker.git_diff, { desc = "find git diff" })
 keymap.set("n", "<leader>fgs", picker.git_status, { desc = "find git status" })
 keymap.set("n", "<leader>fgt", picker.git_stash, { desc = "find git stash" })
