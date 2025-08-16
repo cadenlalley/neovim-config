@@ -1,0 +1,215 @@
+{
+  "recipeId": "",
+  "kitchenId": "",
+  "name": "French Onion Soup Gratinée",
+  "summary": "This is the best French onion soup recipe I know. I have been making it for 30 years and it never fails to please. It makes an exquisite presentation too!",
+  "prepTime": 15,
+  "cookTime": 60,
+  "servings": 4,
+  "difficulty": 2,
+  "course": "supper",
+  "class": "soup",
+  "cuisine": "french",
+  "cover": null,
+  "source": "https://www.allrecipes.com/recipe/91192/french-onion-soup-gratinee/",
+  "createdAt": "0001-01-01T00:00:00Z",
+  "updatedAt": "0001-01-01T00:00:00Z",
+  "deletedAt": null,
+  "reviewCount": 0,
+  "reviewRating": 0,
+  "sourceDomain": null,
+  "ingredients": [
+    {
+      "ingredientId": 1,
+      "name": "butter",
+      "quantity": 4,
+      "unit": "tbsp",
+      "group": ""
+    },
+    {
+      "ingredientId": 2,
+      "name": "red onions",
+      "quantity": 2,
+      "unit": "piece",
+      "group": ""
+    },
+    {
+      "ingredientId": 3,
+      "name": "sweet onions",
+      "quantity": 2,
+      "unit": "piece",
+      "group": ""
+    },
+    {
+      "ingredientId": 4,
+      "name": "salt",
+      "quantity": 1,
+      "unit": "tsp",
+      "group": ""
+    },
+    {
+      "ingredientId": 5,
+      "name": "chicken broth",
+      "quantity": 48,
+      "unit": "ounce",
+      "group": ""
+    },
+    {
+      "ingredientId": 6,
+      "name": "beef broth",
+      "quantity": 14,
+      "unit": "ounce",
+      "group": ""
+    },
+    {
+      "ingredientId": 7,
+      "name": "red wine",
+      "quantity": 0.5,
+      "unit": "cup",
+      "group": ""
+    },
+    {
+      "ingredientId": 8,
+      "name": "Worcestershire sauce",
+      "quantity": 1,
+      "unit": "tbsp",
+      "group": ""
+    },
+    {
+      "ingredientId": 9,
+      "name": "fresh parsley",
+      "quantity": 2,
+      "unit": null,
+      "group": ""
+    },
+    {
+      "ingredientId": 10,
+      "name": "fresh thyme leaves",
+      "quantity": 1,
+      "unit": null,
+      "group": ""
+    },
+    {
+      "ingredientId": 11,
+      "name": "bay leaf",
+      "quantity": 1,
+      "unit": null,
+      "group": ""
+    },
+    {
+      "ingredientId": 12,
+      "name": "balsamic vinegar",
+      "quantity": 1,
+      "unit": "tbsp",
+      "group": ""
+    },
+    {
+      "ingredientId": 13,
+      "name": "black pepper",
+      "quantity": null,
+      "unit": null,
+      "group": ""
+    },
+    {
+      "ingredientId": 14,
+      "name": "French bread",
+      "quantity": 4,
+      "unit": "slice",
+      "group": ""
+    },
+    {
+      "ingredientId": 15,
+      "name": "Gruyère cheese",
+      "quantity": 8,
+      "unit": "slice",
+      "group": ""
+    },
+    {
+      "ingredientId": 16,
+      "name": "shredded Asiago cheese",
+      "quantity": 0.5,
+      "unit": "cup",
+      "group": ""
+    },
+    {
+      "ingredientId": 17,
+      "name": "paprika",
+      "quantity": 4,
+      "unit": "pinch",
+      "group": ""
+    }
+  ],
+  "steps": [
+    {
+      "stepId": 1,
+      "instruction": "Melt butter in a large pot over medium-high heat. Stir in red onions, sweet onions, and salt. Cook, stirring frequently, until onions are caramelized and almost syrupy, about 35 minutes. ",
+      "group": null,
+      "ingredientIds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 2,
+      "instruction": "Stir in chicken broth, beef broth, red wine, and Worcestershire sauce. Bundle parsley, thyme, and bay leaf with kitchen twine; add to the pot. Simmer over medium heat for 20 minutes, stirring occasionally. Remove and discard herb bundle. Reduce heat to low; stir in vinegar and season with salt and pepper. Cover soup and keep warm over low heat while you prepare the toast.",
+      "group": null,
+      "ingredientIds": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 3,
+      "instruction": "Set an oven rack about 6 inches from the heat source and preheat the oven's broiler. Arrange bread slices on a baking sheet and broil, turning once, until well toasted on both sides, about 3 minutes. Remove from heat; do not turn off the broiler.",
+      "group": null,
+      "ingredientIds": [
+        14
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 4,
+      "instruction": "Arrange 4 large oven-safe bowls or crocks on a rimmed baking sheet. Fill each bowl 2/3 full with hot soup. Top each bowl with 1 slice of toasted bread, 2 slices Gruyère cheese, and 1/4 of the Asiago cheese. Sprinkle a little bit of paprika over the top of each one.",
+      "group": null,
+      "ingredientIds": [
+        14,
+        15,
+        16,
+        17
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 5,
+      "instruction": "Cook under the hot broiler until bubbly and golden brown, about 5 minutes. Cheese will cascade over the sides of the crock and form a beautifully melted crusty seal as it melts.",
+      "group": null,
+      "ingredientIds": [],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 6,
+      "instruction": "Serve hot and enjoy!",
+      "group": null,
+      "ingredientIds": [],
+      "images": null,
+      "note": ""
+    }
+  ],
+  "shareUrl": ""
+}

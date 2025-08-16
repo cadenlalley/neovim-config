@@ -1,0 +1,174 @@
+{
+  "recipeId": "",
+  "kitchenId": "",
+  "name": "Apple Crumble",
+  "summary": "This easy Apple Crumble recipe is a classic for a reason! Full of warmly spiced, caramelized apples and a crunchy, buttery crumble topping.",
+  "prepTime": 20,
+  "cookTime": 45,
+  "servings": 12,
+  "difficulty": 2,
+  "course": "dessert",
+  "class": "main",
+  "cuisine": "American",
+  "cover": null,
+  "source": "https://www.budgetbytes.com/apple-crumble/",
+  "createdAt": "0001-01-01T00:00:00Z",
+  "updatedAt": "0001-01-01T00:00:00Z",
+  "deletedAt": null,
+  "reviewCount": 0,
+  "reviewRating": 0,
+  "sourceDomain": null,
+  "ingredients": [
+    {
+      "ingredientId": 1,
+      "name": "Salted Butter",
+      "quantity": 6.5,
+      "unit": "tbsp",
+      "group": "Crumble Topping"
+    },
+    {
+      "ingredientId": 2,
+      "name": "All-Purpose Flour",
+      "quantity": 0.667,
+      "unit": "cup",
+      "group": "Crumble Topping"
+    },
+    {
+      "ingredientId": 3,
+      "name": "Light Brown Sugar",
+      "quantity": 0.333,
+      "unit": "cup",
+      "group": "Crumble Topping"
+    },
+    {
+      "ingredientId": 4,
+      "name": "Salt",
+      "quantity": 0.25,
+      "unit": "tsp",
+      "group": "Crumble Topping"
+    },
+    {
+      "ingredientId": 5,
+      "name": "Pumpkin Pie Spice or Apple Pie Spice",
+      "quantity": 1,
+      "unit": "tsp",
+      "group": "Crumble Topping"
+    },
+    {
+      "ingredientId": 6,
+      "name": "Granny Smith Apples",
+      "quantity": 5,
+      "unit": "piece",
+      "group": "Filling"
+    },
+    {
+      "ingredientId": 7,
+      "name": "Light Brown Sugar",
+      "quantity": 0.333,
+      "unit": "cup",
+      "group": "Filling"
+    },
+    {
+      "ingredientId": 8,
+      "name": "Cornstarch",
+      "quantity": 1,
+      "unit": "tbsp",
+      "group": "Filling"
+    },
+    {
+      "ingredientId": 9,
+      "name": "Ground Cinnamon",
+      "quantity": 1,
+      "unit": "tsp",
+      "group": "Filling"
+    },
+    {
+      "ingredientId": 10,
+      "name": "Ginger Powder",
+      "quantity": 1,
+      "unit": "tsp",
+      "group": "Filling"
+    },
+    {
+      "ingredientId": 11,
+      "name": "Salt",
+      "quantity": 0.125,
+      "unit": "tsp",
+      "group": "Filling"
+    },
+    {
+      "ingredientId": 12,
+      "name": "Lemon Juice",
+      "quantity": 2,
+      "unit": "tbsp",
+      "group": "Filling"
+    }
+  ],
+  "steps": [
+    {
+      "stepId": 1,
+      "instruction": "Preheat oven to 350° F and butter a baking dish (my dish was 8×10”), set aside for now. Add salted butter, all-purpose flour, light brown sugar, salt, and pumpkin pie spice/apple pie spice to a medium size mixing bowl.",
+      "group": null,
+      "ingredientIds": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 2,
+      "instruction": "Firmly mix crumble ingredients together by hand, breaking it up into little pieces, and freeze for 10 minutes.",
+      "group": null,
+      "ingredientIds": [],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 3,
+      "instruction": "Peel most of your apples (I left the skin on a few apples because I think it’s a nice little color pop) and slice into thin 1/8” slices.",
+      "group": null,
+      "ingredientIds": [
+        6
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 4,
+      "instruction": "Place your sliced apples in a mixing bowl and add light brown sugar, cornstarch, cinnamon, ginger powder, salt, and lemon juice.",
+      "group": null,
+      "ingredientIds": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 5,
+      "instruction": "Toss filling ingredients together and pat down into the baking dish. Then, add frozen crumble on top.",
+      "group": null,
+      "ingredientIds": [],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 6,
+      "instruction": "Bake for 40-45 min or once the crumble on top turns golden brown.",
+      "group": null,
+      "ingredientIds": [],
+      "images": null,
+      "note": ""
+    }
+  ],
+  "shareUrl": ""
+}

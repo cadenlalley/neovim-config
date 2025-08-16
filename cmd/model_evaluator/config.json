@@ -1,0 +1,27 @@
+[
+  {
+    "name": "apple-crumble",
+    "url": "https://www.budgetbytes.com/apple-crumble/",
+    "expectedFile": "./expected/apple-crumble.json"
+  },
+  {
+    "name": "shrimp-tacos",
+    "url": "https://natashaskitchen.com/shrimp-tacos/",
+    "expectedFile": "./expected/shrimp-tacos.json"
+  },
+  {
+    "name": "french-onion-soup",
+    "url": "https://www.allrecipes.com/recipe/91192/french-onion-soup-gratinee/",
+    "expectedFile": "./expected/french-onion-soup.json"
+  },
+  {
+    "name": "coconut-macaroons",
+    "url": "https://www.onceuponachef.com/recipes/coconut-macaroons.html",
+    "expectedFile": "./expected/coconut-macaroons.json"
+  },
+  {
+    "name": "shake-shack-burgers",
+    "url": "https://umamigirl.com/shake-shack-burgers/",
+    "expectedFile": "./expected/shake-shack-burgers.json"
+  }
+]

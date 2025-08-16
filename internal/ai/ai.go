@@ -1,8 +1,8 @@
 package ai
 
 import (
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/option"
+	"github.com/openai/openai-go/v2"
+	"github.com/openai/openai-go/v2/option"
 )
 
 type AIClient struct {
@@ -22,4 +22,11 @@ type TokenUsage struct {
 	PromptTokens     int64 `json:"promptTokens"`
 	CompletionTokens int64 `json:"completionTokens"`
 	TotalTokens      int64 `json:"totalTokens"`
+}
+
+type ResponseMetrics struct {
+	Model            openai.ChatModel `json:"model"`
+	PromptTokens     int64            `json:"promptTokens"`
+	CompletionTokens int64            `json:"completionTokens"`
+	Latency          int64            `json:"latency"`
 }

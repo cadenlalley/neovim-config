@@ -20,7 +20,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/lib/pq v1.10.9
-	github.com/openai/openai-go v1.7.0
+	github.com/openai/openai-go/v2 v2.0.2
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.32.0
 	github.com/segmentio/ksuid v1.0.4

@@ -1,0 +1,232 @@
+{
+  "recipeId": "",
+  "kitchenId": "",
+  "name": "Shrimp Tacos",
+  "summary": "These Shrimp Tacos are loaded with plump juicy shrimp, crisp cabbage, avocado, cotija cheese, cilantro, and a lime crema sauce, all served over toasted tortillas.",
+  "prepTime": 25,
+  "cookTime": 5,
+  "servings": 8,
+  "difficulty": 2,
+  "course": "dinner",
+  "class": "main",
+  "cuisine": "Mexican",
+  "cover": null,
+  "source": "https://natashaskitchen.com/shrimp-tacos/",
+  "createdAt": "0001-01-01T00:00:00Z",
+  "updatedAt": "0001-01-01T00:00:00Z",
+  "deletedAt": null,
+  "reviewCount": 0,
+  "reviewRating": 0,
+  "sourceDomain": null,
+  "ingredients": [
+    {
+      "ingredientId": 1,
+      "name": "sour cream",
+      "quantity": 0.333,
+      "unit": "cup",
+      "group": "Shrimp Taco Sauce"
+    },
+    {
+      "ingredientId": 2,
+      "name": "mayonnaise",
+      "quantity": 0.333,
+      "unit": "cup",
+      "group": "Shrimp Taco Sauce"
+    },
+    {
+      "ingredientId": 3,
+      "name": "lime juice",
+      "quantity": 1.5,
+      "unit": "tbsp",
+      "group": "Shrimp Taco Sauce"
+    },
+    {
+      "ingredientId": 4,
+      "name": "garlic powder",
+      "quantity": 0.75,
+      "unit": "tsp",
+      "group": "Shrimp Taco Sauce"
+    },
+    {
+      "ingredientId": 5,
+      "name": "sriracha sauce",
+      "quantity": 0.75,
+      "unit": "tsp",
+      "group": "Shrimp Taco Sauce"
+    },
+    {
+      "ingredientId": 6,
+      "name": "white corn tortillas",
+      "quantity": 8,
+      "unit": "piece",
+      "group": "Shrimp Taco Toppings"
+    },
+    {
+      "ingredientId": 7,
+      "name": "purple cabbage",
+      "quantity": 0.5,
+      "unit": null,
+      "group": "Shrimp Taco Toppings"
+    },
+    {
+      "ingredientId": 8,
+      "name": "avocado",
+      "quantity": 1,
+      "unit": "piece",
+      "group": "Shrimp Taco Toppings"
+    },
+    {
+      "ingredientId": 9,
+      "name": "red onion",
+      "quantity": 0.5,
+      "unit": null,
+      "group": "Shrimp Taco Toppings"
+    },
+    {
+      "ingredientId": 10,
+      "name": "Cotija cheese",
+      "quantity": 4,
+      "unit": "ounce",
+      "group": "Shrimp Taco Toppings"
+    },
+    {
+      "ingredientId": 11,
+      "name": "cilantro",
+      "quantity": 0.25,
+      "unit": "bottle",
+      "group": "Shrimp Taco Toppings"
+    },
+    {
+      "ingredientId": 12,
+      "name": "lime",
+      "quantity": 1,
+      "unit": "piece",
+      "group": "Shrimp Taco Toppings"
+    },
+    {
+      "ingredientId": 13,
+      "name": "shrimp",
+      "quantity": 1,
+      "unit": "pound",
+      "group": "For the Shrimp"
+    },
+    {
+      "ingredientId": 14,
+      "name": "garlic clove",
+      "quantity": 1,
+      "unit": "piece",
+      "group": "For the Shrimp"
+    },
+    {
+      "ingredientId": 15,
+      "name": "sea salt",
+      "quantity": 0.5,
+      "unit": "tsp",
+      "group": "For the Shrimp"
+    },
+    {
+      "ingredientId": 16,
+      "name": "black pepper",
+      "quantity": 0.25,
+      "unit": "tsp",
+      "group": "For the Shrimp"
+    },
+    {
+      "ingredientId": 17,
+      "name": "ground cumin",
+      "quantity": 0.25,
+      "unit": "tsp",
+      "group": "For the Shrimp"
+    },
+    {
+      "ingredientId": 18,
+      "name": "cayenne pepper",
+      "quantity": 0.25,
+      "unit": "tsp",
+      "group": "For the Shrimp"
+    },
+    {
+      "ingredientId": 19,
+      "name": "olive oil",
+      "quantity": 1,
+      "unit": "tbsp",
+      "group": "For the Shrimp"
+    }
+  ],
+  "steps": [
+    {
+      "stepId": 1,
+      "instruction": "Make the Shrimp Taco Sauce – In a small bowl, whisk together the sauce ingredients and set aside for the flavors to meld. Transfer to a squeeze bottle if desired.",
+      "group": null,
+      "ingredientIds": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 2,
+      "instruction": "Prep the Toppings – Thinly slice cabbage, dice the avocado, finely dice the red onion, and coarsely chop the cilantro. Arrange toppings in small bowls for easy serving.",
+      "group": null,
+      "ingredientIds": [
+        7,
+        8,
+        9,
+        11
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 3,
+      "instruction": "Season the Shrimp – Thaw and pat dry the shrimp with paper towels and place in a medium bowl. Add seasonings and garlic and stir to combine.",
+      "group": null,
+      "ingredientIds": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 4,
+      "instruction": "Cook the Shrimp – Place a large non-stick pan over medium-high heat. Add 1 Tbsp olive oil and add shrimp in a single layer. Sauté 1-2 minutes per side or just until cooked through. As soon as they are cooked through (white inside with some pink and red accents outside), transfer to a serving platter and set aside to cool.",
+      "group": null,
+      "ingredientIds": [
+        19
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 5,
+      "instruction": "Heat the Tortillas – You can toast the tortillas over a gas flame, on a griddle or in a skillet**. ",
+      "group": null,
+      "ingredientIds": [
+        6
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 6,
+      "instruction": "To Serve – Build tacos by arranging toppings and shrimp over each toasted tortilla. Serve drizzled with the taco sauce.",
+      "group": null,
+      "ingredientIds": [
+        10,
+        12
+      ],
+      "images": null,
+      "note": ""
+    }
+  ],
+  "shareUrl": ""
+}

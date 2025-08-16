@@ -1,0 +1,117 @@
+{
+  "recipeId": "",
+  "kitchenId": "",
+  "name": "Coconut Macaroons",
+  "summary": "Soft and chewy on the inside, crisp and golden on the outside — these are the perfect coconut macaroons.",
+  "prepTime": 20,
+  "cookTime": 25,
+  "servings": 26,
+  "difficulty": 2,
+  "course": "dessert",
+  "class": "snack",
+  "cuisine": "american",
+  "cover": null,
+  "source": "https://www.onceuponachef.com/recipes/coconut-macaroons.html",
+  "createdAt": "0001-01-01T00:00:00Z",
+  "updatedAt": "0001-01-01T00:00:00Z",
+  "deletedAt": null,
+  "reviewCount": 0,
+  "reviewRating": 0,
+  "sourceDomain": null,
+  "ingredients": [
+    {
+      "ingredientId": 1,
+      "name": "sweetened flaked coconut",
+      "quantity": 1,
+      "unit": "bag",
+      "group": null
+    },
+    {
+      "ingredientId": 2,
+      "name": "sweetened condensed milk",
+      "quantity": 0.875,
+      "unit": "cup",
+      "group": null
+    },
+    {
+      "ingredientId": 3,
+      "name": "vanilla extract",
+      "quantity": 1,
+      "unit": "tsp",
+      "group": null
+    },
+    {
+      "ingredientId": 4,
+      "name": "large egg whites",
+      "quantity": 2,
+      "unit": "piece",
+      "group": null
+    },
+    {
+      "ingredientId": 5,
+      "name": "salt",
+      "quantity": 0.25,
+      "unit": "tsp",
+      "group": null
+    },
+    {
+      "ingredientId": 6,
+      "name": "semi-sweet chocolate",
+      "quantity": 4,
+      "unit": "ounce",
+      "group": null
+    }
+  ],
+  "steps": [
+    {
+      "stepId": 1,
+      "instruction": "Preheat the oven to 325°F. Set two oven racks near the center of the oven. Line two baking sheets with parchment paper.",
+      "group": null,
+      "ingredientIds": [],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 2,
+      "instruction": "In a medium bowl, mix together the coconut, sweetened condensed milk and vanilla extract. Set aside.",
+      "group": null,
+      "ingredientIds": [
+        1,
+        2,
+        3
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 3,
+      "instruction": "In the bowl of an electric mixer, beat the egg whites and salt until stiff peaks form. Use a large rubber spatula to fold the egg whites into the coconut mixture.",
+      "group": null,
+      "ingredientIds": [
+        4,
+        5
+      ],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 4,
+      "instruction": "Using a mini ice cream scoop or two spoons, form heaping tablespoons of the mixture into mounds on the prepared baking sheets, spacing about 1 inch apart. Bake for 23 to 25 minutes, rotating the pans from top to bottom and front to back, until the tops and edges are golden. Let cool on the pans for a few minutes, then transfer to a wire rack to cool completely.",
+      "group": null,
+      "ingredientIds": [],
+      "images": null,
+      "note": ""
+    },
+    {
+      "stepId": 5,
+      "instruction": "If dipping the macaroons in chocolate, melt the chocolate in a microwave-safe bowl at medium power, stopping and stirring at 30 second intervals, until just smooth and creamy. (Alternatively, melt the chocolate in a double boiler over simmering water.) Dip the bottoms of the macaroons in the chocolate, letting any excess drip back into the bowl, and return to the lined baking sheets. Place the macaroons in the refrigerator for about 10 minutes to allow the chocolate to set. The cookies keep well in an airtight container at room temperature for about a week.",
+      "group": null,
+      "ingredientIds": [
+        6
+      ],
+      "images": null,
+      "note": ""
+    }
+  ],
+  "shareUrl": ""
+}

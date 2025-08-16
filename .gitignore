@@ -32,6 +32,7 @@ scratch/
 
 # Evaluator
 cmd/local_*
+cmd/model_evaluator/actual_*
 
 # VS Code Workspace
 .vscode

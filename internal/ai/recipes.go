@@ -6,9 +6,8 @@ import (
 	"time"
 
 	"github.com/kitchens-io/kitchens-api/internal/metrics"
-	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/v2"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
 
 var RecipeResponseJSONSchema = GenerateSchema[RecipeResponseSchema]()
@@ -44,7 +43,7 @@ type RecipeResponseStepsSchema struct {
 	IngredientIDs []int  `json:"ingredientIds" jsonschema_description:"optional list of ingredient IDs that are used in this step"`
 }
 
-func (a *AIClient) ExtractRecipeFromText(ctx context.Context, text string) (RecipeResponseSchema, error) {
+func (a *AIClient) ExtractRecipeFromText(ctx context.Context, text string) (RecipeResponseSchema, ResponseMetrics, error) {
 	schemaParam := openai.ResponseFormatJSONSchemaJSONSchemaParam{
 		Name:        "recipe",
 		Description: openai.String("A JSON object representing a recipe"),
@@ -54,8 +53,8 @@ func (a *AIClient) ExtractRecipeFromText(ctx context.Context, text string) (Reci
 
 	start := time.Now()
 	chat, err := a.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
-		Model:     openai.ChatModelGPT4oMini,
-		MaxTokens: openai.Int(1600),
+		Model:               openai.ChatModelGPT4oMini2024_07_18,
+		MaxCompletionTokens: openai.Int(1600),
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(`
 Your task is to extract the recipe from the provided markdown text with perfect accuracy. Follow these rules carefully:
@@ -119,33 +118,28 @@ ingredientIds: []       // No ingredients actively used
 	})
 
 	if err != nil {
-		return RecipeResponseSchema{}, errors.Wrap(err, "unexpected error from OpenAI API")
+		return RecipeResponseSchema{}, ResponseMetrics{}, errors.Wrap(err, "unexpected error from OpenAI API")
 	}
 
-	log.Info().
-		Str("producer", "openai_text_import").
-		Interface("tokenUsage", TokenUsage{
-			PromptTokens:     chat.Usage.PromptTokens,
-			CompletionTokens: chat.Usage.CompletionTokens,
-			TotalTokens:      chat.Usage.TotalTokens,
-		}).
-		Int64("latency", metrics.Elapsed(start)).
-		Msg("openai metadata")
-
-	if chat.Choices == nil || len(chat.Choices) == 0 {
-		return RecipeResponseSchema{}, errors.New("no choices returned from OpenAI API")
+	if chat.Choices == nil {
+		return RecipeResponseSchema{}, ResponseMetrics{}, errors.New("no choices returned from OpenAI API")
 	}
 
 	var results RecipeResponseSchema
 	err = json.Unmarshal([]byte(chat.Choices[0].Message.Content), &results)
 	if err != nil {
-		return RecipeResponseSchema{}, errors.Wrap(err, "failed to unmarshal recipe response")
+		return RecipeResponseSchema{}, ResponseMetrics{}, errors.Wrap(err, "failed to unmarshal recipe response")
 	}
 
-	return results, nil
+	return results, ResponseMetrics{
+		Model:            chat.Model,
+		PromptTokens:     chat.Usage.PromptTokens,
+		CompletionTokens: chat.Usage.CompletionTokens,
+		Latency:          metrics.Elapsed(start),
+	}, nil
 }
 
-func (a *AIClient) ExtractRecipeFromImageURLs(ctx context.Context, urls []string) (RecipeResponseSchema, error) {
+func (a *AIClient) ExtractRecipeFromImageURLs(ctx context.Context, urls []string) (RecipeResponseSchema, ResponseMetrics, error) {
 	schemaParam := openai.ResponseFormatJSONSchemaJSONSchemaParam{
 		Name:        "image_recipe_response",
 		Description: openai.String("A JSON object representing a recipe extracted from a URL."),
@@ -163,8 +157,8 @@ func (a *AIClient) ExtractRecipeFromImageURLs(ctx context.Context, urls []string
 
 	start := time.Now()
 	chat, err := a.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
-		Model:     openai.ChatModelGPT4oMini,
-		MaxTokens: openai.Int(1600),
+		Model:               openai.ChatModelGPT4oMini2024_07_18,
+		MaxCompletionTokens: openai.Int(1600),
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage("Retrieve the complete recipe from the following images, including ingredient lists, quantities, and step-by-step instructions, preserving all original formatting and text."),
 			openai.UserMessage(images),
@@ -177,28 +171,23 @@ func (a *AIClient) ExtractRecipeFromImageURLs(ctx context.Context, urls []string
 	})
 
 	if err != nil {
-		return RecipeResponseSchema{}, errors.Wrap(err, "unexpected error from OpenAI API")
+		return RecipeResponseSchema{}, ResponseMetrics{}, errors.Wrap(err, "unexpected error from OpenAI API")
 	}
 
-	log.Info().
-		Str("producer", "openai_image_import").
-		Interface("tokenUsage", TokenUsage{
-			PromptTokens:     chat.Usage.PromptTokens,
-			CompletionTokens: chat.Usage.CompletionTokens,
-			TotalTokens:      chat.Usage.TotalTokens,
-		}).
-		Int64("latency", metrics.Elapsed(start)).
-		Msg("openai metadata")
-
 	if len(chat.Choices) == 0 {
-		return RecipeResponseSchema{}, errors.New("no choices returned from OpenAI API")
+		return RecipeResponseSchema{}, ResponseMetrics{}, errors.New("no choices returned from OpenAI API")
 	}
 
 	var results RecipeResponseSchema
 	err = json.Unmarshal([]byte(chat.Choices[0].Message.Content), &results)
 	if err != nil {
-		return RecipeResponseSchema{}, errors.Wrap(err, "failed to unmarshal recipe response")
+		return RecipeResponseSchema{}, ResponseMetrics{}, errors.Wrap(err, "failed to unmarshal recipe response")
 	}
 
-	return results, nil
+	return results, ResponseMetrics{
+		Model:            chat.Model,
+		PromptTokens:     chat.Usage.PromptTokens,
+		CompletionTokens: chat.Usage.CompletionTokens,
+		Latency:          metrics.Elapsed(start),
+	}, nil
 }

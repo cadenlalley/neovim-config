@@ -74,10 +74,17 @@ func (a *App) extractRecipeMeta(ctx context.Context, recipeID string) (*ai.Recip
 		return nil, err
 	}
 
-	result, err := a.aiClient.ExtractRecipeMetaFromText(ctx, string(recipeJSON))
+	result, metrics, err := a.aiClient.ExtractRecipeMetaFromText(ctx, string(recipeJSON))
 	if err != nil {
 		return nil, err
 	}
+
+	log.Info().
+		Str("producer", "ai_metadata").
+		Str("source", recipeID).
+		Str("method", "extractRecipeMeta").
+		Interface("metrics", metrics).
+		Msg("extracted recipe metadata")
 
 	// TODO: Temporary Backfill recipe metadata, only update if no data has been filled out.
 	// This should indicate that the frontend hasn't implemented difficulty, course, or class.

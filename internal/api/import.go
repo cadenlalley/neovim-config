@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/kitchens-io/kitchens-api/internal/ai"
 	"github.com/kitchens-io/kitchens-api/internal/extractor"
 	"github.com/kitchens-io/kitchens-api/internal/media"
 	"github.com/kitchens-io/kitchens-api/internal/web"
@@ -14,14 +15,21 @@ import (
 	"github.com/kitchens-io/kitchens-api/pkg/recipes"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"gopkg.in/guregu/null.v4"
 )
+
+type ImportResponse struct {
+	*recipes.Recipe
+	Metrics *ai.ResponseMetrics `json:"metrics,omitempty"`
+}
 
 type ImportURLRequest struct {
 	Source   string `json:"source"`
 	Features struct {
 		Groups bool `json:"groups"`
 	} `json:"features"`
+	Debug bool `json:"debug"`
 }
 
 func (a *App) ImportURL(c echo.Context) error {
@@ -42,10 +50,17 @@ func (a *App) ImportURL(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
 
-	res, err := a.aiClient.ExtractRecipeFromText(ctx, str)
+	res, metrics, err := a.aiClient.ExtractRecipeFromText(ctx, str)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
+
+	log.Info().
+		Str("producer", "ai_import").
+		Str("source", input.Source).
+		Str("method", "ImportURL").
+		Interface("metrics", metrics).
+		Msg("extracted recipe from URL")
 
 	data, err := json.Marshal(res)
 	if err != nil {
@@ -59,7 +74,13 @@ func (a *App) ImportURL(c echo.Context) error {
 	}
 	r.Source = null.NewString(input.Source, true)
 
-	return c.JSON(http.StatusOK, r)
+	var response ImportResponse
+	response.Recipe = &r
+	if input.Debug {
+		response.Metrics = &metrics
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
 
 type ImportImageRequest struct {
@@ -68,6 +89,8 @@ type ImportImageRequest struct {
 		Groups bool `form:"featureGroups"`
 	}
 	URLs string `form:"urls"`
+
+	Debug bool `form:"debug"`
 
 	// The following are manually checked in the handler based on the provided count.
 	// file_1, file_2, file_n...
@@ -131,10 +154,17 @@ func (a *App) ImportImage(c echo.Context) error {
 		}
 	}
 
-	res, err := a.aiClient.ExtractRecipeFromImageURLs(ctx, urls)
+	res, metrics, err := a.aiClient.ExtractRecipeFromImageURLs(ctx, urls)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
+
+	log.Info().
+		Str("producer", "ai_import").
+		Str("source", input.URLs).
+		Str("method", "ImportImage").
+		Interface("metrics", metrics).
+		Msg("extracted recipe from image")
 
 	data, err := json.Marshal(res)
 	if err != nil {
@@ -147,5 +177,11 @@ func (a *App) ImportImage(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not parse recipe from URL").SetInternal(err)
 	}
 
-	return c.JSON(http.StatusOK, r)
+	var response ImportResponse
+	response.Recipe = &r
+	if input.Debug {
+		response.Metrics = &metrics
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

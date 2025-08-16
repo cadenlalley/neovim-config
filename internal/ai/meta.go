@@ -6,9 +6,8 @@ import (
 	"time"
 
 	"github.com/kitchens-io/kitchens-api/internal/metrics"
-	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/v2"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
 
 var RecipeMetaResponseJSONSchema = GenerateSchema[RecipeMetaResponseSchema]()
@@ -32,7 +31,7 @@ type RecipeMetaStepIngredientsSchema struct {
 	IngredientIDs []int `json:"ingredientIds"`
 }
 
-func (a *AIClient) ExtractRecipeMetaFromText(ctx context.Context, text string) (RecipeMetaResponseSchema, error) {
+func (a *AIClient) ExtractRecipeMetaFromText(ctx context.Context, text string) (RecipeMetaResponseSchema, ResponseMetrics, error) {
 	schemaParam := openai.ResponseFormatJSONSchemaJSONSchemaParam{
 		Name:        "recipe_meta",
 		Description: openai.String("A JSON object representing tagging metadata for a recipe"),
@@ -42,8 +41,8 @@ func (a *AIClient) ExtractRecipeMetaFromText(ctx context.Context, text string) (
 
 	start := time.Now()
 	chat, err := a.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
-		Model:     openai.ChatModelGPT4oMini,
-		MaxTokens: openai.Int(1600),
+		Model:               openai.ChatModelGPT4oMini2024_07_18,
+		MaxCompletionTokens: openai.Int(1600),
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(`
 Your task is to parse the provided JSON recipe and extract metadata for it.
@@ -105,28 +104,23 @@ ingredientIds: []       // No ingredients actively used
 	})
 
 	if err != nil {
-		return RecipeMetaResponseSchema{}, errors.Wrap(err, "unexpected error from OpenAI API")
+		return RecipeMetaResponseSchema{}, ResponseMetrics{}, errors.Wrap(err, "unexpected error from OpenAI API")
 	}
 
-	log.Info().
-		Str("producer", "openai_text_import").
-		Interface("tokenUsage", TokenUsage{
-			PromptTokens:     chat.Usage.PromptTokens,
-			CompletionTokens: chat.Usage.CompletionTokens,
-			TotalTokens:      chat.Usage.TotalTokens,
-		}).
-		Int64("latency", metrics.Elapsed(start)).
-		Msg("openai metadata")
-
-	if chat.Choices == nil || len(chat.Choices) == 0 {
-		return RecipeMetaResponseSchema{}, errors.New("no choices returned from OpenAI API")
+	if chat.Choices == nil {
+		return RecipeMetaResponseSchema{}, ResponseMetrics{}, errors.New("no choices returned from OpenAI API")
 	}
 
 	var results RecipeMetaResponseSchema
 	err = json.Unmarshal([]byte(chat.Choices[0].Message.Content), &results)
 	if err != nil {
-		return RecipeMetaResponseSchema{}, errors.Wrap(err, "failed to unmarshal recipe response")
+		return RecipeMetaResponseSchema{}, ResponseMetrics{}, errors.Wrap(err, "failed to unmarshal recipe response")
 	}
 
-	return results, nil
+	return results, ResponseMetrics{
+		Model:            chat.Model,
+		PromptTokens:     chat.Usage.PromptTokens,
+		CompletionTokens: chat.Usage.CompletionTokens,
+		Latency:          metrics.Elapsed(start),
+	}, nil
 }
