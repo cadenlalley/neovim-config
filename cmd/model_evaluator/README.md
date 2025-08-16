@@ -22,7 +22,7 @@ The newer models (like gpt-5-nano) show significantly higher latency and cost wi
 
 ### Cost Efficiency:
 * Most Cost-Effective: `gpt-4o-mini-2024-07-18` ($0.0009 - $0.0013 per test)
-* Most Expensive: `gpt-5-nano-2025-08-07` ($0.0039 - $0.0072 per test)
+* Most Expensive: `gpt-4o-2024-11-20` ($0.0173 - $0.0219 per test)
 
 ## Evaluation Results
 
