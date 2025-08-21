@@ -10,8 +10,8 @@ local git = require("snacks.git")
 local gitbrowse = require("snacks.gitbrowse")
 local lazygit = require("snacks.lazygit")
 local flash = require("flash")
-local aerial = require("aerial")
 local harpoon = require("harpoon")
+local treesittercontext = require("treesitter-context")
 
 ----------------------
 -- misc
@@ -110,3 +110,9 @@ keymap.set("n", "<leader>ha", function() harpoon:list():add() end, { desc = "har
 keymap.set("n", "<leader>hl", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = "harpoon show list" })
 keymap.set("n", "<leader>h[", function() harpoon:list():prev() end, { desc = "harpoon previous mark" })
 keymap.set("n", "<leader>h]", function() harpoon:list():next() end, { desc = "harpoon next mark" })
+
+----------------------
+-- treesitter context
+----------------------
+
+keymap.set("n", "[c", treesittercontext.go_to_context, { desc = "go to context" })
