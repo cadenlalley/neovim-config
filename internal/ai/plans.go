@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/kitchens-io/kitchens-api/internal/metrics"
-	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/v2"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 )
@@ -50,7 +50,7 @@ func (a *AIClient) GeneratePlanGroceryList(ctx context.Context, planIngredientsM
 
 				QUANTITY PRESERVATION RULE: Keep each individual quantity EXACTLY as provided in the input.
 				- Input: 0.5 lbs ground beef → Output: 0.5 lbs ground beef (quantity preserved exactly)
-				- Input: 0.5 lbs ground beef → Output: 0.5 lbs ground beef (quantity preserved exactly) 
+				- Input: 0.5 lbs ground beef → Output: 0.5 lbs ground beef (quantity preserved exactly)
 				- Input: 0.5 lbs ground beef → Output: 0.5 lbs ground beef (quantity preserved exactly)
 				These should result in THREE separate items, each with quantity 0.5, NOT one item with quantity 1.5.
 
@@ -79,12 +79,12 @@ func (a *AIClient) GeneratePlanGroceryList(ctx context.Context, planIngredientsM
 				EXAMPLES OF CORRECT BEHAVIOR:
 				Input table with 3 rows of ground beef (0.5 lbs each):
 				| recipe1 | 123 | ground beef | 0.5 | lbs | meat |
-				| recipe2 | 124 | lean ground beef | 0.5 | pounds | meat |  
+				| recipe2 | 124 | lean ground beef | 0.5 | pounds | meat |
 				| recipe3 | 125 | 80/20 ground beef | 0.5 | lb | meat |
 
 				Correct Output: THREE separate items:
 				1. {"id": 0, "alikeId": 1, "recipeId": "recipe1", "name": "ground beef", "quantity": 0.5, "unit": "lbs", "category": "meat"}
-				2. {"id": 1, "alikeId": 1, "recipeId": "recipe2", "name": "ground beef", "quantity": 0.5, "unit": "lbs", "category": "meat"}  
+				2. {"id": 1, "alikeId": 1, "recipeId": "recipe2", "name": "ground beef", "quantity": 0.5, "unit": "lbs", "category": "meat"}
 				3. {"id": 2, "alikeId": 1, "recipeId": "recipe3", "name": "ground beef", "quantity": 0.5, "unit": "lbs", "category": "meat"}
 
 				WRONG Output: One aggregated item (DO NOT DO THIS):
