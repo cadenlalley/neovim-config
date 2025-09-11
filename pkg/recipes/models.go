@@ -196,7 +196,7 @@ type RecipeImage struct {
 }
 
 type RecipeIngredient struct {
-	RecipeID     string      `json:"-" db:"recipe_id"`
+	RecipeID     string      `json:"recipeId" db:"recipe_id"`
 	IngredientID int         `json:"ingredientId" db:"ingredient_id" validate:"required"`
 	Name         string      `json:"name" db:"ingredient_name" validate:"required"`
 	Quantity     null.Float  `json:"quantity" db:"quantity"`

@@ -116,7 +116,6 @@ ingredientIds: []       // No ingredients actively used
 			},
 		},
 	})
-
 	if err != nil {
 		return RecipeResponseSchema{}, ResponseMetrics{}, errors.Wrap(err, "unexpected error from OpenAI API")
 	}
@@ -169,7 +168,6 @@ func (a *AIClient) ExtractRecipeFromImageURLs(ctx context.Context, urls []string
 			},
 		},
 	})
-
 	if err != nil {
 		return RecipeResponseSchema{}, ResponseMetrics{}, errors.Wrap(err, "unexpected error from OpenAI API")
 	}

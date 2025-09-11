@@ -74,6 +74,10 @@ func Create(input CreateInput) *App {
 	}))
 	app.API.Use(mw.TimeoutWithConfig(mw.TimeoutConfig{
 		Timeout: 30 * time.Second,
+		Skipper: func(c echo.Context) bool {
+			// Skip timeout for grocery list generation route
+			return c.Request().Method == "GET" && c.Path() == "/v1/account/:account_id/plan/:id/groceries"
+		},
 	}))
 
 	// Health Handler
@@ -152,13 +156,19 @@ func Create(input CreateInput) *App {
 	// Uploads
 	v1.POST("/upload", app.Upload)
 
-	// Meal Planning
+	// Meal Planning & grocery list
 	v1.POST("/account/:account_id/plan", app.CreatePlan)
 	v1.GET("/account/:account_id/plan/:id", app.GetPlanByID)
 	v1.GET("/account/:account_id/plan/:start_date/:end_date", app.GetPlanByAccountIDAndDateRange)
 	v1.GET("/account/:account_id/plan", app.GetPlansByUserID)
 	v1.POST("/account/:account_id/plan/recipes/:id", app.AddRecipesToPlan)
 	v1.GET("/account/:account_id/plan/:id/recipes", app.GetFullRecipesByPlanID)
+	v1.GET("/account/:account_id/plan/:id/groceries", app.GetGroceryListByPlanID)
+	v1.POST("/account/:account_id/plan/:id/groceries", app.CreateGroceryListItem)
+	v1.DELETE("/account/:account_id/plan/:id/recipe/:recipe_id", app.RemoveRecipeFromPlan)
+	v1.DELETE("/account/:account_id/plan/:id/groceries/:item_id", app.DeleteGroceryListItem)
+	v1.PUT("/account/:account_id/plan/:id/groceries/:item_id", app.UpdateGroceryListItem)
+	v1.POST("/account/:account_id/plan/:id/groceries/:item_id/mark", app.UpdateGroceryListItemMark)
 
 	// Public
 	public := app.API.Group("/public")

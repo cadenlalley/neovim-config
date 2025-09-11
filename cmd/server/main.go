@@ -72,7 +72,6 @@ type AppConfig struct {
 }
 
 func main() {
-
 	// .env file is optional, so ignore the error returned from loading.
 	_ = godotenv.Load()
 

@@ -64,6 +64,7 @@ func GetTestRecipe() recipes.Recipe {
 		SourceDomain: null.String{},
 		Ingredients: []recipes.RecipeIngredient{
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 1,
 				Name:         "unsalted butter, cold",
 				Quantity:     null.FloatFrom(9.00),
@@ -71,6 +72,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie crust"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 2,
 				Name:         "all-purpose flour",
 				Quantity:     null.FloatFrom(1.25),
@@ -78,6 +80,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie crust"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 3,
 				Name:         "heavy cream",
 				Quantity:     null.FloatFrom(1.00),
@@ -85,6 +88,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 4,
 				Name:         "whole milk",
 				Quantity:     null.FloatFrom(0.5),
@@ -92,6 +96,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 5,
 				Name:         "large eggs plus 2 large yolks",
 				Quantity:     null.FloatFrom(3.00),
@@ -99,6 +104,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 6,
 				Name:         "vanilla extract",
 				Quantity:     null.FloatFrom(1.00),
@@ -106,6 +112,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 7,
 				Name:         "pumpkin puree",
 				Quantity:     null.FloatFrom(1.00),
@@ -113,6 +120,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 8,
 				Name:         "brown sugar",
 				Quantity:     null.FloatFrom(0.5),
@@ -120,6 +128,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 9,
 				Name:         "maple syrup",
 				Quantity:     null.FloatFrom(0.25),
@@ -127,6 +136,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 10,
 				Name:         "ground cinnamon",
 				Quantity:     null.FloatFrom(0.75),
@@ -134,6 +144,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 11,
 				Name:         "ground ginger",
 				Quantity:     null.FloatFrom(0.5),
@@ -141,6 +152,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 12,
 				Name:         "nutmeg",
 				Quantity:     null.FloatFrom(0.25),
@@ -148,6 +160,7 @@ func GetTestRecipe() recipes.Recipe {
 				Group:        null.StringFrom("Pie filling"),
 			},
 			{
+				RecipeID:     "rcp_2jbgfAMKOCnKrWQroRBkXPIRI6T",
 				IngredientID: 13,
 				Name:         "salt",
 				Quantity:     null.FloatFrom(0.75),

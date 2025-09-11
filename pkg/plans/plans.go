@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -91,6 +92,8 @@ func ListPlansByUserID(ctx context.Context, store Store, userID string) ([]Plan,
 		return nil, err
 	}
 
+	defer rows.Close()
+
 	var plans []Plan
 	for rows.Next() {
 		var plan Plan
@@ -138,6 +141,8 @@ func GetRecipesByPlanID(ctx context.Context, store Store, planID string) ([]Plan
 		return nil, err
 	}
 
+	defer rows.Close()
+
 	var recipes []PlanRecipe
 	for rows.Next() {
 		var recipe PlanRecipe
@@ -154,6 +159,7 @@ func GetRecipesByPlanID(ctx context.Context, store Store, planID string) ([]Plan
 func GetFullRecipesByPlanID(ctx context.Context, store Store, planID string) ([]FullPlanRecipe, error) {
 	query := `
 		SELECT 
+			mpr.meal_plan_recipe_id,
 			r.recipe_id, 
 			mpr.day_number, 
 			mp.start_date,
@@ -184,6 +190,8 @@ func GetFullRecipesByPlanID(ctx context.Context, store Store, planID string) ([]
 		return nil, err
 	}
 
+	defer rows.Close()
+
 	var fullRecipes []FullPlanRecipe
 	for rows.Next() {
 		var recipe FullPlanRecipe
@@ -203,6 +211,179 @@ func AddRecipesToPlan(ctx context.Context, store Store, planID string, recipeID 
 		VALUES (?, ?, ?, ?);
 	`
 	_, err := store.ExecContext(ctx, query, planID, recipeID, dayNumber, servingSize)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RemoveRecipeFromPlan(ctx context.Context, store Store, mealPlanRecipeID string) error {
+	query := `
+		DELETE FROM meal_plan_recipes WHERE meal_plan_recipe_id = ?
+	`
+
+	_, err := store.ExecContext(ctx, query, mealPlanRecipeID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetGroceryListByMealPlanID(ctx context.Context, store Store, planID string) (*GroceryList, error) {
+	query := `SELECT item_id, alike_id, recipe_id, name, quantity, unit, category, marked FROM meal_plan_grocery_list_items WHERE meal_plan_id = ?`
+
+	rows, err := store.QueryxContext(ctx, query, planID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	groceryListItems := &GroceryList{
+		GroceryItems: []GroceryListItem{},
+	}
+
+	hasRows := false
+	for rows.Next() {
+		hasRows = true
+		var item GroceryListItem
+
+		err := rows.Scan(
+			&item.ID,
+			&item.AlikeID,
+			&item.RecipeID,
+			&item.Name,
+			&item.Quantity,
+			&item.Unit,
+			&item.Category,
+			&item.IsMarked,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		groceryListItems.GroceryItems = append(groceryListItems.GroceryItems, item)
+	}
+
+	// If no rows found, return nil to trigger AI generation
+	if !hasRows {
+		return nil, nil
+	}
+
+	return groceryListItems, nil
+}
+
+func CreateGroceryList(ctx context.Context, store Store, planID string, groceryList GroceryList) error {
+	if len(groceryList.GroceryItems) == 0 {
+		return nil
+	}
+
+	builder := sq.
+		StatementBuilder.
+		PlaceholderFormat(sq.Question).
+		Insert("meal_plan_grocery_list_items").
+		Columns("meal_plan_id", "alike_id", "recipe_id", "name", "quantity", "unit", "category")
+
+	for _, groceryItem := range groceryList.GroceryItems {
+		builder = builder.Values(planID, groceryItem.AlikeID, groceryItem.RecipeID, groceryItem.Name, groceryItem.Quantity, groceryItem.Unit, groceryItem.Category)
+	}
+
+	sql, args, err := builder.ToSql()
+	if err != nil {
+		return err
+	}
+
+	_, err = store.ExecContext(ctx, sql, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteGroceryList(ctx context.Context, store Store, planID string) error {
+	query := `DELETE FROM meal_plan_grocery_list_items WHERE meal_plan_id = ? AND is_user_created = false`
+
+	_, err := store.ExecContext(ctx, query, planID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteGroceryListItem(ctx context.Context, store Store, planID string, itemID int) error {
+	query := `DELETE FROM meal_plan_grocery_list_items WHERE meal_plan_id = ? AND item_id = ?`
+
+	result, err := store.ExecContext(ctx, query, planID, itemID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrPlanNotFound
+	}
+
+	return nil
+}
+
+func UpdateGroceryListItemMark(ctx context.Context, store Store, planID string, itemID int) error {
+	query := `UPDATE meal_plan_grocery_list_items SET marked = NOT marked WHERE meal_plan_id = ? AND item_id = ?`
+
+	_, err := store.ExecContext(ctx, query, planID, itemID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateGroceryListItem(ctx context.Context, store Store, planID string, itemID int, name string, quantity float64, unit string, category string) error {
+	query := `UPDATE meal_plan_grocery_list_items SET name = ?, quantity = ?, unit = ?, category = ? WHERE meal_plan_id = ? AND item_id = ?`
+
+	_, err := store.ExecContext(ctx, query, name, quantity, unit, category, planID, itemID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CreateGroceryListItem(ctx context.Context, store Store, planID string, name string, quantity float64, unit string, category string) error {
+	query := `INSERT INTO meal_plan_grocery_list_items (meal_plan_id, recipe_id, name, quantity, unit, category, is_user_created, marked, alike_id) VALUES (?, '', ?, ?, ?, ?, true, false, 0)`
+
+	_, err := store.ExecContext(ctx, query, planID, name, quantity, unit, category)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetPlanGroceryListIsDirty(ctx context.Context, store Store, planID string) (bool, error) {
+	query := `SELECT grocery_list_is_dirty FROM meal_plans WHERE meal_plan_id = ?`
+
+	row := store.QueryRowxContext(ctx, query, planID)
+
+	var isDirty bool
+	err := row.Scan(&isDirty)
+	if err != nil {
+		return true, err
+	}
+
+	return isDirty, nil
+}
+
+func SetPlanGroceryListIsDirty(ctx context.Context, store Store, planID string, isDirty bool) error {
+	query := `UPDATE meal_plans SET grocery_list_is_dirty = ? WHERE meal_plan_id = ?`
+
+	_, err := store.ExecContext(ctx, query, isDirty, planID)
 	if err != nil {
 		return err
 	}
