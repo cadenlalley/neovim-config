@@ -319,6 +319,13 @@ func (a *App) GetGroceryListByPlanID(c echo.Context) error {
 		return c.JSON(http.StatusOK, aiGeneratedGroceryList)
 	}
 
+	categoryOrder, err := plans.GetCategoryOrderByPlanID(ctx, a.db, planID)
+	if err != nil {
+		return c.JSON(http.StatusOK, storedGroceryList)
+	}
+
+	storedGroceryList.CategoryOrder = categoryOrder
+
 	return c.JSON(http.StatusOK, storedGroceryList)
 }
 
@@ -510,4 +517,40 @@ func (a *App) CreateGroceryListItem(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusCreated)
+}
+
+type updateCategoryOrderRequest struct {
+	CategoryOrder []string `json:"categoryOrder"`
+}
+
+func (a *App) UpdateCategoryOrder(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	planID := c.Param("id")
+
+	var req updateCategoryOrderRequest
+	err := web.ValidateRequest(c, web.ContentTypeApplicationJSON, &req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+
+	err = plans.UpdateCategoryOrder(ctx, a.db, planID, req.CategoryOrder)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not update category order").SetInternal(err)
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (a *App) GetCategoryOrder(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	planID := c.Param("id")
+
+	categoryOrder, err := plans.GetCategoryOrderByPlanID(ctx, a.db, planID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "could not get category order").SetInternal(err)
+	}
+
+	return c.JSON(http.StatusOK, map[string][]string{"categoryOrder": categoryOrder})
 }

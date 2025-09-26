@@ -1,6 +1,9 @@
 package plans
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/segmentio/ksuid"
@@ -60,7 +63,40 @@ type GroceryListItem struct {
 }
 
 type GroceryList struct {
-	GroceryItems []GroceryListItem `json:"groceries"`
+	GroceryItems  []GroceryListItem `json:"groceries"`
+	CategoryOrder []string          `json:"categoryOrder,omitempty"`
+}
+
+type CategoryOrder []string
+
+func (co *CategoryOrder) Scan(value interface{}) error {
+	if value == nil {
+		*co = nil
+		return nil
+	}
+
+	switch v := value.(type) {
+	case []byte:
+		return json.Unmarshal(v, co)
+	case string:
+		return json.Unmarshal([]byte(v), co)
+	default:
+		return errors.New("cannot scan CategoryOrder")
+	}
+}
+
+func (co CategoryOrder) Value() (driver.Value, error) {
+	if co == nil {
+		return nil, nil
+	}
+	return json.Marshal(co)
+}
+
+type PlanCategoryOrder struct {
+	MealPlanID    string        `json:"mealPlanId" db:"meal_plan_id"`
+	CategoryOrder CategoryOrder `json:"categoryOrder" db:"category_order"`
+	CreatedAt     time.Time     `json:"createdAt" db:"created_at"`
+	UpdatedAt     time.Time     `json:"updatedAt" db:"updated_at"`
 }
 
 func CreatePlanID() string {

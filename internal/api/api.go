@@ -158,10 +158,8 @@ func Create(input CreateInput) *App {
 
 	// Meal Planning & grocery list
 	v1.POST("/account/:account_id/plan", app.CreatePlan)
-	v1.GET("/account/:account_id/plan/:id", app.GetPlanByID)
-	v1.GET("/account/:account_id/plan/:start_date/:end_date", app.GetPlanByAccountIDAndDateRange)
-	v1.GET("/account/:account_id/plan", app.GetPlansByUserID)
-	v1.POST("/account/:account_id/plan/recipes/:id", app.AddRecipesToPlan)
+	v1.GET("/account/:account_id/plan/:id/categories/order", app.GetCategoryOrder)
+	v1.PUT("/account/:account_id/plan/:id/categories/order", app.UpdateCategoryOrder)
 	v1.GET("/account/:account_id/plan/:id/recipes", app.GetFullRecipesByPlanID)
 	v1.GET("/account/:account_id/plan/:id/groceries", app.GetGroceryListByPlanID)
 	v1.POST("/account/:account_id/plan/:id/groceries", app.CreateGroceryListItem)
@@ -169,6 +167,10 @@ func Create(input CreateInput) *App {
 	v1.DELETE("/account/:account_id/plan/:id/groceries/:item_id", app.DeleteGroceryListItem)
 	v1.PUT("/account/:account_id/plan/:id/groceries/:item_id", app.UpdateGroceryListItem)
 	v1.POST("/account/:account_id/plan/:id/groceries/:item_id/mark", app.UpdateGroceryListItemMark)
+	v1.POST("/account/:account_id/plan/recipes/:id", app.AddRecipesToPlan)
+	v1.GET("/account/:account_id/plan/:id", app.GetPlanByID)
+	v1.GET("/account/:account_id/plan/:start_date/:end_date", app.GetPlanByAccountIDAndDateRange)
+	v1.GET("/account/:account_id/plan", app.GetPlansByUserID)
 
 	// Public
 	public := app.API.Group("/public")

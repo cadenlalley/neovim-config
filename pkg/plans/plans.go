@@ -390,3 +390,37 @@ func SetPlanGroceryListIsDirty(ctx context.Context, store Store, planID string, 
 
 	return nil
 }
+
+func GetCategoryOrderByPlanID(ctx context.Context, store Store, planID string) ([]string, error) {
+	query := `SELECT category_order FROM meal_plan_category_order WHERE meal_plan_id = ?`
+
+	row := store.QueryRowxContext(ctx, query, planID)
+
+	var categoryOrder CategoryOrder
+	err := row.Scan(&categoryOrder)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return []string{"produce", "dairy", "meat", "fish", "snacks", "canned_goods", "breads_and_bakery", "dry_and_baking_goods", "frozen", "uncategorized"}, nil
+		}
+		return nil, err
+	}
+
+	return []string(categoryOrder), nil
+}
+
+func UpdateCategoryOrder(ctx context.Context, store Store, planID string, categoryOrder []string) error {
+	categoryOrderType := CategoryOrder(categoryOrder)
+
+	insertQuery := `
+		INSERT INTO meal_plan_category_order (meal_plan_id, category_order)
+		VALUES (?, ?)
+		ON DUPLICATE KEY UPDATE category_order = VALUES(category_order), updated_at = CURRENT_TIMESTAMP
+	`
+
+	_, err := store.ExecContext(ctx, insertQuery, planID, categoryOrderType)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
