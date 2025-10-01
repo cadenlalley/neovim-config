@@ -8,6 +8,7 @@ return {
 	keymap = {
 		preset = "enter",
 		["<Enter>"] = { "select_and_accept", "fallback" },
+		["<Tab>"] = false,
 	},
 
     appearance = {
