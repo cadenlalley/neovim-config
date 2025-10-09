@@ -51,7 +51,7 @@ return {
 		explorer = { enabled = true, sources = { files = { hidden = true, } } },
 		indent = { enabled = true },
 		input = { enabled = true },
-		picker = { enabled = true, sources = { files = { hidden = true, ignored = true } }, hidden = true, ignored = true },
+		picker = { enabled = true, sources = { files = { hidden = true, ignored = true } }, hidden = true, ignored = true, exclude = { "vendor/**" } },
 		notifier = { enabled = true },
 		quickfile = { enabled = true },
 		scope = { enabled = true },
