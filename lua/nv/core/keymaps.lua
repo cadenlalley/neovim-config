@@ -23,8 +23,6 @@ keymap.set("n", "<Esc>", "<cmd>noh<cr>", { desc = "clear search" })
 -- buffer management
 ----------------------
 
-keymap.set("n", "<Tab>", "<cmd>bnext<cr>", { desc = "buffer next" })
-keymap.set("n", "<S-Tab>", "<cmd>bprev<cr>", { desc = "buffer prev" })
 keymap.set("n", "<leader>x", "<cmd>bdelete<cr>", { desc = "buffer delete" })
 keymap.set("n", "<leader>n", "<cmd>enew<cr>", { desc = "new buffer" })
 
