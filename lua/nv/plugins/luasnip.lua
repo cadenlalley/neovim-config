@@ -29,7 +29,7 @@ return {
 			s("fmterr", {
 				t("if err != nil {"),
 				t({ "", "\treturn fmt.Errorf(\"" }),
-				i(1, ""), -- cursor will jump here
+				i(1),
 				t({ " :%w\", err)", "", "}" }),
 			}),
 		})
