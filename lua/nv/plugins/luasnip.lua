@@ -30,7 +30,7 @@ return {
 				t("if err != nil {"),
 				t({ "", "\treturn fmt.Errorf(\"" }),
 				i(1),
-				t({ " :%w\", err)", "", "}" }),
+				t({ " :%w\", err)", "}" }),
 			}),
 		})
 	end,
