@@ -64,10 +64,12 @@ return {
 	},
 
 	config = function(_, opts)
-		local lspconfig = require('lspconfig')
-		for server, config in pairs(opts.servers) do
-			config.capabilities = require('blink.cmp').get_lsp_capabilities(config.capabilities)
-			lspconfig[server].setup(config)
+		local cmp = require('blink.cmp')
+		for server, server_opts in pairs(opts.servers) do
+			local config = vim.deepcopy(server_opts)
+			config.capabilities = cmp.get_lsp_capabilities(config.capabilities)
+			vim.lsp.config(server, config)
+			vim.lsp.enable(server)
 		end
 	end
 }
