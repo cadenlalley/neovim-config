@@ -60,6 +60,11 @@ return {
 			zls = {
 
 			},
+			eslint = {
+				on_attach = function(client, _)
+					client.server_capabilities.documentHighlightProvider = false
+				end
+			},
 		}
 	},
 
