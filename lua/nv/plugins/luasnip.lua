@@ -33,6 +33,14 @@ return {
 				t({ " :%w\", err)", "}" }),
 			}),
 		})
+
+		ls.add_snippets("go", {
+			s("sle", {
+				t("if err != nil {"),
+				t({ "", "\tslog.Error(\"" }),
+				i(1),
+				t({"\", \"err\", err.Error()"})
+			})
+		})
 	end,
 }
-

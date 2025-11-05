@@ -124,3 +124,10 @@ keymap.set("n", "<leader>0", function() harpoon:list():select(0) end, { desc = "
 ----------------------
 
 keymap.set("n", "[c", treesittercontext.go_to_context, { desc = "go to context" })
+
+----------------------
+-- codesnap
+----------------------
+
+keymap.set("x", "<leader>cc", "<cmd>CodeSnap<cr>", { desc = "Save selected code snapshot into clipboard" })
+keymap.set("x", "<leader>cs", "<cmd>CodeSnapSave<cr>", { desc = "Save selected code snapshot in ~/Pictures" })

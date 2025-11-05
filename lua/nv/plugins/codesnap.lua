@@ -1,1 +1,6 @@
-return { "mistricky/codesnap.nvim", build = "make build_generator" }
+return {
+	"mistricky/codesnap.nvim",
+	build = "make",
+	event = "VeryLazy",
+	cmd = { "CodeSnap", "CodeSnapSave" },
+}
