@@ -39,7 +39,8 @@ return {
 				t("if err != nil {"),
 				t({ "", "\tslog.Error(\"" }),
 				i(1),
-				t({"\", \"err\", err.Error()"})
+				t({ "\", \"err\", err.Error())" }),
+				t({ "", "}" })
 			})
 		})
 	end,
