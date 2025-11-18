@@ -5,7 +5,8 @@ return {
 		'folke/snacks.nvim',
 		'nvim-tree/nvim-web-devicons',
 	},
-	config = function()
-		require "octo".setup()
-	end
+	opts = {
+		picker = "snacks",
+		enable_builtin = true,
+	}
 }
