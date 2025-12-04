@@ -60,11 +60,23 @@ return {
 			zls = {
 
 			},
-			eslint = {
+			ts_ls = {
 				on_attach = function(client, _)
 					client.server_capabilities.documentHighlightProvider = false
 				end
 			},
+			rust_analyzer = {
+				on_attach = function(client, _)
+					client.server_capabilities.documentHighlightProvider = false
+				end
+			},
+			dockerls = {
+				on_attach = function(client, _)
+					client.server_capabilities.documentHighlightProvider = false
+				end,
+				filetypes = { 'dockerfile' },
+				root_markers = { 'Dockerfile', '.git', 'docker-compose.yml' },
+			}
 		}
 	},
 
