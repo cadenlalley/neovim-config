@@ -8,8 +8,6 @@ return {
 			cursor_color_insert_mode = color,
 			smear_insert_mode = true,
 			stiffness_insert_mode = 0.65,
-			trailing_stiffness_insert_mode = 0.6,
-			damping_insert_mode = 0.93,
 			max_length_insert_mode = 30,
 			distance_stop_animating_vertical_bar = 0.3,
 			gradient_exponent = 0,
@@ -17,7 +15,7 @@ return {
 			particle_spread = 1,
 			particles_per_second = 100,
 			particles_per_length = 50,
-			particle_max_lifetime = 1500,
+			particle_max_lifetime = 1000,
 		})
 	end,
 }
