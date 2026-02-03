@@ -12,6 +12,7 @@ local lazygit = require("snacks.lazygit")
 local flash = require("flash")
 local harpoon = require("harpoon")
 local treesittercontext = require("treesitter-context")
+local copilot = require("nv.core.copilot")
 
 ----------------------
 -- misc
@@ -93,6 +94,17 @@ keymap.set("n", "<leader>gr", picker.lsp_references, { desc = "lsp go to referen
 keymap.set("n", "<leader>lf", vim.diagnostic.open_float, { desc = "lsp open diagnostic" })
 keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "lsp code actions" })
 keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "lsp rename" })
+
+----------------------
+-- copilot
+----------------------
+
+keymap.set("n", "<leader>ct", copilot.toggle, { desc = "copilot toggle ghost text" })
+keymap.set("i", "<C-y>", 'copilot#Accept("\\<C-y>")', {
+	expr = true,
+	replace_keycodes = false,
+	desc = "copilot accept suggestion",
+})
 
 ----------------------
 -- flash
