@@ -90,6 +90,11 @@ return {
 				end,
 				filetypes = { 'dockerfile' },
 				root_markers = { 'Dockerfile', '.git', 'docker-compose.yml' },
+			},
+			pyright = {
+				on_attach = function(client, _)
+					client.server_capabilities.documentHighlightProvider = false
+				end,
 			}
 		}
 	},
