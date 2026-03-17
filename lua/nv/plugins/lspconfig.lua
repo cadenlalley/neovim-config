@@ -95,6 +95,13 @@ return {
 				on_attach = function(client, _)
 					client.server_capabilities.documentHighlightProvider = false
 				end,
+			},
+			postgres_lsp = {
+				on_attach = function(client, _)
+					client.server_capabilities.documentHighlightProvider = false
+				end,
+				cmd = { "postgres-language-server", "lsp-proxy" },
+				root_markers = { "postgres-language-server.jsonc", ".git" },
 			}
 		}
 	},
