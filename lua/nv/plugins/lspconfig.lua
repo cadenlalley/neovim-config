@@ -64,6 +64,17 @@ return {
 				on_attach = function(client, _)
 					client.server_capabilities.documentHighlightProvider = false
 				end,
+				init_options = {
+					plugins = {
+						{
+							name = "@vue/typescript-plugin",
+							-- For Mason users:
+							location = vim.fn.stdpath("data") ..
+								"/mason/packages/vue-language-server/node_modules/@vue/language-server",
+							languages = { "vue" },
+						},
+					},
+				},
 				filetypes = {
 					"javascript",
 					"javascriptreact",
@@ -71,8 +82,15 @@ return {
 					"typescript",
 					"typescriptreact",
 					"typescript.tsx",
+					"vue",
 				},
 				root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
+			},
+			vue_ls = {
+				on_attach = function(client, _)
+					client.server_capabilities.documentHighlightProvider = false
+				end,
+				-- No extra config needed; it manages HTML/CSS sections by default
 			},
 			eslint = {
 				on_attach = function(client, _)
