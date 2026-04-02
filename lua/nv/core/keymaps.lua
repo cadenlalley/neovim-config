@@ -125,9 +125,6 @@ keymap.set("n", "<S-C-u>", function() require("opencode").command("session.half.
 keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end,
 	{ desc = "Scroll opencode down" })
 
-keymap.set("n", "+", "<C-a>", { desc = "Increment under cursor", noremap = true })
-keymap.set("n", "-", "<C-x>", { desc = "Decrement under cursor", noremap = true })
-
 ----------------------
 -- flash
 ----------------------

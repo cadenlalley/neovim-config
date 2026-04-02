@@ -1,3 +1,5 @@
+local snacks = require("snacks")
+
 return {
 	"folke/snacks.nvim",
 	priority = 1000,
@@ -37,7 +39,7 @@ return {
 					title = "Git Status",
 					section = "terminal",
 					enabled = function()
-						return Snacks.git.get_root() ~= nil
+						return snacks.git.get_root() ~= nil
 					end,
 					cmd = "git status --short --branch --renames",
 					height = 5,

@@ -7,7 +7,18 @@ return {
 			lua_ls = {
 				on_attach = function(client, _)
 					client.server_capabilities.documentHighlightProvider = false
-				end
+				end,
+				settings = {
+					Lua = {
+						diagnostics = {
+							globals = { "vim" },
+						},
+						workspace = {
+							checkThirdParty = false,
+							library = vim.api.nvim_get_runtime_file("", true),
+						},
+					},
+				},
 			},
 			gopls = {
 				on_attach = function(client, _)
