@@ -143,3 +143,58 @@ keymap.set("n", "[c", treesittercontext.go_to_context, { desc = "go to context" 
 
 keymap.set("x", "<leader>cc", "<cmd>CodeSnap<cr>", { desc = "Save selected code snapshot into clipboard" })
 keymap.set("x", "<leader>cs", "<cmd>CodeSnapSave<cr>", { desc = "Save selected code snapshot in ~/Pictures" })
+
+----------------------
+-- tmux-aware navigation (fixes floating window edge detection)
+----------------------
+
+local function is_snacks_explorer_focused()
+	local ok, pickers = pcall(function()
+		return require("snacks.picker").get({ source = "explorer" })
+	end)
+	if not ok or not pickers then
+		return false
+	end
+	return vim.iter(pickers):any(function(p)
+		return p:is_focused()
+	end)
+end
+
+local function smart_tmux_navigate(direction)
+	local tmux_dir = { h = "L", j = "D", k = "U", l = "R" }
+
+	if is_snacks_explorer_focused() then
+		-- Explorer is a floating window so wincmd edge detection fails.
+		-- For left/up/down, go straight to tmux. For right, use wincmd to
+		-- reach the editor window.
+		if direction == "l" then
+			vim.cmd("wincmd l")
+		else
+			vim.fn.system("tmux select-pane -" .. tmux_dir[direction])
+		end
+		return
+	end
+
+	-- Normal vim-tmux-navigator behavior for regular windows
+	local nr = vim.fn.winnr()
+	vim.cmd("wincmd " .. direction)
+	if nr == vim.fn.winnr() then
+		vim.fn.system("tmux select-pane -" .. tmux_dir[direction])
+	end
+end
+
+keymap.set("n", "<C-h>", function() smart_tmux_navigate("h") end, { silent = true })
+keymap.set("n", "<C-j>", function() smart_tmux_navigate("j") end, { silent = true })
+keymap.set("n", "<C-k>", function() smart_tmux_navigate("k") end, { silent = true })
+keymap.set("n", "<C-l>", function() smart_tmux_navigate("l") end, { silent = true })
+
+-- terminal buffers (claudecode, lazygit, etc.) need terminal-mode mappings
+vim.api.nvim_create_autocmd("TermOpen", {
+	callback = function(ev)
+		local opts = { buffer = ev.buf, silent = true }
+		keymap.set("t", "<C-h>", "<cmd>TmuxNavigateLeft<cr>", opts)
+		keymap.set("t", "<C-j>", "<cmd>TmuxNavigateDown<cr>", opts)
+		keymap.set("t", "<C-k>", "<cmd>TmuxNavigateUp<cr>", opts)
+		keymap.set("t", "<C-l>", "<cmd>TmuxNavigateRight<cr>", opts)
+	end,
+})
