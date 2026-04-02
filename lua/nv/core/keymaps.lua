@@ -107,6 +107,28 @@ keymap.set("i", "<C-y>", 'copilot#Accept("\\<C-y>")', {
 })
 
 ----------------------
+-- opencode
+----------------------
+
+keymap.set({ "n", "x" }, "<C-a>", function() require("opencode").ask("@this: ", { submit = true }) end,
+	{ desc = "Ask opencode…" })
+keymap.set({ "n", "x" }, "<C-x>", function() require("opencode").select() end, { desc = "Execute opencode action…" })
+keymap.set({ "n", "t" }, "<C-i>", function() require("opencode").toggle() end, { desc = "Toggle opencode" })
+
+keymap.set({ "n", "x" }, "go", function() return require("opencode").operator("@this ") end,
+	{ desc = "Add range to opencode", expr = true })
+keymap.set("n", "goo", function() return require("opencode").operator("@this ") .. "_" end,
+	{ desc = "Add line to opencode", expr = true })
+
+keymap.set("n", "<S-C-u>", function() require("opencode").command("session.half.page.up") end,
+	{ desc = "Scroll opencode up" })
+keymap.set("n", "<S-C-d>", function() require("opencode").command("session.half.page.down") end,
+	{ desc = "Scroll opencode down" })
+
+keymap.set("n", "+", "<C-a>", { desc = "Increment under cursor", noremap = true })
+keymap.set("n", "-", "<C-x>", { desc = "Decrement under cursor", noremap = true })
+
+----------------------
 -- flash
 ----------------------
 
