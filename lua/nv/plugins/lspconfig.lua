@@ -124,6 +124,23 @@ return {
 				on_attach = function(client, _)
 					client.server_capabilities.documentHighlightProvider = false
 				end,
+				settings = {
+					python = {
+						analysis = {
+							typeCheckingMode = "basic",
+							autoSearchPaths = true,
+							useLibraryCodeForTypes = true,
+							diagnosticMode = "workspace",
+						},
+					},
+				},
+			},
+			ruff = {
+				on_attach = function(client, _)
+					client.server_capabilities.documentHighlightProvider = false
+					-- Disable hover in favor of pyright's richer hover
+					client.server_capabilities.hoverProvider = false
+				end,
 			},
 			postgres_lsp = {
 				on_attach = function(client, _)

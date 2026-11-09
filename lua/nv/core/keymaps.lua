@@ -161,6 +161,11 @@ local function is_snacks_explorer_focused()
 end
 
 local function smart_tmux_navigate(direction)
+	if vim.env.HERDR_PANE_ID then
+		vim.cmd("wincmd " .. direction)
+		return
+	end
+
 	local tmux_dir = { h = "L", j = "D", k = "U", l = "R" }
 
 	if is_snacks_explorer_focused() then
@@ -183,18 +188,6 @@ local function smart_tmux_navigate(direction)
 	end
 end
 
-keymap.set("n", "<C-h>", function() smart_tmux_navigate("h") end, { silent = true })
-keymap.set("n", "<C-j>", function() smart_tmux_navigate("j") end, { silent = true })
-keymap.set("n", "<C-k>", function() smart_tmux_navigate("k") end, { silent = true })
-keymap.set("n", "<C-l>", function() smart_tmux_navigate("l") end, { silent = true })
-
--- terminal buffers (claudecode, lazygit, etc.) need terminal-mode mappings
-vim.api.nvim_create_autocmd("TermOpen", {
-	callback = function(ev)
-		local opts = { buffer = ev.buf, silent = true }
-		keymap.set("t", "<C-h>", "<cmd>TmuxNavigateLeft<cr>", opts)
-		keymap.set("t", "<C-j>", "<cmd>TmuxNavigateDown<cr>", opts)
-		keymap.set("t", "<C-k>", "<cmd>TmuxNavigateUp<cr>", opts)
-		keymap.set("t", "<C-l>", "<cmd>TmuxNavigateRight<cr>", opts)
-	end,
-})
+for _, dir in ipairs({ "h", "j", "k", "l" }) do
+	keymap.set({ "n", "t" }, "<C-" .. dir .. ">", function() smart_tmux_navigate(dir) end, { silent = true })
+end
