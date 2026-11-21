@@ -1,5 +1,7 @@
 local snacks = require("snacks")
 
+vim.env.PUPPETEER_EXECUTABLE_PATH = vim.env.PUPPETEER_EXECUTABLE_PATH or "/usr/bin/google-chrome-stable"
+
 return {
 	"folke/snacks.nvim",
 	priority = 1000,
@@ -61,7 +63,7 @@ return {
 		statuscolumn = { enabled = true },
 		words = { enabled = true },
 		terminal = { enabled = true },
-		mage = { enabled = true },
+		image = { enabled = true },
 		gitbrowse = { enabled = true },
 		git = { enabled = true },
 		lazygit = { enabled = true },
