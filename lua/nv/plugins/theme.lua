@@ -1,9 +1,10 @@
 return {
-	"olimorris/onedarkpro.nvim",
+	"neanias/everforest-nvim",
+	version = false,
+	lazy = false,
 	priority = 1000,
-	opts = {},
 	config = function()
-		require('onedarkpro').setup({})
-		vim.cmd("colorscheme onedark_vivid")
+		require("everforest").setup({ background = "hard" })
+		vim.cmd("colorscheme everforest")
 	end
 }
